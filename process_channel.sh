@@ -28,8 +28,14 @@ if [ -d ".venv" ]; then
     fi
 fi
 
+# Determine which python command to use
+PYTHON_CMD="python3"
+if command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+fi
+
 # Run python script in background using nohup
-nohup python process_channel.py "$CHANNEL_URL" --max 0 > channel_process.log 2>&1 &
+nohup $PYTHON_CMD process_channel.py "$CHANNEL_URL" --max 0 > channel_process.log 2>&1 &
 
 echo "✅ Process started in background! PID is $!"
 echo "👉 You can now safely close this terminal."
