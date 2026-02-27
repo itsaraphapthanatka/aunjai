@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nong Unjai | MAAC Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-primary: #00f2ff;
+            --accent-secondary: #7000ff;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a0;
+            --glass-blur: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Abstract Background Elements */
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .glow-1 {
+            top: -200px;
+            left: -200px;
+            background: var(--accent-primary);
+        }
+
+        .glow-2 {
+            bottom: -200px;
+            right: -200px;
+            background: var(--accent-secondary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sidebar Like Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            backdrop-filter: blur(var(--glass-blur));
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text-main);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(var(--glass-blur));
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 242, 255, 0.3);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            color: var(--accent-primary);
+            background: rgba(0, 242, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Main Content Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(var(--glass-blur));
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            color: var(--text-dim);
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        td {
+            padding: 1rem;
+            font-size: 0.9375rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-auth {
+            background: rgba(0, 242, 255, 0.15);
+            color: var(--accent-primary);
+        }
+
+        .status-follow {
+            background: rgba(112, 0, 255, 0.15);
+            color: #b780ff;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .tag-badge {
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        .tag-type-default {
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+        }
+
+        .tag-type-gold {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .tag-type-emerald {
+            background: rgba(52, 211, 153, 0.2);
+            color: #34d399;
+        }
+
+        .tag-type-rose {
+            background: rgba(244, 63, 94, 0.2);
+            color: #fb7185;
+        }
+
+        .tag-badge:hover {
+            filter: brightness(1.2);
+            transform: scale(1.05);
+        }
+
+        select,
+        option {
+            background-color: #111 !important;
+            color: #fff !important;
+            border: 1px solid var(--card-border);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .pagination-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-dim);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+        }
+
+        .pagination-btn.wide {
+            width: auto;
+            padding: 0 1rem;
+        }
+
+        .pagination-btn:hover:not(:disabled),
+        .pagination-btn.active {
+            background: var(--accent-primary);
+            color: var(--bg-color);
+            border-color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .dots {
+            color: var(--text-dim);
+            padding: 0 0.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <div class="container">
+        <nav>
+            <div class="logo">
+                <i data-lucide="shield-check"></i>
+                Nong Unjai Admin
+            </div>
+            <div class="nav-links">
+                <a class="nav-link active" onclick="switchTab('dashboard')">Dashboard</a>
+                <a class="nav-link" onclick="switchTab('contacts')">Contacts</a>
+                <a class="nav-link" onclick="switchTab('campaigns')">Campaigns</a>
+            </div>
+            <button class="btn" onclick="triggerSync()">
+                <i data-lucide="refresh-cw"></i>
+                Sync Data
+            </button>
+        </nav>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboardView">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <i data-lucide="users" class="stat-icon"></i>
+                    </div>
+                    <div class="stat-value" id="totalContacts">0</div>
+                    <div class="stat-label">Total Sync Contacts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <i data-lucide="mouse-pointer-2" class="stat-icon"></i>
+                    </div>
+                    <div class="stat-value" id="totalClicks">0</div>
+                    <div class="stat-label">Total Message Clicks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <i data-lucide="trending-up" class="stat-icon"></i>
+                    </div>
+                    <div class="stat-value" id="conversionRate">0%</div>
+                    <div class="stat-label">CTR (Average)</div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="panel">
+                    <h2><i data-lucide="activity"></i> Performance Trends</h2>
+                    <canvas id="performanceChart" height="250"></canvas>
+                </div>
+
+                <div class="panel">
+                    <h2><i data-lucide="user-plus"></i> Latest Contacts</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Synced</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contactTableBodyShort">
+                                <!-- Rows will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACTS VIEW -->
+        <div id="contactsView" style="display: none;">
+            <div class="panel">
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;">
+                    <h2><i data-lucide="users"></i> Advanced Contact Directory</h2>
+                    <div style="flex: 1; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                        <input type="text" placeholder="Search contacts..." id="contactSearch" oninput="debounceFetch()"
+                            style="background: var(--card-bg); border: 1px solid var(--card-border); color: white; padding: 0.5rem 1rem; border-radius: 8px; width: 250px;">
+
+                        <select id="statusFilter" onchange="resetAndFetch()"
+                            style="padding: 0.5rem 1rem; border-radius: 8px;">
+                            <option value="">All Status</option>
+                            <option value="follow">Follow</option>
+                            <option value="auth">Auth</option>
+                            <option value="unfollow">Unfollow</option>
+                        </select>
+
+                        <select id="tagFilter" onchange="resetAndFetch()"
+                            style="padding: 0.5rem 1rem; border-radius: 8px; max-width: 150px;">
+                            <option value="">All Tags</option>
+                            <!-- Tags will be populated here -->
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>LINE UID</th>
+                                <th>Display Name</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Tags</th>
+                                <th>Status</th>
+                                <th>Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contactTableBodyFull">
+                        </tbody>
+                    </table>
+                </div>
+                <!-- PAGINATION CONTROLS -->
+                <div class="pagination" id="paginationControls">
+                    <!-- Numbers will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- CAMPAIGNS VIEW -->
+        <div id="campaignsView" style="display: none;">
+            <div class="panel">
+                <h2><i data-lucide="megaphone"></i> Campaign Performance History</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Campaign Name</th>
+                                <th>Opens</th>
+                                <th>Clicks</th>
+                                <th>CTR</th>
+                                <th>Revenue</th>
+                                <th>Last Sync</th>
+                            </tr>
+                        </thead>
+                        <tbody id="campaignTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div id="settingsView" style="display: none;">
+            <div class="panel">
+                <h2><i data-lucide="settings"></i> System Settings</h2>
+                <div style="padding: 2rem; color: var(--text-dim); text-align: center;">
+                    <i data-lucide="shield-check"
+                        style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>API Authentication & Webhook verification are currently managed via .env configuration.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Global Charts
+        let performanceChart;
+        let currentTab = 'dashboard';
+
+        // Search & Filter State
+        let contactPage = 1;
+        let contactLimit = 50;
+        let contactTotal = 0;
+        let debounceTimer;
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+
+            // Find the link by text to be more robust
+            const links = document.querySelectorAll('.nav-link');
+            links.forEach(l => {
+                if (l.innerText.toLowerCase() === tab) l.classList.add('active');
+            });
+
+            document.getElementById('dashboardView').style.display = tab === 'dashboard' ? 'block' : 'none';
+            document.getElementById('contactsView').style.display = tab === 'contacts' ? 'block' : 'none';
+            document.getElementById('campaignsView').style.display = tab === 'campaigns' ? 'block' : 'none';
+            document.getElementById('settingsView').style.display = tab === 'settings' ? 'block' : 'none';
+
+            initDashboard();
+        }
+
+        async function initDashboard() {
+            if (currentTab === 'dashboard') {
+                await fetchStats();
+                await fetchContacts(10, false);
+            } else if (currentTab === 'contacts') {
+                await fetchTags();
+                await fetchContacts(contactLimit, true, contactPage);
+            } else if (currentTab === 'campaigns') {
+                await fetchCampaigns();
+            }
+        }
+
+        function filterByTag(tagName) {
+            document.getElementById('tagFilter').value = tagName;
+            resetAndFetch();
+        }
+
+        async function fetchTags() {
+            const select = document.getElementById('tagFilter');
+            if (select.children.length > 1) return; // Already populated
+            try {
+                const response = await fetch('/api/tags');
+                const tags = await response.json();
+                tags.forEach(tag => {
+                    const opt = document.createElement('option');
+                    opt.value = tag;
+                    opt.innerText = tag;
+                    opt.style.background = "#111";
+                    select.appendChild(opt);
+                });
+            } catch (e) { console.error("Error fetching tags", e); }
+        }
+
+        function debounceFetch() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                resetAndFetch();
+            }, 500);
+        }
+
+        function resetAndFetch() {
+            contactPage = 1;
+            initDashboard();
+        }
+
+        function changePage(deltaOrPage) {
+            const totalPages = Math.ceil(contactTotal / contactLimit);
+            let newPage = typeof deltaOrPage === 'number' && Math.abs(deltaOrPage) === 1
+                ? contactPage + deltaOrPage
+                : deltaOrPage;
+
+            if (newPage >= 1 && newPage <= totalPages) {
+                contactPage = newPage;
+                initDashboard();
+            }
+        }
+
+        function getTagClass(tagName) {
+            // Logic to color tags by type/content
+            const low = tagName.toLowerCase();
+            if (low.includes('vip') || low.includes('gold')) return 'tag-type-gold';
+            if (low.includes('member') || low.includes('new')) return 'tag-type-emerald';
+            if (low.includes('churn') || low.includes('error')) return 'tag-type-rose';
+            return 'tag-type-default';
+        }
+
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/performance');
+                const data = await response.json();
+
+                if (data.length > 0) {
+                    const latest = data[0];
+                    document.getElementById('totalClicks').innerText = data.reduce((acc, curr) => acc + curr.clicks, 0).toLocaleString();
+
+                    const totalTransactions = data.reduce((acc, curr) => acc + curr.transactions, 0);
+                    document.getElementById('conversionRate').innerText = ((totalTransactions / (latest.clicks || 1)) * 10).toFixed(1) + '%';
+
+                    renderChart(data);
+                }
+            } catch (e) { console.error("Error fetching performance stats", e); }
+        }
+
+        async function fetchContacts(limit = 10, isFull = false, page = 1) {
+            try {
+                let url = `/api/contacts?limit=${limit}&offset=${(page - 1) * limit}`;
+                if (isFull) {
+                    const status = document.getElementById('statusFilter').value;
+                    const tag = document.getElementById('tagFilter').value;
+                    const search = document.getElementById('contactSearch').value;
+                    if (status) url += `&status=${status}`;
+                    if (tag) url += `&tag=${encodeURIComponent(tag)}`;
+                    if (search) url += `&search=${encodeURIComponent(search)}`;
+                }
+
+                const response = await fetch(url);
+                const result = await response.json();
+                const data = result.contacts || [];
+
+                if (!isFull) {
+                    document.getElementById('totalContacts').innerText = result.total.toLocaleString();
+                    const tableBody = document.getElementById('contactTableBodyShort');
+                    tableBody.innerHTML = '';
+                    data.slice(0, 10).forEach(contact => {
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${contact.display_name || contact.line_display_name || 'User'}</td>
+                                <td>${contact.email || '-'}</td>
+                                <td><span class="status-badge status-${contact.status}">${contact.status}</span></td>
+                                <td style="color: var(--text-dim); font-size: 0.8rem;">${new Date(contact.last_synced_at).toLocaleDateString()}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    contactTotal = result.total;
+                    const tableBody = document.getElementById('contactTableBodyFull');
+                    tableBody.innerHTML = '';
+                    data.forEach(contact => {
+                        const tagsHtml = (contact.tags || []).map(tagName => {
+                            const detail = (contact.tags_detail || []).find(d => d.name === tagName);
+                            const tooltip = detail ? `Tagged at: ${new Date(detail.tagged_at).toLocaleString()}` : '';
+                            const colorClass = getTagClass(tagName);
+                            return `<span class="tag-badge ${colorClass}" title="${tooltip}" onclick="filterByTag('${tagName}')">${tagName}</span>`;
+                        }).join(' ');
+
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td style="font-family: monospace; font-size: 0.75rem; color: var(--accent-primary)">${contact.line_uid}</td>
+                                <td>${contact.display_name || contact.line_display_name || '-'}</td>
+                                <td>${contact.email || '-'}</td>
+                                <td>${contact.mobile || '-'}</td>
+                                <td style="max-width: 300px; display: flex; flex-wrap: wrap; gap: 4px;">${tagsHtml || '-'}</td>
+                                <td><span class="status-badge status-${contact.status}">${contact.status}</span></td>
+                                <td style="color: var(--text-dim); font-size: 0.8rem;">${new Date(contact.updated_at).toLocaleString()}</td>
+                            </tr>
+                        `;
+                    });
+
+                    // Update Pagination UI
+                    const totalPages = Math.ceil(contactTotal / contactLimit);
+                    const pagination = document.getElementById('paginationControls');
+                    pagination.innerHTML = '';
+
+                    // Previous Button
+                    pagination.innerHTML += `<button class="pagination-btn wide" onclick="changePage(-1)" ${contactPage === 1 ? 'disabled' : ''}>Prev</button>`;
+
+                    // Logic for showing page numbers with ellipsis
+                    let pages = [];
+                    if (totalPages <= 7) {
+                        for (let i = 1; i <= totalPages; i++) pages.push(i);
+                    } else {
+                        if (contactPage <= 4) pages = [1, 2, 3, 4, 5, '...', totalPages];
+                        else if (contactPage > totalPages - 4) pages = [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+                        else pages = [1, '...', contactPage - 1, contactPage, contactPage + 1, '...', totalPages];
+                    }
+
+                    pages.forEach(p => {
+                        if (p === '...') {
+                            pagination.innerHTML += `<span class="dots">...</span>`;
+                        } else {
+                            pagination.innerHTML += `<button class="pagination-btn ${p === contactPage ? 'active' : ''}" onclick="changePage(${p})">${p}</button>`;
+                        }
+                    });
+
+                    // Next Button
+                    pagination.innerHTML += `<button class="pagination-btn wide" onclick="changePage(1)" ${contactPage === totalPages ? 'disabled' : ''}>Next</button>`;
+
+                    lucide.createIcons();
+                }
+            } catch (e) { console.error("Error fetching contacts", e); }
+        }
+
+        async function fetchCampaigns() {
+            try {
+                const response = await fetch('/api/performance'); // Assuming /api/performance also returns campaign-like data for now
+                const data = await response.json();
+                const tableBody = document.getElementById('campaignTableBody');
+                tableBody.innerHTML = '';
+
+                data.forEach(camp => {
+                    const ctr = camp.opens > 0 ? ((camp.clicks / camp.opens) * 100).toFixed(1) : 0; // Corrected CTR calculation
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 600;">${camp.event_name}</td>
+                            <td>${camp.opens.toLocaleString()}</td>
+                            <td>${camp.clicks.toLocaleString()}</td>
+                            <td style="color: var(--accent-primary)">${ctr}%</td>
+                            <td style="color: #4ade80">$${parseFloat(camp.transaction_revenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            <td style="color: var(--text-dim); font-size: 0.8rem;">${new Date(camp.updated_at || camp.last_synced_at).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                });
+            } catch (e) { console.error("Error fetching campaigns", e); }
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const labels = data.map(d => d.event_name).reverse();
+            const clicks = data.map(d => d.clicks).reverse();
+            const transactions = data.map(d => d.transactions).reverse();
+
+            if (performanceChart) performanceChart.destroy();
+
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Clicks',
+                            data: clicks,
+                            borderColor: '#00f2ff',
+                            backgroundColor: 'rgba(0, 242, 255, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Transactions',
+                            data: transactions,
+                            borderColor: '#7000ff',
+                            backgroundColor: 'rgba(112, 0, 255, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: '#a0a0a0' } }
+                    },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a0a0a0' } },
+                        x: { grid: { display: false }, ticks: { color: '#a0a0a0' } }
+                    }
+                }
+            });
+        }
+
+        async function triggerSync() {
+            const btn = document.querySelector('.btn');
+            btn.style.opacity = '0.5';
+            btn.innerText = 'Syncing...';
+
+            try {
+                await fetch('/sync/contacts', { method: 'POST' });
+                alert('Contact sync started in background!');
+                setTimeout(initDashboard, 2000);
+            } catch (e) {
+                alert('Sync failed');
+            } finally {
+                btn.style.opacity = '1';
+                btn.innerHTML = '<i data-lucide="refresh-cw"></i> Sync Data';
+                lucide.createIcons();
+            }
+        }
+
+        // Run Init
+        initDashboard();
+        // Refresh every 30s
+        setInterval(initDashboard, 30000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,3775 @@
+FORMAT: 1A
+
+# MAAC OpenAPI
+This is a technical document. For marketing or customer service colleagues, please refer to [operating manual](https://pse.is/3r8rd6).<br>
+If you have any questions, please contact [customer-supoort@cresclab.com](mailto:customer-supoort@cresclab.com).<br><br>
+
+查看中文版文件請至 [MAAC Open API](https://cresclab.docs.apiary.io/)<br>
+
+## Purpose
+---
+Use MAAC's official account to connect with MAAC OpenAPI to access contact information, add tags, add audiences, push messages and other functions.
+It can be connected to third-party platforms to marketing automation and CRM data connection.
+
+## Considerations
+
+- Do not use `http` when connecting with API, please use `https` to avoid insecure data transmission.
+- In a production environment, please use `https://api.cresclab.com`, and the connection must be Server-to-server data connection.
+- If you are using MAAC in the Japan region, please use `https://api.jp.cresclab.com`
+
+## API Description
+---
+### Format
+MAAC OpenAPI uses REST API format, JSON format, and UTF-8 encoding.
+
+### Request header
+Bring the Authorization parameter in the HTTP header to call MAAC OpenAPI
+| Request header | Description |
+| :-- | :-- |
+|Authorization| Bearer `{Access token}` |
+
+<a name="rate_limits"></a>
+### Rate limits
+
+#### MAAC Rate limit
+MAAC server applies the following rate limits for each endpoint based on official accounts.
+The detailed API limits are listed in the table below.
+| API                                      | rate limiting |
+| :--------------------------------------- | :------------ |
+| import contacts                          | 15/m          |
+| send push message                        | 170/s         |
+| send multicast message                   | 10/s          |
+| send enhanced multicast                  | 170/s         |
+| send SMS+ message                        | 170/s         |
+| send multicast SMS+ message              | 10/s          |
+
+<a name="line_rate_limits"></a>
+#### Line Rate limit
+Line server applies the following rate limits for each endpoint based on official accounts.
+These API calls are counted toward the total usage across all purposes, including MAAC products (such as broadcasts) and other integrations.
+The detailed API limits are listed in the table below.
+| API                                      | rate limiting |
+| :--------------------------------------- | :------------ |
+| send push message                        | 2000/s        |
+| send multicast message                   | 200/s        |
+
+
+### status codes
+| code | description                                                                                                                                                                                                                |
+| :--- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|200| `OK` - Request successful (The response status code is 201 when part of the resource creation API request is successful)                                                                                                   |
+|201| `Created` - The request has been fulfilled and has resulted in one or more new resources being created.                                                                                                                    |
+|204| `No Content` - The server has successfully fulfilled the request and that there is no additional content to send in the response payload body.                                                                             |
+|400| `Bad Request` - The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing). |
+|401| `Unauthorized` - The request has not been applied because it lacks valid authentication credentials for the target resource.                                                                                               |
+|403| `Forbidden` - the server understood the request but refuses to authorize it.                                                                                                                                               |
+|404| `Not Found` - The origin server did not find a current representation for the target resource or is not willing to disclose that one exists.                                                                               |
+|405| `Method Not Allowed` - The method received in the request-line is known by the origin server but not supported by the target resource.                                                                                     |
+|429| `Too Many Requests` - Possible reasons for this error include exceeding [the rate limit](#rate_limits) for each bot, or the system experiencing high traffic during peak hours. We recommend trying again after a few seconds, and extending the interval between each request to reduce the request frequency and help the system handle your requests more efficiently. |
+
+## Webhook
+
+---
+
+### Overview
+
+When the relevant events you subscribe to occur, MAAC will actively notify your system through Webhooks to achieve real-time synchronization of information.
+
+### Webhook Headers
+
+- `CrescLab-Idempotency-Key` to identify unique webhooks.
+- `CrescLab-Signature` to verify the events were sent by MAAC.
+
+### Considerations
+
+- We recommend processing events asynchronously, so that processing an HTTP POST request doesn't cause delays in processing subsequent requests.
+- Your server may receive malicious HTTP POST requests that weren't sent from the MAAC Platform.
+Don't process any webhook event objects until you have verified their signatures.
+- You need to ensure the stability of your own connection and flow control. We provide retry services but do not help save all log records.
+
+### Response
+
+Your server must return [status code 200](https://developer.mozilla.org/zh-TW/docs/Web/HTTP/Status/200) after it receives the HTTP POST request sent from the MAAC Platform.
+
+### Retry policy
+
+If a webhook POST to a server receives the following responses indicate transient problems will retry:
+
+- HTTP 408, 429, and 5xx response codes.
+- Socket timeouts and TCP disconnects.
+
+We perform retry requests with an exponential backoff algorithm by increasing the waiting time between retries up to a maximum backoff time.
+MAAC will retry as following steps:
+
+1. Make a request to Webhook endpoint .
+2. If the request fails, wait 1 second and retry the request.
+3. If the request fails, wait 2 seconds and retry the request.
+4. If the request fails, wait 4 seconds and retry the request.
+
+You can detect duplicate webhook events by comparing the `CrescLab-Idempotency-Key` header to previous events.
+
+### Check the webhook signatures
+
+MAAC signs the webhook events using HMAC-SHA256 and hex digest encoding by including a signature in each event's `CrescLab-Signature` header.
+This allows you to verify that the events were sent by MAAC, not by a third party.
+We provide the following Python snippet as a reference implementation.
+
+Before you can verify signatures, you need to retrieve your endpoint's secret from your [Dashboard's Webhooks settings](https://maac.cresclab.com/webhooks).
+MAAC generates a unique secret key for each endpoint. Select an endpoint that you want to obtain the secret for, then click the eye icon button to reveal the secret.
+
+The following is an example of how to implement signature validation in Python®.
+
+```python
+import hashlib
+import hmac
+
+# Please use row string `r"..."` to present body.
+# if you don't use raw string, you need to escape the backslash to present unicode. E.g: do not use `\u65b0`, instead, use escape `\\u65b0`
+# In json string, please keep the space after comma and colon. E.g: do not remove spaces {"a":1,"b":2}, instead, keep spaces {"a": 1,"b": 2}
+
+share_secret = "..."  # share secret string
+header_signature = "..."  # CrescLab-Signature in request header
+body = r"..."  # Request body string (python's raw string)
+signature = hmac.new(
+    share_secret.encode("utf-8"), body.encode("utf-8"), hashlib.sha256
+).hexdigest()
+assert hmac.compare_digest(signature, header_signature)
+```
+
+## FAQ
+---
+> #### How to enable OpenAPI?
+> If you have activated MAAC but not yet enabled OpenAPI, please contact [Customer support](mailto:customer-supoort@cresclab.com)
+
+> #### How to get Access token?
+> If you have activated MAAC and enabled OpenAPI, you can generate an Access token in [MAAC](https://maac.cresclab.com) : API> API token> click the "Get Token" button.
+![Schematic](https://storage.googleapis.com/maac-media/maac/sample/OpenAPI%20issue%20token.png)
+
+
+> #### What if the Access token is lost?
+> Click "Generate Token" and save it yourself to start using Open API. If it is missing, please generate it again. If you need to delete the Token for security, please contact the partner of the crescendo lab.
+
+> #### Does the access token expired?
+> The period of use is the contract period signed by the crescendo lab and the partner
+
+> #### Pricing?
+> Please refer to the sales deck. There are four major categories, and each category can correspond to the itemized API of this file. The detailed pricing rules are based on your official account purchase plan, please contact us for details [Customer support](mailto:customer-supoort@cresclab.com)。
+
+## Release Note
+---
+#### v1.1.0 / 2020.12.17
+- First version
+### v1.1.1 / 2021.04.21
+- Fix API typo
+- Remove unused parameter `event_id` in tracelink & deeplink
+### v1.1.2 / 2021.04.27
+- Fix ratelimit， `import contact` time unit : `1/s` -> `1/m`
+### v1.1.3 / 2021.04.27
+- Add custom segment API
+### v1.1.4 / 2021.06.21
+- Add `birthday` field to Contact API
+### v1.1.5 / 2021.09.29
+- Fix List APIs pagination size description
+### v1.1.6 / 2021.09.30
+- Fix deeplink API response body
+### v1.1.7 / 2021.11.15
+- Add example file to custom segment API
+- Adjust delete segment API's example
+### v1.1.8 / 2021.12.07
+- Adjust enhanced multicast username parameter will not be displayed
+- Add Webhook and events payload
+### v1.1.9 / 2022.01.10
+- Remove Proxy Server and Production Server test functions
+- Added OpenAPI concatenation considerations
+### v1.1.10 / 2022.02.11
+- Added `pnp.status_updated` subscription event to Webhook feature
+### v1.1.11 / 2022.04.08
+- Revise the description of `available_days` for `Tag` related APIs
+- Add description of the concurrency limit and rate limit of the import contact API
+### v1.1.12 / 2022.04.28
+- Added Webhook event `prize.points_added`
+### v1.1.13 / 2022.05.09
+- Added Webhook event `pnp.profile_updated`
+### v1.1.14 / 2022.06.02
+- Revise the API descriptions of LINE Notification Message related APIs
+### v1.1.15 / 2022.06.15
+- Add description for the `datetime` field in `receipt validated` webhook
+### v1.1.16 / 2022.06.22
+- Revise the description of the `Check import contact task status` API
+- Adjust the rate limit of the import contact API
+### v1.1.17 / 2022.07.20
+- Revise the description of the `Query sending message status` API
+### v1.1.18 / 2022.08.25
+- Deprecate `archived` field in `Get message event list` and `Get Message event info` APIs
+### v1.1.19 / 2022.09.01
+- Added Webhook event `message.first_open`
+### v1.1.20 / 2022.09.14
+- Add `opens` field to `Get message performance report` API
+### v1.1.21 / 2022.09.16
+- Add `unique_clicks` field to Tracelink API
+### v1.1.22 / 2022.09.18
+- Update link of operating manual and fix typo
+### v1.1.23 / 2022.10.05
+- Add `unique_clicks` field to `Get message performance report` API
+### v1.1.24 / 2022.10.26
+- Add `Get LINE Notification Message sending records list` API
+### v1.1.25 / 2022.10.31
+- Add notes for `Send message`
+- Add `answer_hash` in the request of `SurveyCake Submitted` Webhook
+### v1.1.26 / 2022.11.10
+- Add `sms_blocked` status in LINE Notification Message API and webhook
+- Add `sms_temporary_error` status in LINE Notification Message API and webhook
+- Add the response data ordering information of `Get LINE Notification Message sending records list` API
+### v1.1.27 / 2022.11.30
+- Add `sms_error_category` in LINE Notification Message API and webhook
+- Add `sms_callback_timeout` status in LINE Notification Message API and webhook
+- Add the limitation of image parameter when pushing message in `Send message` section
+### v1.1.28 / 2023.01.03
+- Add Redeem Prize API for Voucher (Unique Code) redemption
+### v1.1.29 / 2023.05.05
+- Add descriptions of 429 Too Many Requests in the `MAAC OpenAPI`'s `status codes`.
+### v1.1.30 / 2023.05.29
+- Add `Notes` about `fail_info` in `Query sending message status` of `Send message`.
+### v1.1.31 / 2023.06.27
+- Introduce LINE Push Message to Line Notification Message API and webhook
+- Rename and refine Line Notification Message to SMS+
+### v1.1.32 / 2023.07.03
+- Use the term, "contact", to present the member of LINE OA
+### v1.1.33 / 2023.07.28
+- Use the term, "import contacts" for import member API
+- Update max rate of import member task to 15/m
+- fix typo
+### v1.1.34 / 2023.08.22
+- Add “tags” field to the Update contact API
+### v1.1.35 / 2023.08.25
+- Ignore “tags” field to the Update contact API
+### v1.1.36 / 2023.09.12
+- Add the limitation of CSV file for creating/updating custom segment with LINE UID
+### v1.1.37 / 2023.10.25
+- Add instructions for handling special characters when using phone numbers to `get contact list`
+### v1.1.38 / 2023.10.26
+- Add a new sms error category "sensitive words".
+### v1.1.39 / 2023.12.18
+- add more desctiption to "event_id" field in example of send message APIs
+- add `ingestion_timestamp` field to response of Contact Tracking APIs
+- add `tags_detail` to "Get contact list" API
+### v1.1.40 / 2024.04.29
+- add query parameter `member_id` to "Get contact list" API
+### v1.1.41 / 2024.05.28
+- Add `display_name` field to Contact
+### v1.1.42 / 2024.06.12
+- Add new error status to SMS+ API
+### v1.1.43 / 2024.07.04
+- add more descriptions about how to implement signature validation in Python
+- adjust retry time interval between webhook requests to 1, 2, 4 seconds.
+### v1.1.44 / 2025.01.02
+- Add enhanced_multicast notes
+### v1.1.45 / 2025.01.09
+- Bulk member data import instructions
+### v1.1.46 / 2025.08.26
+- Fix type typos in API documentation: line_uid from number to string, tag_id from string to number
+### v1.1.47 / 2025.10.07
+- SMS+ API new feature: whatsapp.template_data.header.parameters now supports multimedia message parameters
+### v1.1.48 / 2025.11.28
+- SMS+ API (PNP push) now supports both E.164 and SHA256-hashed phone number formats
+- SHA256-hashed phone numbers are only accepted when SMS is disabled in the SMS+ template
+- LINE Push only supports exact match (E.164 and SHA256 formats are incompatible)
+- Webhooks (pnp.status_updated, pnp.profile_updated) now support SHA256-hashed phone numbers
+
+# Group Contact
+|column | type | description |
+| :-- | :------- | :-- |
+|line_uid| String | The unique user ID of the contact in the LINE official account, 33 characters in length
+|line_display_name| String | The name defined by the contact in the official LINE account with maximum 255 characters
+|display_name| String | The name showed in MAAC with maximum 255 characters
+|email| String | Contact email address
+|mobile| String | Contact phone number
+|customer_id| String | User ID of the third-party system
+|gender| String | Contact gender (default is predicted by MAAC AI)<br>`male` :male<br>`female`：female<br>`unknown`：unknown
+|birthday| String | Contact birthday (ISO Format)
+|tags| Array[String] | All valid MAAC tags
+|status| String | Contact status <br>`follow` : Contacts of LINE official account<br>`auth` : The contacts have authorized the LINE official account to get their information<br>`unfollow` : The contacts have blocked the official account
+|updated_at| String | Contact information update time
+|created_at| String | Contact creation time
+|blocked_at| String | The time when the contact blocked the official account
+---
+
+## Contact [/openapi/v1/member/]
+
+### Get contact list [GET /openapi/v1/member/{?member_id,line_uid,email,mobile,customer_id,status,updated_at_min,updated_at_max,all_tag,start}]
+Get a list of the information of contacts belonging to the official account in MAAC. The list is paged for every 300 contact information.
+
+* Query Parameter can be used to filter eligible contacts
+* Query parameters containing special characters or symbols should be encoded
+* Bring the token in the response `next` parameter of the previous page into the `start` parameter of the request to get the next page.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + line_uid : `Uoooxxxoooxxxoooxxxoooxxxoooxx` (optional, string)
+    + member_id : `20240429` (optional, int)
+    + email : `demo@cresclab.com` (optional, string)
+    + mobile : `%2b886912345678` (optional, string) -
+    the **"+"** symbols should be encoded as **"%2b"**<br>
+    + customer_id : `1235734897` (optional, string)
+    + status : `follow` (optional, string)
+    + updated_at_min : `2017-05-17` (optional, string) ... Filter contacts who have updated information after this date **(YYYY-MM-DD)**
+    + updated_at_max :  `2020-05-17` (optional, string) ... Filter contacts who have updated information before this date **(YYYY-MM-DD)**
+    + all_tag = 0 (optional, number) ... **0**: Use the above two parameters to filter the time when contacts are tagged<br> **1**: Get all tags of contacts<br>
+    + start : `OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D`(optional, string)-
+    The id of the next page will be returned to the `next` parameter of the previous page
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `results` (array) - contact data array
+            + (object)
+                + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+                + `line_display_name` (string) - The name defined by the contact in the official LINE account with maximum 255 characters
+                + `display_name` (string) - The name showed in MAAC with maximum 255 characters
+                + `email` (string) - Contact email
+                + `mobile` (string) - Contact phone number
+                + `customer_id` (string) - User ID of the third-party system
+                + `gender` (string) - Contact gender
+                + `birthday` (string) - Contact birthday (ISO Format)
+                + `tags` (array) - Array of all valid tags
+                    + (string) - Tag name
+                + `tags_detail` (array) - Array of tags detail
+                    + (object)
+                        + `name` (string) - Tag name
+                        + `tagged_at` (string) - The timestamp when the tag is first time tagged to this contact
+                + `status` (string) - Contact status
+                + `updated_at` (string) - Contact information update time
+                + `created_at` (string) - Contact creation time
+                + `blocked_at` (string) - The time when the contact blocked the official account
+        + `next` (string) - page token of the next page
+
+    + Body
+
+            {
+                "results": [
+                    {
+                        "line_uid": "U353dc4b8ea88acaa8663c6cd9a4f4000",
+                        "line_display_name": "Alan Mathison Turing",
+                        "display_name": "Alan Mathison Turing",
+                        "email": "alan@example.com",
+                        "mobile": "+886987654321",
+                        "customer_id": "1235734897",
+                        "gender": "male",
+                        "birthday": "2017-05-17",
+                        "tags": [
+                            "tag1"
+                        ],
+                        "tags_detail": [
+                            {
+                                "name": "tag1",
+                                "tagged_at": "2020-01-13T18:58:21.604283+08:00"
+                            }
+                        ],
+                        "status": "follow",
+                        "updated_at": "2020-01-13T18:58:21.604283+08:00",
+                        "created_at": "2020-01-13T18:48:23.604283+08:00",
+                        "blocked_at": "2020-01-13T18:48:23.604283+08:00"
+                    }
+                ],
+                "next": "OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D"
+            }
+
+### Update contact [PATCH /openapi/v1/member/{line_uid}/]
+Update your contact information in MAAC.
+- Bind contacts by mapping customer_id and update the contact information in MAAC.
+- Unbind contacts by depositing `null` to `customer_id`.
+
++ Parameters
+    + line_uid (required, string, `U21d78de43c3ce40fbcbc5c4ce6dfe0b0`)
+
++ Request (application/json)
+    + Attributes (object)
+        + `display_name` (optional, string) - The name showed in MAAC
+        + `customer_id` (optional, string) - User ID of the third-party system
+        + `email` (optional, string) - Contact email
+        + `mobile` (optional, string) - Contact phone number, please use E.164 format. If the number starts with 09XX, it will be automatically converted to E.164 format according to the channel's region.
+        + `gender` (optional, string) - Contact gender
+          value: **male**, **female**, **unknown**
+        + `birthday` (optional, string) - Contact birthday (ISO Format)
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "display_name": "Alan Mathison Turing",
+                "customer_id": "fake-cid",
+                "email": "example@example.com",
+                "mobile": "+886910123456",
+                "gender": "male",
+                "birthday": "2017-05-17"
+            }
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+        + `line_display_name` (string) - The name defined by the contact in the official LINE account with maximum 255 characters
+        + `display_name` (string) - The name showed in MAAC with maximum 255 characters
+        + `email` (string) - Contact email
+        + `mobile` (string) - Contact phone number
+        + `customer_id` (string) - User ID of the third-party system
+        + `gender` (string) - Contact gender
+        + `birthday` (string) - Contact birthday (ISO Format)
+        + `tags` (array) - Array of all valid tags
+            + (string) - Tag name
+        + `tags_detail` (array) - Array of tags detail
+            + (object)
+                + `name` (string) - Tag name
+                + `tagged_at` (string) - The timestamp when the tag is first time tagged to this contact
+        + `status` (string) - Contact status
+        + `updated_at` (string) - Contact information update time
+        + `created_at` (string) - Contact creation time
+        + `blocked_at` (string) - The time when the contact blocked the official account
+
+    + Body
+
+            {
+                "line_uid": "U353dc4b8ea88acaa8663c6cd9a4f4000",
+                "line_display_name": "Alan Mathison Turing",
+                "display_name": "Alan Mathison Turing",
+                "email": "example@example.com",
+                "mobile": "+886910123456",
+                "customer_id": "fake-cid",
+                "gender": "male",
+                "birthday": "2017-05-17",
+                "tags": [
+                    "tag1"
+                ],
+                "tags_detail": [
+                    {
+                        "name": "tag1",
+                        "tagged_at": "2020-01-13T18:58:21.604283+08:00"
+                    }
+                ],
+                "status": "follow",
+                "updated_at": "2020-01-13T18:58:21.604283+08:00",
+                "created_at": "2020-01-13T18:48:23.604283+08:00",
+                "blocked_at": "2020-01-13T18:48:23.604283+08:00"
+            }
+
+### Import contact [POST /openapi/v1/member/import/]
+
+If you have an existing membership database, you can also import it through MAAC OpenAPI to integrate data.
+
+* Import up to 10,000 contact information in a single request
+* Maximum number of concurrent import task: 1 import task
+* Maximum rate of import task: 15/min
+* The maximum body size of a single request is 10MB
+* For contacts who are successfully compared, the non-blank `customer_id`, `line_display_name`, `email`, `mobile`, `gender`, and `birthday` provided in the imported contact information will be used to overwrite the MAAC contact information
+* The above rules do not include `tags`, the system will only tag contacts with new tags, and will not overwrite or remove tags that have been posted by contacts in the past
+* Since it takes time to import contact information, you can check the status of the import with `task_id`
+* If you want to perform a large number of import behaviors, it is recommended to design the following flow:
+    1. Call the API `Import contact`, make the first import, and get the task ID from API Response
+    2. Call the API `Check import contact task status` and confirm whether the task of item 1 has been completed or not.
+        * Finished → go back to 1. and continue to next import.
+        * Not yet completed → wait for 1 second, repeat 2. Confirmation and operation.
+
++ Request (application/json)
+    + Attributes (object)
+        + `import_key` (required, string) - Specify the field to be aglined with the contact data in the MAAC database
+        value: **line_uid**, **customer_id**, **email**, **mobile**
+        + data (required, array)
+            + (object)
+                + `line_uid` (optional, string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+                + `line_display_name` (optional, string) - The name defined by the contact in the official LINE account with maximum 255 characters
+                + `email` (optional, string) - Contact email
+                + `mobile` (optional, string) - Contact phone number, please use E.164 format. If the number starts with 09XX, it will be automatically converted to E.164 format according to the channel's region.
+                + `customer_id` (optional, string) - User ID of the third-party system
+                + `gender` (optional, string) - Contact gender
+                value: **male**, **female**
+                + `tags` (optional, array) - Name array of tags to tag to individual contacts
+                    + (string) - tag name
+                + `birthday` (optional, string) - Contact's birthday (ISO 8601: YYYY-MM-DD)
+        + tags (optional, array) - For all imported contacts, the tag name array of the tags to be attached
+            + (string) - Tag name
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "import_key": "line_uid",
+                "data": [
+                    {
+                        "line_uid": "U21d78de43c3ce40fbcbc5c4ce6dfe0b0",
+                        "line_display_name": "test_contact1",
+                        "email": "alan@example.com",
+                        "mobile": "+886987654321",
+                        "customer_id": "1235734897",
+                        "gender": "male",
+                        # personal tags
+                        "tags": [
+                            "tag1",
+                            "tag2"
+                        ]
+                    },
+                    {
+                        "line_uid": "U21d78de43c3ce40fbcbc5c4ce6dfe0b1",
+                        "line_display_name": "test_contact1",
+                        "email": "alan@example.com",
+                        "mobile": "+886987654321",
+                        "customer_id": "1235734897",
+                        "gender": "male",
+                        # personal tags
+                        "tags": [
+                            "tag1",
+                            "tag3"
+                        ]
+                    }
+                ],
+                "tags":["20200101import"] # global tags
+            }
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `id` (number) - The task id of the imported contact task. It can be used to query the progress of the task.
+        + `result` (string) - status description
+
+    + Body
+
+            {
+                "id": 999,
+                "result": "start importing"
+            }
+
+### Check import contact task status [GET /openapi/v1/member/import/{task_id}/]
+Check the status of the import contact task by `task_id`. The `response code` represent the status of the checking operation(i.e., the `GET` API call) instead of the task status. In addition, there might be different response bodies when the task statuses are different.
+
++ Request Import contact is pending (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + task_id : 1 (required, number)
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `category` (string) - `import_member`
+        + `status` (string) - Contact import status: pending, processing, done
+        + `created_at` (string) - creation time
+        + `updated_at` (string) - update time
+
+    + Body
+
+            {
+                "category": "import_member",
+                "status": "pending",
+                "created_at": "2021-04-23T22:34:07.360839+08:00",
+                "updated_at": "2021-04-23T22:34:07.427273+08:00"
+            }
+
++ Request Import contact is processing (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `category` (string) - `import_member`
+        + `status` (string) - Contact import status: pending, processing, done
+        + `created_at` (string) - creation time
+        + `updated_at` (string) - update time
+
+    + Body
+
+            {
+                "category": "import_member",
+                "status": "processing",
+                "created_at": "2021-04-23T22:34:07.360839+08:00",
+                "updated_at": "2021-04-23T22:34:07.427273+08:00"
+            }
+
++ Request Import contact has been successful (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `category` (string) - `ex:import_member`
+        + `status` (string)- Contact import status
+        + `result` (object)- detailed report after successful import
+            + `tags` (array)
+                + (string)-label name
+            + `success` (boolean)- whether the import was successful or not
+            + `total_num` (number)- the number of the imported users
+            + `created_num` (number)- the number of the created users
+            + `updated_num` (number)- the number of the updated users
+            + `mismatch_num` (number)- The number of the users that do not exist or blocked the LINE OA
+            + `mismatch_export_link` (string) - The list of the users that do not exist or blocked the LINE OA(The field is only available when the `import key` is `line_uid`. Otherwise, this field will be `null`.)
+            + `start_time` (string)- Import start time
+            + `end_time` (string)- Import completion time
+        + `created_at` (string)- creation time
+        + `updated_at` (string)- update time
+
+    + Body
+
+            {
+                "category": "import_member",
+                "result": {
+                    "tags": [
+                        "test tag"
+                    ],
+                    "success": true,
+                    "end_time": "2021-04-23T22:33:06.643646+08:00",
+                    "total_num": 2,
+                    "start_time": "2021-04-23T22:33:06.031562+08:00",
+                    "created_num": 0,
+                    "updated_num": 0,
+                    "mismatch_num": 2,
+                    "mismatch_export_link": "https://storage.googleapis.com/cresclab-maac-production/public/org_368/export_member/XXXXXX.csv"
+                },
+                "status": "done",
+                "created_at": "2021-04-23T22:33:05.936006+08:00",
+                "updated_at": "2021-04-23T22:33:06.673536+08:00"
+            }
+
++ Request Import contact has been failed (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `category` (string) - `ex:import_member`
+        + `status` (string)- Contact import status
+        + `result` (object)- detailed report after failed import
+            + `success` (boolean)- whether the import was successful or not
+            + `blank_error` (number) - the number of contacts whose `import_key` field of data are blank
+            + `miss_fields` (array) - the missing fields of the contact profile
+                + (string) - 欄位名稱
+            + `gender_error` (number) - the number of contacts whose gender field is invalid
+            + `mobile_error` (number) - the number of contacts whose mobile field is invalid
+            + `birthday_error` (number) - the number of contacts whose birthday field is invalid
+            + `useless_fields` (array) - the redundant fields of the contact profile
+                + (string) - 欄位名稱
+            + `duplicate_error` (number) - the number of contacts whose `import_key` field of profiles are duplicated with others'
+        + `created_at` (string)- creation time
+        + `updated_at` (string)- update time
+
+    + Body
+
+            {
+                "category": "import_member",
+                "result": {
+                    "success": false,
+                    "blank_error": 1,
+                    "miss_fields": [],
+                    "gender_error": 0,
+                    "mobile_error": 0,
+                    "birthday_error": 0,
+                    "useless_fields": [],
+                    "duplicate_error": 1
+                },
+                "status": "done",
+                "created_at": "2021-04-23T22:33:05.936006+08:00",
+                "updated_at": "2021-04-23T22:33:06.673536+08:00"
+            }
+
+## Contact Tracking [/openapi/v1/behavior/download/]
+Get the Google Analytics data after the contact clicks the MAAC push message, trace link, rich menu, and the tracking link to the official website, including the following behavioral data.
+
+### Pageview [GET /openapi/v1/behavior/download/{date}/pageview/]
+
++ Parameters
+    + date (required, string, `2017-05-17`) ... date (ISO Format)
+
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 200 (text/csv)
+    + Headers
+
+            Content-Disposition: attachment; filename={date}_pageview.csv
+
+    + Attributes (object)
+        + csv field description (object)
+            + `line_uid` (string)- The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `utm_campaign` (string)- Set the tracking code `utm_campaign` in MAAC
+            + `utm_source` (string)- Set the tracking code `utm_source` in MAAC
+            + `utm_medium` (string)- Set the tracking code `utm_medium` in MAAC
+            + `utm_content` (string)- Set the tracking code `utm_content` in MAAC
+            + `time` (string)- Record time (ISO Format)
+            + `page_path` (string)- [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:pagePath)
+            + `page_title` (string)- [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:pageTitle)
+            + `page_views` (number)- [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:pageviews)
+            + `views_per_session` (number)- [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:pageviewsPerSession)
+            + `entrances` (number)- [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:entrances)
+            + `avg_time_on_page` (number)- [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:avgTimeOnPage)
+            + `exits` (number)- [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:exits)
+            + `ingestion_timestamp` (string)- time when data was actually ingested into the table
+
+### Product [GET /openapi/v1/behavior/download/{date}/product/]
+
++ Parameters
+    + date (required, string, `2017-05-17`) ... date (ISO Format)
+
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 200 (text/csv)
+    + Headers
+
+            Content-Disposition: attachment; filename={date}_product.csv
+
+    + Attributes (object)
+        + csv field description (object)
+            + `line_uid` (string)- The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `utm_campaign` (string)- Set the tracking code `utm_campaign` in MAAC
+            + `utm_source` (string)- Set the tracking code `utm_source` in MAAC
+            + `utm_medium` (string)- Set the tracking code `utm_medium` in MAAC
+            + `utm_content` (string)- Set the tracking code `utm_content` in MAAC
+            + `time` (string)- Record time (ISO Format)
+            + `product_name` (string) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:productName)
+            + `product_sku` (string) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:productSku)
+            + `adds_to_cart` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:productAddsToCart)
+            + `removes_from_cart` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:productRemovesFromCart)
+            + `item_revenue` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:itemRevenue)
+            + `item_quantity` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:itemQuantity)
+            + `checkouts` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:productCheckouts)
+            + `list_clicks` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:productListClicks)
+            + `list_views` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:productListViews)
+            + `ingestion_timestamp` (string)- time when data was actually ingested into the table
+
+### Transaction [GET /openapi/v1/behavior/download/{date}/transaction/]
+
++ Parameters
+    + date (required, string, `2017-05-17`) ... date (ISO Format)
+
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 200 (text/csv)
+    + Headers
+
+            Content-Disposition: attachment; filename={date}_transaction.csv
+
+    + Attributes (object)
+        + csv field description (object)
+            + `line_uid` (string)- The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `utm_campaign` (string)- Set the tracking code `utm_campaign` in MAAC
+            + `utm_source` (string)- Set the tracking code `utm_source` in MAAC
+            + `utm_medium` (string)- Set the tracking code `utm_medium` in MAAC
+            + `utm_content` (string)- Set the tracking code `utm_content` in MAAC
+            + `time` (string)- Record time (ISO Format)
+            + `transactions` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:transactions)
+            + `revenue` (number) - [Description](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/#ga:transactionRevenue)
+            + `ingestion_timestamp` (string)- time when data was actually ingested into the table
+
+
+# Group Tag
+| column | type | description |
+| :-- | :------- | :-- |
+|id| Number | MAAC tag id
+| column | String | Tag name
+|available_days| Number | The valid number of days after the tag is attached to the contact<br>The `null` value means the tag will be attached permanently.
+---
+
+## Tag [/openapi/v1/tag/]
+
+### Get tag list [GET /openapi/v1/tag/{?name,start}]
+Get a list of tags of the official account in MAAC. The list is paged for every 300 tags.
+
+* Query Parameter can be used to filter the tags that meet the conditions
+* Bring the token in the response `next` parameter of the previous page into the `start` parameter of the request to get the label of the next page
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + name : `fake-tag-name` (optional, string)
+    + start : `OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D`(optional, string)-
+    The id of the next page will be returned to the `next` parameter of the previous page
+
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `results` (array) - Tag array
+            + (object)
+                + `id` (number) - MAAC tag id
+                + `name` (string) - Tag name
+                + `available_days` (number) - The valid number of days after the tag is attached to the contact. The `null` value means the tag will be attached permanently.
+        + `next` (string) - page token of the next page
+
+
+    + Body
+
+            {
+                "results": [
+                    {
+                        "id": 1,
+                        "name": "tag 1",
+                        "available_days": null
+                    },
+                    {...}
+                ],
+                "next": "OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D"
+            }
+
+### Get tag info [GET /openapi/v1/tag/{tag_id}/]
+
++ Parameters
+    + tag_id: `1` (required, number)
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - MAAC tag id
+        + `name` (string) - Tag name
+        + `available_days` (number) - The valid number of days after the tag is attached to the contact. The `null` value means the tag will be attached permanently.
+
+    + Body
+
+            {
+                "id": 1,
+                "name": "fake-tag-name",
+                "available_days": 100
+            }
+
+### Create tags [POST]
+
++ Request (application/json)
+    + Attributes (object)
+        + `name` (string) - Tag name
+        + `available_days` (number) - The valid number of days after the tag is attached to the contact. Use `null` to attach the tag permanently.
+
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "name": "fake-tag-name",
+                "available_days": 100
+            }
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + `id` (number) - MAAC tag id
+        + `name` (string) - Tag name
+        + `available_days` (number) - The valid number of days after the tag is attached to the contact. The `null` value means the tag will be attached permanently.
+
+    + Body
+
+            {
+                "id": 1,
+                "name": "fake-tag-name",
+                "available_days": 100
+            }
+
+
+## Add or remove tags to contact [/openapi/v1/taglinemember/]
+Put new tags on contacts or remove tags that have already been applied.
+
+### Add tags to contact[POST]
+
++ Request (application/json)
+    + Attributes (object)
+        + `tag_id` (required, number) - MAAC tag ID
+        + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "tag_id": 1,
+                "line_uid": "U353dc4b8ea88acaa8663c6cd9a4f4000"
+            }
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + `tag_id` (required, number) - MAAC tag ID
+        + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+        + `created_at` (string)- Time when the tag was added to the contact (ISO Format)
+        + `expired_at` (string)- The expiration time of the tag on the contact (ISO Format)
+
+    + Body
+
+            {
+                "tag_id": 1,
+                "line_uid": "U353dc4b8ea88acaa8663c6cd9a4f4000",
+                "created_at": "2020-12-17T23:00:00+08",
+                "expired_at": "9999-12-31T23:59:59+08"
+            }
+
+### Remove tags from contacts [DELETE]
+
++ Request (application/json)
+    + Attributes (object)
+        + `tag_id` (required, number) - MAAC tag ID
+        + `line_uid` (optional, string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "tag_id": 1,
+                "line_uid": "U353dc4b8ea88acaa8663c6cd9a4f4000"
+            }
+
++ Response 204
+
+
+# Group Segment
+| column | type | description |
+| :-- | :------- | :-- |
+| column | Number | segment name
+|description| String | segment description
+|segment_type| Number | segment type<br>`1`: normal segment<br>`2`: custom segment
+|status| Number | Segment status<br>`1`: pending<br>`2`: ready
+|member_count| Number | Number of contacts (if `status` not ready yet, member_count will return `-1`)
+|last_updated_time| String | Segment last update time(ISO Format)
+---
+
+## Segment [/openapi/v1/segment/]
+
+### Get segment list [GET /openapi/v1/segment/{?name,start}]
+Get the MAAC segment list, and the list is paged for every 300 segments of the data.
+
+* The default limit for an official account is 30 segments. If you need to purchase more segments, please contact [customer-suport@cresclab.com](mailto:customer-supoort@cresclab.com)
+* Bring the token in the response `next` parameter of the previous page into the `start` parameter of the request to get the next segment page.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + name : `fake-tag-name` (optional, string)
+    + start : `OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D`(optional, string) -
+    The identification code of the next page will be returned to the `next` parameter of the previous page
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `results` (array) - segment array
+            + (object)
+                + `id` (number) - MAAC segment id
+                + `name` (string) - MAAC segment name
+                + `description` (string) - MAAC segment description
+                + `segment_type` (number) - segment type
+                value: **normal segment=1**, **custom segment=2**
+                + `member_count` (number) - number of contacts
+                + `status` (number) - segment status
+                value: **pending=1**, **ready=2**
+                + `last_updated_time` (string) - segment last update time(ISO Format)
+        + `next` (string) - page token of the next page
+
+
+    + Body
+
+            {
+                "results": [
+                    {
+                        "id": 1,
+                        "name": "tag_1segment",
+                        "description": "contacts tagged with tag_1",
+                        "segment_type": 1,
+                        "member_count": 100,
+                        "status": 2,
+                        "last_updated_time": "2020-12-17T23:00:00+08"
+                    },
+                    {}
+                ],
+                "next": "OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D"
+            }
+
+### Get segment info [GET /openapi/v1/segment/{segment_id}/]
+
++ Parameters
+    + segment_id: `1` (required, number)
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - MAAC segment id
+        + `name` (string) - MAAC segment name
+        + `description` (string) - segment description
+        + `segment_type` (number) - segment type
+        value: **normal segment=1**, **custom segment=2**
+        + `member_count` (number) - number of contacts
+        + `status` (number) - segment status
+        value: **pending=1**, **ready=2**
+        + `last_updated_time` (string) - segment last update time(ISO Format)
+
+    + Body
+
+            {
+                "id": 1,
+                "name": "tag_1segment",
+                "description": "contacts tagged with tag_1",
+                "segment_type": 1,
+                "member_count": 100,
+                "status": 2,
+                "last_updated_time": "2020-12-17T23:00:00+08"
+            }
+
+### Create segments [POST]
+
++ Request (application/json)
+    + Attributes (object)
+        + `name` (required, string) - segment name
+        + `operator` (optional, string) - operational logic unit between the segment filters
+        default: *AND*
+        + `description` (optional, string) - segment description
+        + `tags` (required, array) - tag filter array
+            + (object)
+                + `status` (required, string) - with or without tags
+                value: **with**, *without*
+                + `tag_id` (required, number) - MAAC tag id
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "name": "tag_1 & tag_2",
+                "operator": "AND",
+                "description": "contacts tagged with tag_1 and tag_2",
+                "segment_type": 1,
+                "tags": [
+                    {
+                        "status": "with",
+                        "tag_id": 1
+                    },
+                    {
+                        "status": "with",
+                        "tag_id": 2
+                    }
+                ]
+            }
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + `id` (number) - MAAC segment id
+        + `name` (string) - MAAC segmant name
+        + `description` (string) - segmant description
+        + `segment_type` (number) - segment type
+        value: **normal segment=1**, **custom segment=2**
+        + `member_count` (number) - number of contacts
+        + `status` (number) - segment status
+        value: **pending=1**, **ready=2**
+        + `last_updated_time` (string) - segment last update time(ISO Format)
+
+    + Body
+
+            {
+                "id": 2,
+                "name": "tag_1 & tag_2",
+                "description": "contacts tagged with tag_1 and tag_2",
+                "segment_type": 1,
+                "member_count": -1,
+                "status": 1,
+                "last_updated_time": none
+            }
+
+### Create segment for uploading custom LINE UIDs [POST /openapi/v1/custom_segment/]
+- Create segment by uploading CSV file with LINE UIDs, [file example](https://drive.google.com/uc?export=download&id=12RswSx_9HyBNqs-OEm-O5bZaq1l6aEcb).
+- The maximum number of LINE UIDs in one CSV file: 300,000; the maximum size of CSV: 25 MB
+
++ Request (multipart/form-data)
+    + Attributes (object)
+        + `name` (required, string) - MAAC segment name
+        + `description` (optional, string) - segment description
+        + `file` (required, *csv*) - LINE UID CSV file
+
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "name": "crm remarketing LINE UID list(2021-05-06)",
+                "description": "remarketing line uid list from crm",
+                "file": *file*
+            }
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + `id` (number) - MAAC segment id
+        + `name` (string) - MAAC segment name
+        + `description` (string) - segment description
+        + `segment_type` (number) - segment type
+        value: **normal segment=1**, **custom segment=2**
+        + `member_count` (number) - number of contacts
+        + `status` (number) - segment status
+        value: **pending=1**, **ready=2**
+        + `last_updated_time` (string) - segment last upadte time(ISO Format)
+
+    + Body
+
+            {
+                "id": 3,
+                "name": "crm remarketing LINE UID list(2021-05-06)",
+                "description": "remarketing line uid list from crm",
+                "segment_type": 2,
+                "member_count": -1,
+                "status": 1,
+                "last_updated_time": none
+            }
+
+### Delete segments [DELETE /openapi/v1/segment/{segment_id}/]
+
++ Parameters
+    + segment_id (required, number, `1`)
+
++ Request (application/json)
+    + Attributes (object)
+        + `segment_id` (number) - MAAC segment id
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 204 (application/json)
+
+
+### Update segment for uploading custom LINE UIDs [PATCH /openapi/v1/custom_segment/{segment_id}/]
+- Create segment by uploading CSV file with LINE UIDs, [file example](https://drive.google.com/uc?export=download&id=12RswSx_9HyBNqs-OEm-O5bZaq1l6aEcb).
+- The maximum number of LINE UIDs in one CSV file: 300,000; the maximum size of CSV: 25 MB
+- `name`、`description`、`file` at least one of above parameters need to be include in Request body.
+
++ Parameters
+    + segment_id (required, number)
+
++ Request (application/json)
+    + Attributes (object)
+        + `name` (optional, string) - MAAC segment name
+        + `description` (optional, string) - MAAC segment description
+        + `file` (optional, *csv*) - LINE UID file
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "name": "crm remarketing LINE UID list(2021-05-07)",
+                "description": "remarketing line uid list from crm",
+                "file": *file*
+            }
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - MAAC segment id
+        + `name` (string) - MAAC segment name
+        + `description` (string) - segment description
+        + `segment_type` (number) - segment type
+        value: **normal segment=1**, **custom segment=2**
+        + `member_count` (number) - number of contacts
+        + `status` (number) - segment status
+        value: **pending=1**, **ready=2**
+        + `last_updated_time` (string) - segment last update time(ISO Format)
+
+    + Body
+
+            {
+                "id": 3,
+                "name": "crm remarketing LINE UID list(2021-05-07)",
+                "description": "remarketing line uid list from crm",
+                "segment_type": 2,
+                "member_count": -1,
+                "status": 1,
+                "last_updated_time": none
+            }
+
+### Get the segment contacts LINE UIDs[GET /openapi/v1/segment/{segment_id}/members/]
+
++ Parameters
+    + segment_id: 3 (required, number)
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 200 (text/csv)
+    + Headers
+
+            Content-Disposition: attachment; filename={date}_segment_{segment_id}_members.csv
+
+    + Attributes (object)
+        + csv column description(object)
+            + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+
+
+# Group Message
+
+## Message template [/openapi/v1/template/{?start}]
+When sending a message push, you need to fill in the ID of the message template.
+The template needs to be created in the "Message Center"> "Message Template Library" of the MAAC.
+
+### Get message template list [GET]
+
+* The list is paginated for every 300 message template data
+* Bring the token in the response `next` parameter of the previous page into the `start` parameter of the request to get the message template of the next page
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + start : `OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D`(optional, string) -
+    The id of the next page will be returned to the `next` parameter of the previous page
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `results` (array) - Array of message template
+            + (object)
+                + `id` (number) - MAAC message template ID
+                + `name` (string) - Message template name
+                + `parameters` (array) - The array of parameters in the message template
+                    + (string) - Parameter name
+        + `next` (string) - the page token of next page
+
+
+    + Body
+
+            {
+                "results": [
+                    {
+                        "id": 1,
+                        "name": "best_sellers_recommendation"
+                          "parameters": [
+                              "store_name",
+                              "product_name",
+                              "product_price"
+                          ]
+                    },
+                    {}
+                ],
+                "next": "OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D"
+            }
+
+## Message event [/openapi/v1/event/]
+When sending a message to push, if you need to track the performance of the message, you need to fill in the event ID. <br><br>
+
+**Notes**<br><br>
+MAAC will use the message event to track the performance, and the performance data of the messages pushed with the same message event ID will be integrated.
+
+
+### Get message event list [GET /openapi/v1/event/{?name,start}]
+
+* The list is paginated for every 300 message template data
+* Bring the token in the response `next` parameter of the previous page into the `start` parameter of the request to get the message template of the next page
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + name : `Arrival Notice` (optional, string)
+    + start : `OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D`(optional, string) -
+    The id of the next page will be returned to the `next` parameter of the previous page
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `results` (array) - Message event array
+            + (object)
+                + `id` (number)-The ID of the message event in MAAC
+                + `archived` (boolean)- This field has been deprecated. Don't use this field.
+                + `name` (string)- Message event name
+                + `created_at` (string)- Message event created time(ISO Format)
+        + `next` (string)- the page token of the next page
+
+    + Body
+
+            {
+                "results": [
+                    {
+                        "id": 12,
+                        "archived": false,
+                        "name": "Arrival Notice",
+                        "created_at": "2020-05-27T17:48:56.042752+08:00"
+                    },
+                    {
+                        "id": 2,
+                        "archived": false,
+                        "name": "Marketing Message",
+                        "created_at": "2020-05-27T08:00:00+08:00"
+                    },
+                    {
+                        "id": 1,
+                        "archived": false,
+                        "name": "General Notice",
+                        "created_at": "2020-05-27T08:00:00+08:00"
+                    }
+                ],
+                "next": "OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D"
+            }
+
+### Get Message event info [GET /openapi/v1/event/{event_id}/]
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + event_id : 1 (required, number)
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `id` (number)- MAAC message event ID
+        + `archived` (boolean)- This field has been deprecated. Don't use this field.
+        + `name` (string)- Message event name
+        + `created_at` (string)- message event created time (ISO Format)
+
+    + Body
+
+            {
+                "id": 1,
+                "archived": false,
+                "name": "123",
+                "created_at": "2020-05-27T08:00:00+08:00"
+            }
+
+### Create Message Event [POST]
+
+**🚨 Notice:**  
+There is a limit on the number of `event_id`s — the maximum allowed is **1,000**.  
+If you encounter the error message: `The number of events has reached the limit`,  
+please contact your **Crescendo Lab representative** for assistance.
+
+
++ Request (application/json)
+    + Attributes (object)
+        + `name` (required, string) - Message event name
+
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "name": "December marketing news"
+            }
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + `id` (number) - MAAC message event ID
+        + `name` (string) - MAAC message event name
+
+    + Body
+
+            {
+                "id": 1,
+                "name": "December marketing news"
+            }
+
+## Send message [/openapi/v1/direct_message/]
+Three data needed to push the message<br>
+* template_id: Create a customized message template through MAAC, and get the message template id<br>
+* event_id: Create message event through API and get event id<br>
+**🚨Attention: To track performance, be sure to create an event_id to ensure the brand can fully track relevant data!**<br>
+* line_uid: the user line_uid to be sent<br>
+
+**Notes**<br>
+* When the response status code is `200`, it means that MAAC already sent a message out and already created a sending record for this message, but it does not mean that LINE sent this message to users successfully. For more information about the sending result, please refer to `detail` field in `response` payload.
+* The provided value for parameters in a message template should end with an image file extension if this value represents an image. This is because some versions of the computer LINE App cannot show images correctly without an image file extension.
+* If the provided value of the parameter represents an image, the image shall follow the below limitations:<br>
+  **image format**: JPEG or PNG <br>
+  **image aspect ratio**: 1:1 <br>
+  **max. image size**: 4096x4096 <br>
+  **max. file size**: 1MB <br>
+* Messages sent via the Enhanced Multicast API do not support personalized tracking, and there will be no tracking data for opens and clicks.
+
+### Send push message [POST /openapi/v1/direct_message/push/]
+Pushing messages to a single user<br><br>
+
++ **Notes**
++ MAAC will track the performance of the message event, if you want to track the performance of the message push, please fill in `event_id`
++ The system will push the message in real time and reply the status in real time
++ There are two possible types of `result` in the message push API response (`string`, `object`), see the example on the right for the different types
++ This API request will be subject to the traffic limits of the LINE Push API. Please refer to [Line rate limit](#line_rate_limits).
+
++ Request (application/json)
+    + Attributes (object)
+        + `template_id` (required, number) - message template ID
+        + `data` (required, object) - message setting
+            + `line_uid` (required, string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `PARAM_1` (optional, string) - parameter in the message template: name vs. value
+            + `PARAM_2` (optional, string) - parameter in the message template: name vs. value
+        + `event_id` (optional, number) - message event ID, required if you want to track the performance
+
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+              "template_id": 45629,
+              "event_id": 346,
+              "data": {
+                  "line_uid":"U1348y18439jefidsgjf924r2",
+                  "parameter1": "hello",
+                  "parameter2": "world"
+              }
+            }
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - sending message ID
+        + `event_id` (number) - message event ID
+        + `result` (string) - sending message status
+        value: **success**, **timeout**, **error**
+
+    + Body
+
+            {
+                "id": 1342,
+                "event": "cart retarget",
+                "result": "success"
+            }
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - sending message ID
+        + `event_id` (number) - message event ID
+        + `result` (object) - sending message status
+            + `message` (string)- The reason for the error in the LINE reply
+            + `details` (array)- the reason for the error
+                + `message` (string)- error details
+                + `property` (string)- error property
+
+    + Body
+
+            {
+                "id": 1342,
+                "event": "cart retarget",
+                "result": {
+                    "message": "The request body has 1 error(s)",
+                    "details": [
+                        {
+                            "message": "Must be one of the following values: [text, image, video, audio, location, sticker, template, imagemap, flex]",
+                            "property": "messages[0].type"
+                        }
+                    ]
+                }
+            }
+
+### Send multicast message [POST /openapi/v1/direct_message/multicast/]
+A single push of different messages to a small number of users. A single request can push up to 150 contacts. (Each user's message parameter setting is independent)<br><br>
+
++ **Notes**
++ MAAC will track the performance of the message event, if you want to track the performance of the message push, please fill in `event_id` when requesting
++ The system will use asynchronous push messages, so the current status of the API response is `pending`, if you need to query the push status, you can use [query sending status](#query sending status) to query
++ Up to 150 contacts in a single request
++ This API request will be subject to the traffic limits of the LINE Multicast API. Please refer to [Line rate limit](#line_rate_limits).
+
++ Request (application/json)
+    + Attributes (object)
+        + `template_id` (required, number) - message template ID
+        + `data` (required, array) - array of push message setting
+            + (object)
+                + `line_uid` (required, string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+                + `PARAM_1` (optional, string) - parameter in the message template: name vs. value
+                + `PARAM_2` (optional, string) - parameter in the message template: name vs. value
+        + `event_id` (optional, number) - message event ID, required if you want to track the performance
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "template_id": 45629,
+                "event_id": 346,
+                "data": [
+                    {
+                        "line_uid":"U1348y18439jefidsgjf924r2",
+                        "parameter1": "hello",
+                        "parameter2": "world"
+                    },
+                    {
+                        "line_uid":"Uofkowekgowrpgwrkpglpwlpe",
+                        "parameter1": "cresclab",
+                        "parameter2": "api"
+                    }
+                ]
+            }
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - sending message ID
+        + `result` (string) - sending message status
+
+    + Body
+
+            {
+                "id": 1342,
+                "result": "pending"
+            }
+
+
+### Send enhance multicast message [POST /openapi/v1/direct_message/enhanced_multicast/]
+A large number of users who push the same message at a time, and a single request pushes up to 500 contacts.
+
++ **Notes**
++ Each user must use the same set of message parameter settings
++ MAAC will track the performance of the message event, if you want to track the performance of the message push, please fill in `event_id` when requesting
++ The system will use asynchronous push messages, so the current status of the API response is `pending`, if you need to query the push status, you can use [query sending status](#query sending status) to query
++ Up to 500 contacts can be pushed in a single request
++ note: The "username" parameter used in the message template does not apply to enhanced multicast, and will not be displayed.
++ note: Personalized information such as prizes is not available in this API, please send via push or multicast API.
++ This API request will be subject to the traffic limits of the LINE Multicast API. Please refer to [Line rate limit](#line_rate_limits).
++ Messages sent via this API do not support personalized tracking, and there will be no tracking data for opens and clicks.
+
++ Request (application/json)
+    + Attributes (object)
+        + `template_id` (required, number) - message template ID
+        + `line_uids` (required, array) - the array of the unique user ID of the contact in the LINE official account
+            + (required, string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+        + `data` (required, object) - message setting
+            + `PARAM_1` (optional, string) - parameter in the message template: name vs. value
+            + `PARAM_2` (optional, string) - parameter in the message template: name vs. value
+        + `event_id` (optional, number) - message event ID, required if you want to track the performance
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "template_id": 45629,
+                "line_uids": [
+                    "U1348y18439jefidsgjf924r2....",
+                    "Uofkowekgowrpgwrkpglpwlpe...."
+                ],
+                "data": {
+                    "parameter1": "hello",
+                    "parameter2": "world"
+                },
+                "event_id": 346
+            }
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - sending message ID
+        + `result` (string) - sending message status
+
+    + Body
+
+            {
+                "id": 1342,
+                "result": "pending"
+            }
+
+## Sending message status [/openapi/v1/direct_message/{direct_message_id}/]
+<a name="query sending message status"></a>
+
+### Query sending message status [GET]
+Used to query the sending status of past push messages, including: send message, send multicast message, and send enhanced message.
+The value of the `status` field will be one of the following: `pending`, `sending`, and `sent`. The `result` field will be returned once the message is in `sent` status.
+
++ **Notes**
++ if the response status code is 200, it means MAAC has this sending record.
++ if `fail_info` value exists, it is highly possible that LINE failed to send this message out. Please assess whether to resend this or not.
+
++ Parameters
+    + direct_message_id: `1` (required, number)
+
++ Request (application/json)
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - MAAC event id
+        + `category` (string) - message type: push, multicast
+        + `status` (string) - sending status
+        + `result` (object) - result ( **multicast** )
+            + `sent_time` (string) -
+            + `to` (object) -
+                + `line_ids` (array)
+                    + `line_id` (string)
+            + `total_count` (number) - total number of messages sent
+            + `fail_count` (number) - number of failed message sending
+            + `fail_info` (array) - failure details for each failed message
+                + (object)
+                    + `line_uid` (string) - LINE user ID that failed
+                    + `mark` (number) - position index in original push/multicast LINE IDs array (0-indexed)
+                    + `response` (string) - error message from LINE or internal error
+
+    + Body
+
+            {
+                "id": 1,
+                "category": "multicast",
+                "status": "sent",
+                "event_id": null,
+                "result": {
+                    "sent_time": "2024-01-15T10:30:00+08:00",
+                    "to": {
+                    "line_ids": [
+                        "U11111111111111111111111111111111",
+                        "U22222222222222222222222222222222",
+                        "U33333333333333333333333333333333"
+                    ]
+                    },
+                    "total_count": 5,
+                    "fail_count": 3,
+                    "fail_info": [
+                        {
+                            "line_uid": "U11111111111111111111111111111111",
+                            "mark": 0,
+                            "response": "timeout"
+                        },
+                        {
+                            "line_uid": "U22222222222222222222222222222222",
+                            "mark": 2,
+                            "response": "{\"message\": \"Invalid user\"}"
+                        },
+                        {
+                            "line_uid": "U33333333333333333333333333333333",
+                            "mark": 3,
+                            "response": "429 Too Many Requests"
+                        }
+                    ]
+                }
+            }
+
+## Message performance [/openapi/v1/event/{event_id}/report/{?start_date,end_date}]
+
+### Get message performance report [GET /openapi/v1/event/{event_id}/report/{?start_date,end_date}]
+Used to query the performance report in the past push messages. <br><br>
+
++ **Notes**
++ MAAC will track the performance of the message event. If you want to get the message performance, please fill in the event_id when pushing.
++ When requesting, you can set the start and end dates for the calculation of the performance report
++ The field `unique_clicks` will be available from 2022-10-05. Note that it is nullable if there is no data source.
++ Messages sent via the Enhanced Multicast API do not support personalized tracking, so there will be no data on opens and clicks.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + event_id : 1 (required, number)
+    + start_date : `2017-05-17` (optional, string) ... start date **(YYYY-MM-DD)**
+    + end_date : `2020-05-17` (optional, string) ... end date **(YYYY-MM-DD)**
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `id` (number) - MAAC message event ID
+        + `report` (object)
+            + `total` (object)
+                + `clicks` (number) - total clicks
+                + `unique_clicks` (number, nullable) - unique clicks
+                + `adds_to_cart` (number) - add to cart count
+                + `transactions` (number) - transaction count
+                + `transaction_revenue` (number) - transaction revenue
+                + `opens` (number) - open count
+            + `urls` (array) - URL tracking data
+                + (object)
+                    + `id` (number) - URL tracking ID
+                    + `link` (number) - link ID
+                    + `url` (string) - the tracked URL
+                    + `utm_campaign` (string, nullable) - UTM campaign parameter
+                    + `utm_source` (string, nullable) - UTM source parameter
+                    + `utm_medium` (string, nullable) - UTM medium parameter
+                    + `utm_content` (string, nullable) - UTM content parameter
+                    + `clicks` (number) - total clicks
+                    + `unique_clicks` (number, nullable) - unique clicks
+                    + `adds_to_cart` (number) - add to cart count
+                    + `transactions` (number) - transaction count
+                    + `transaction_revenue` (number) - transaction revenue
+                    + `tags` (array) - associated tags
+            + `messages` (array) - trigger keyword tracking data
+                + (object)
+                    + `id` (number) - message tracking ID
+                    + `message` (string) - trigger keyword in message template
+                    + `clicks` (number) - click count
+                    + `tags` (array) - associated tags
+
+
+    + Body
+
+            {
+                "id": 1,
+                "report": {
+                    "total": {
+                        "opens": 1234,
+                        "clicks": 567,
+                        "unique_clicks": 432,
+                        "adds_to_cart": 89,
+                        "transactions": 23,
+                        "transaction_revenue": 12500.00
+                    },
+                    "urls": [
+                        {
+                            "id": 1,
+                            "link": 101,
+                            "url": "https://example.com/product",
+                            "utm_campaign": "summer_sale",
+                            "utm_source": "line",
+                            "utm_medium": "message",
+                            "utm_content": "banner",
+                            "clicks": 150,
+                            "unique_clicks": 120,
+                            "adds_to_cart": 30,
+                            "transactions": 8,
+                            "transaction_revenue": 4500.00,
+                            "tags": ["promo", "summer"]
+                        }
+                    ],
+                    "messages": [
+                        {
+                            "id": 1,
+                            "message": "Buy now",
+                            "clicks": 75,
+                            "tags": ["cta", "purchase"]
+                        }
+                    ]
+                }
+            }
+
+
+# Group Deeplink
+
+## Deeplink [/openapi/v1/deeplink/]
+
+### Get deeplink performance report [GET /openapi/v1/deeplink/{?start_date,end_date}]
+Get the performance report of the deeplink.<br><br>
+
++ **Notes**
++ MAAC will track the performance of the message event. If you want to get the message performance, please fill in the event_id when pushing.
++ When requesting, you can set the start and end dates for the calculation of the performance report
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + start_date : `2017-05-17` (optional, string) ... start date **(YYYY-MM-DD)**
+    + end_date : `2020-05-17` (optional, string) ... end date **(YYYY-MM-DD)**
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `id` (number) - deeplink ID
+        + `name` (string) - deeplink name
+        + `description` (string) - deeplink description
+        + `shorten_url` (string) - deeplink shorten_url
+        + `created_at` (string) - deeplink created time(ISO Format)
+        + `tags` (array) - tag name array of the tags to be attached
+                + (string)
+        + `report` (object) - performance report
+            + `click_count` (number) - click count
+            + `auth_count` (number) - auth contact count
+            + `new_friend_count` (number) - new contact count
+            + `existing_friend_count` (number) - existing contact count
+            + `unique_auth_count` (number) - unique auth count
+            + `unique_new_friend_count` (number) - unique new contact count
+            + `unique_existing_friend_count` (number) - unique existing contact count
+
+
+
+    + Body
+
+            {
+                "id": 1,
+                "name": "deeplink_1",
+                "description": "1st deeplink",
+                "shorten_url": "https://maac.io/xxxxx",
+                "created_at": "2020-07-27T14:52:41.874151+08:00",
+                "tags": ["tag_1", "tag_2"],
+                "report": {
+                    "click_count": 0,
+                    "auth_count": 0,
+                    "new_friend_count": 0,
+                    "existing_friend_count": 0,
+                    "unique_auth_count": 0,
+                    "unique_new_friend_count": 0,
+                    "unique_existing_friend_count": 0
+                }
+            }
+
+# Group Tracelink
+
+## Tracelink [/openapi/v1/tracelink/]
+
+### Get tracelink performance report [GET /openapi/v1/tracelink/{?start_date,end_date}]
+Get the performance report of the tracelink.<br><br>
+
++ **Notes**
++ MAAC will track the performance of the message event. If you want to get the message performance, please fill in the event_id when pushing.
++ When requesting, you can set the start and end dates for the calculation of the performance report
++ The field `unique_clicks` will be available from 2022-09-16. Note that it is nullable if there is no data source.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + start_date : `2017-05-17` (optional, string) ... start date **(YYYY-MM-DD)**
+    + end_date : `2020-05-17` (optional, string) ... end date **(YYYY-MM-DD)**
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `id` (number) - Identifier for the TraceLink in MAAC.
+        + `name` (string) - The name of the TraceLink.
+        + `description` (string, nullable) - Description of the TraceLink. Can be null.
+        + `shorten_url` (string) - The shortened URL for the TraceLink.
+        + `created_at` (string) - Timestamp when the TraceLink was created (ISO 8601 Format).
+        + `tag` (array[string]) - List of tags associated with the TraceLink (can be an empty array).
+        + `report` (object) - Summary performance report data for this TraceLink.
+            + `clicks` (number) - Total number of clicks.
+            + `unique_clicks` (number, nullable) - Number of unique clicks. Null if data is unavailable. (Note: Feature enabled 2022-09-16)
+            + `adds_to_cart` (number) - Number of times items were added to the cart.
+            + `transactions` (number) - Total number of transactions.
+            + `transaction_revenue` (number) - Total revenue generated from transactions.
+        + `utm` (object, nullable) - UTM parameters associated with this TraceLink. May be null or an empty object if not configured.
+            + `utm_campaign` (string) - UTM campaign name (utm_campaign).
+            + `utm_source` (string) - UTM source (utm_source).
+            + `utm_medium` (string) - UTM medium (utm_medium).
+            + `utm_content` (string) - UTM content (utm_content).
+
+    + Body
+
+            {
+                "id": 388101,
+                "name": "This is for TraceLink",
+                "description": null,
+                "shorten_url": "https://maac.io/3iuM7",
+                "created_at": "2025-01-23T17:41:37.142001+08:00",
+                "tag": [],
+                "report": {
+                    "clicks": 5,
+                    "unique_clicks": null,
+                    "adds_to_cart": 0,
+                    "transactions": 0,
+                    "transaction_revenue": 0
+                },
+                "utm": {
+                    "utm_campaign": "20241111",
+                    "utm_source": "LINE",
+                    "utm_medium": "offline",
+                    "utm_content": "taipei_branch"
+                }
+            }
+
+# Group Bindlink
+
+## Bindlink [/openapi/v1/binding/bindlink/]
+
+### Generate bindlink [POST]
+From the left column of MAAC > Message Center > Message Template Library > Binding Message Template, after creating a message template, you can get the created template ID.
+
++ **Notes**
++  If you want to update a bound contact data, please use [Update member](#reference/0/0/3)API。
+
++ Request (application/json)
+    + Attributes (object)
+        + `bind_link_id` (required, number) - message template ID
+        + `customer_id` (required, string) - User ID of the third-party system
+        + `email` (optional, string) - contact email
+        + `mobile` (optional, string) - contact phone number
+        + `bind_once` (optional, boolean) - If true, the generated bindlink can only be bound once. If false or omitted, bindlink can be bound multiple times (default behavior)
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+              "customer_id": "1235734897",
+              "bind_link_id": 1,
+              "bind_once": false    
+            }
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + `link` (string) - bindlink
+        + `is_login` (boolean)- whether this `customer_id` has been tied to the contact of the official account
+        + `line_display_name` (optional, string)- If the above is `True`, then reply to the user name bound to the `customer_id`
+
+    + Body
+
+            {
+                "link": "https://maac.io/XXXX",
+                "is_login": false
+            }
+
+
+## Callback [/partner/maac/binding/callback/]
+
+### Callback [POST]
+When the user clicks the binding link and joins the official account to complete the binding, MAAC will send event notifications through the registered callback endpoint. (To log in to the callback endpoint, please contact [Customer support](mailto:customer-supoort@cresclab.com))
+
+(MAAC OpenAPI does not have the endpoint `/partner/maac/binding/callback/`, please do not use this for testing, this is just a design example, for reference only)
+
+>#### **Request**
+
+`POST https://your-api-domain.com/your/callback/endpoint`
+
+>#### **Headers**
+
+| column | value |
+| :-- | :-- |
+|`<custom-preset-header-key>`| `<custom-preset-header-value>` |
+
+>#### **Body**
+
+| column | type | description |
+| -- | -- | -- |
+|line_uid | String | The unique user ID of the contact in the LINE official account, 33 characters in length
+|customer_id| String | User ID of the third-party system
+|email| String | Contact email
+|mobile| String | Contact phone Number
+|status| String | Contact status <br>`follow`: contacts of the official account<br>`auth`: the contact has authorized the official account<br>`unfollow`: the contact has blocked the official account
+
++ Request (application/json)
+    + Attributes (object)
+        + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+        + `customer_id` (string) - User ID of the third-party system
+        + `email` (string) - Contact email
+        + `mobile` (string) - Contact phone Number
+        + `status` (string) - Contact status
+
+
+    + Headers
+
+            x-api-key: api_key_here
+
+    + Body
+
+            {
+                "line_uid": "U12345678901234567890123456789012",
+                "customer_id": "C123456789",
+                "email": "sample@cresclab.com",
+                "mobile": "0912345678",
+                "status": "follow",
+            }
+
++ Response 200 (application/json)
+    + Body
+
+            {}
+
+# Group Prize
+
+## Prize [/openapi/v1/prize/]
+
+### Redeem Prize [POST /openapi/v1/prize/{code}/redeem/]
+Redeem the prize with unique code.<br><br>
+
+**Notes**
++ This is the request for Voucher redemption only.
++ Please try not to press the redeem button and send the request by POS machine at the same time.
+
+#### **Parameters**
+
+| column | type | option |description |
+| -- | -- | -- | -- |
+| code | String(32) | required | The unique prize code of Voucher.
+
+#### **Body**
+
+| column | type | option | description |
+| -- | -- | -- | -- |
+| tags | Array[String(255)] | optional | A List of MAAC tag names for contact.<br> Max number of tags: 5.<br>Max length of name: 255.
+|customer_id| String(1024) | required, nullable | User ID of the third-party system
+|mobile| String(16) | required, nullable | Contact phone number
+|gender| String | required, nullable | Contact gender.<br> value:<br> - `male`<br>- `female`<br>- `unknown`
+|store| String(16) | required, nullable | Vender name
+|revenue| Float | required, nullable | Revenue per redemption
+
+#### **Response**
+
+###### response body
+
+ ```json
+ {
+    "detail": <success/error message>
+ }
+ ```
+
+| status code | detail | description |
+| -- | -- | -- |
+| 201 | Success | The prize redemption is successful.
+| 403 | Token Invalid | The API token is lacking or invalid.
+| 404 | Prize Code Does Not Exist | Prize not found.
+| 404 | Prize Status Expired | The Prize validity is expired.
+| 404 | Contact Not Found | Contact not found.
+| 408 | Prize Redemption Need Retry | Transaction blocking (e.g., while the other is changing prize setting/data), needs to retry.
+| 409 | Prize Has Been Redeemed | The current prize has been redeemed.
+| 409 | Prize Is Not Received | The current prize is not "received".
+| 500 | Other errors | Unknown error.
+
++ Parameters
+    + code: `xxx12345` (optional, string) - Prize code max length: 32<br>
+
++ Request (application/json)
+    + Attributes (object)
+        + `tags` (optional, array[string]) - A list of tags name.
+            default: `[]`.
+            Max number: 5.
+            Max length of tag name: 255.
+        + `customer_id` (required, string, nullable) - User ID of the third-party system (can be `null`)
+            Max length: 1024.
+        + `mobile` (required, string, nullable) - Contact phone number (can be `null`)
+            Max length: 16.
+        + `gender` (required, string, nullable) - Contact gender (can be `null`)
+            value: **male**, **female**, **unknown**
+        + `store`  (required, string, nullable) - Vendor name (can be `null`)
+            Max length: 1024.
+        + `revenue` (required, number, nullable) - Revenue per redemption (can be `null`)
+           default: `0.0` if `null`.
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+              "tags": ["1111 Activity", "1111 Acitivity 2"]
+              "customer_id": "1235734897",
+              "mobile": "0912345678",
+              "gender": "unknown",
+              "store": "CrescLab",
+              "revenue": 1.0,
+            }
+
+
++ Response 201 (application/json)
+    + Attributes (object)
+        + `detail` (string) - success/error message
+    + Body
+
+            {
+                "detail": "Success"
+            }
+
++ Response 403 (application/json)
+    + Body
+
+            {
+                "detail": "Token Invalid"
+            }
+
+
+# Group Auto Reply
+
+## Auto Reply Report [/openapi/v1/auto_reply/]
+
+### Search Auto Reply Reports [POST /openapi/v1/auto_reply/search/]
+
+Search and retrieve auto reply report data with support for filtering by time range and channel type.
+
+**Notes**
+
+- It is recommended to keep the date range within 3 months for optimal performance
+- Terminology Notes:
+  - `new_friend`: New Contact
+  - `original_friend`: Unbound Contact
+  - `bound_friend`: Bound Contact
+
+#### **Request Body**
+
+| Field | Type | Required | Default | Description |
+| :-- | :------- | :-- | :-- | :-- |
+| start_date | String | optional | `"2016-01-01"` | Start date (YYYY-MM-DD)
+| end_date | String | optional | Today | End date (YYYY-MM-DD)
+| channel_type | String | optional | `null` | Channel type filter
+| offset | Integer | optional | `0` | Pagination offset
+| limit | Integer | optional | `20` | Items per page (1-20)
+
+**Field Details**
+
+- **start_date / end_date**
+  - Format: `YYYY-MM-DD` (e.g., `2025-01-15`)
+  - Validation: `start_date` must be ≤ `end_date`
+  - Purpose: Define the time range for report statistics
+
+- **channel_type**
+  - Available values:
+    - `line` - LINE Official Account
+    - `whatsapp` - WhatsApp Business
+    - `wccs` - web chat
+    - `fb` - Facebook Messenger
+    - `ig` - Instagram Messaging
+  - Purpose: Return only auto reply data for the specified channel type
+
+- **offset / limit**
+  - offset: Number of records to skip (≥ 0)
+  - limit: Number of records to return (1-20)
+  - Purpose: Implement pagination
+
+#### **Response (200 OK)**
+
+**Root Level Fields**
+
+| Field | Type | Description |
+| :-- | :------- | :-- |
+| count | Integer | Total number of auto replies matching the criteria (for pagination)
+| reports | Array | Report statistics data
+
+**Report Object**
+
+| Field | Type | Description |
+| :-- | :------- | :-- |
+| id | Integer | Auto reply ID
+| name | String | Auto reply name
+| created_at | String | Auto reply creation time (ISO 8601)
+| start_date | String | Report start date (YYYY-MM-DD)
+| end_date | String | Report end date (YYYY-MM-DD)
+| total | Object | Overall statistics
+| channel_setting_reports | Array | Detailed statistics by channel
+
+**TotalReport Object (total)**
+
+| Field | Type | Description |
+| :-- | :------- | :-- |
+| triggers | Integer | Number of triggers
+| replies | Integer | Number of replies
+| opens | Integer | Number of opens
+| unique_opens | Integer | Number of unique opens
+| clicks | Integer | Number of clicks
+| unique_clicks | Integer | Number of unique clicks
+| click_rate | Float | Click rate (clicks / triggers)
+| adds_to_cart | Integer | Number of add-to-cart actions
+| orders | Integer | Number of orders
+| revenue | Float | Revenue amount
+
+**ChannelSettingReport Object**
+
+| Field | Type | Description |
+| :-- | :------- | :-- |
+| id | Integer | Channel setting ID
+| channel_id | Integer | Channel (Bot) ID
+| channel_type | String | Channel type
+| channel_name | String | Channel name
+| total | Object | Overall statistics for this channel (same structure as TotalReport)
+| new_friend | Object | Statistics for new contacts
+| original_friend | Object | Statistics for unbound contacts
+| bound_friend | Object | Statistics for bound contacts
+
+**MessageReport Object (new_friend / original_friend / bound_friend)**
+
+| Field | Type | Description |
+| :-- | :------- | :-- |
+| total | Object | Statistics for this contact type (same structure as TotalReport)
+| urls | Array | URL click and conversion statistics
+| messages | Array | Interactive message click statistics
+
+**UrlMetric Object (urls array element)**
+
+| Field | Type | Description |
+| :-- | :------- | :-- |
+| id | Integer | Link ID
+| utm_campaign | String | UTM tracking parameter - campaign name
+| utm_source | String | UTM tracking parameter - source (e.g., LINE, WhatsApp)
+| utm_medium | String | UTM tracking parameter - medium (e.g., message)
+| utm_content | String | UTM tracking parameter - content description
+| clicks | Integer | Number of clicks
+| adds_to_cart | Integer | Number of add-to-cart actions
+| transactions | Integer | Number of transactions (orders)
+| transaction_revenue | Float | Transaction amount (revenue)
+| link | Integer | Link ID (same as id)
+| tags | Array[String] | Tag list (for classification)
+
+**MessageMetric Object (messages array element)**
+
+| Field | Type | Description |
+| :-- | :------- | :-- |
+| id | Integer | Message/button ID
+| message | String | Message/button text content
+| tags | Array[String] | Related tag list
+| clicks | Integer | Number of clicks
+
+**Notes**
+- **`urls` purpose**: Track the performance of external links in messages (e.g., product pages, official website) with complete UTM parameters and conversion data
+- **`messages` purpose**: Track clicks on interactive message elements (e.g., LINE Quick Reply, Postback Action)
+- **Conversion tracking**: The `adds_to_cart`, `transactions`, and `transaction_revenue` in `urls` require GA integration to obtain data
+
++ Request (application/json)
+    + Attributes (object)
+        + `start_date` (optional, string) - Start date (YYYY-MM-DD)
+            Default: `"2016-01-01"`.
+        + `end_date` (optional, string) - End date (YYYY-MM-DD)
+            Default: Today.
+        + `channel_type` (optional, string) - Channel type filter
+            Available values: `line`, `whatsapp`, `wccs`, `fb`, `ig`.
+        + `offset` (optional, number) - Pagination offset
+            Default: `0`.
+            Must be >= 0.
+        + `limit` (optional, number) - Items per page
+            Default: `20`.
+            Range: 1-20.
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+              "start_date": "2025-01-01",
+              "end_date": "2025-01-07",
+              "channel_type": "line",
+              "offset": 0,
+              "limit": 10
+            }
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `count` (number) - Total number of auto replies matching the criteria
+        + `reports` (array) - Report statistics data
+            + (object)
+                + `id` (number) - Auto reply ID
+                + `name` (string) - Auto reply name
+                + `created_at` (string) - Auto reply creation time (ISO 8601)
+                + `start_date` (string) - Report start date (YYYY-MM-DD)
+                + `end_date` (string) - Report end date (YYYY-MM-DD)
+                + `total` (object) - Overall statistics
+                    + `triggers` (number) - Number of triggers
+                    + `replies` (number) - Number of replies
+                    + `opens` (number) - Number of opens
+                    + `unique_opens` (number) - Number of unique opens
+                    + `clicks` (number) - Number of clicks
+                    + `unique_clicks` (number) - Number of unique clicks
+                    + `click_rate` (number) - Click rate
+                    + `adds_to_cart` (number) - Number of add-to-cart actions
+                    + `orders` (number) - Number of orders
+                    + `revenue` (number) - Revenue amount
+                + `channel_setting_reports` (array) - Detailed statistics by channel
+                    + (object)
+                        + `id` (number) - Channel setting ID
+                        + `channel_id` (number) - Channel (Bot) ID
+                        + `channel_type` (string) - Channel type
+                        + `channel_name` (string) - Channel name
+                        + `total` (object) - Overall statistics for this channel
+                            + `triggers` (number) - Number of triggers
+                            + `replies` (number) - Number of replies
+                            + `opens` (number) - Number of opens
+                            + `unique_opens` (number) - Number of unique opens
+                            + `clicks` (number) - Number of clicks
+                            + `unique_clicks` (number) - Number of unique clicks
+                            + `click_rate` (number) - Click rate
+                            + `adds_to_cart` (number) - Number of add-to-cart actions
+                            + `orders` (number) - Number of orders
+                            + `revenue` (number) - Revenue amount
+                        + `new_friend` (object) - Statistics for new contacts
+                            + `total` (object) - Statistics (same structure as above)
+                                + `triggers` (number) - Number of triggers
+                                + `replies` (number) - Number of replies
+                                + `opens` (number) - Number of opens
+                                + `unique_opens` (number) - Number of unique opens
+                                + `clicks` (number) - Number of clicks
+                                + `unique_clicks` (number) - Number of unique clicks
+                                + `click_rate` (number) - Click rate
+                                + `adds_to_cart` (number) - Number of add-to-cart actions
+                                + `orders` (number) - Number of orders
+                                + `revenue` (number) - Revenue amount
+                            + `urls` (array) - URL click and conversion statistics
+                                + (object)
+                                    + `id` (number) - Link ID
+                                    + `utm_campaign` (string) - UTM campaign name
+                                    + `utm_source` (string) - UTM source
+                                    + `utm_medium` (string) - UTM medium
+                                    + `utm_content` (string) - UTM content description
+                                    + `clicks` (number) - Number of clicks
+                                    + `adds_to_cart` (number) - Number of add-to-cart actions
+                                    + `transactions` (number) - Number of transactions
+                                    + `transaction_revenue` (number) - Transaction amount
+                                    + `link` (number) - Link ID
+                                    + `tags` (array[string]) - Tag list
+                            + `messages` (array) - Interactive message click statistics
+                                + (object)
+                                    + `id` (number) - Message/button ID
+                                    + `message` (string) - Message/button text content
+                                    + `tags` (array[string]) - Related tag list
+                                    + `clicks` (number) - Number of clicks
+                        + `original_friend` (object) - Statistics for unbound contacts
+                            + `total` (object) - Statistics (same structure as new_friend.total)
+                            + `urls` (array) - URL click and conversion statistics (same structure as new_friend.urls)
+                            + `messages` (array) - Interactive message click statistics (same structure as new_friend.messages)
+                        + `bound_friend` (object) - Statistics for bound contacts
+                            + `total` (object) - Statistics (same structure as new_friend.total)
+                            + `urls` (array) - URL click and conversion statistics (same structure as new_friend.urls)
+                            + `messages` (array) - Interactive message click statistics (same structure as new_friend.messages)
+
+    + Body
+
+            {
+              "count": 2,
+              "reports": [
+                {
+                  "id": 1,
+                  "name": "Welcome Message",
+                  "created_at": "2025-01-01T10:00:00+08:00",
+                  "start_date": "2025-01-01",
+                  "end_date": "2025-01-07",
+                  "total": {
+                    "triggers": 1250,
+                    "replies": 1200,
+                    "opens": 800,
+                    "unique_opens": 750,
+                    "clicks": 320,
+                    "unique_clicks": 300,
+                    "click_rate": 0.256,
+                    "adds_to_cart": 45,
+                    "orders": 28,
+                    "revenue": 15600.50
+                  },
+                  "channel_setting_reports": [
+                    {
+                      "id": 101,
+                      "channel_id": 501,
+                      "channel_type": "line",
+                      "channel_name": "Official LINE Bot",
+                      "total": {
+                        "triggers": 1000,
+                        "replies": 980,
+                        "opens": 650,
+                        "unique_opens": 620,
+                        "clicks": 260,
+                        "unique_clicks": 245,
+                        "click_rate": 0.26,
+                        "adds_to_cart": 38,
+                        "orders": 24,
+                        "revenue": 13200.00
+                      },
+                      "new_friend": {
+                        "total": {
+                          "triggers": 300,
+                          "replies": 295,
+                          "opens": 200,
+                          "unique_opens": 190,
+                          "clicks": 80,
+                          "unique_clicks": 75,
+                          "click_rate": 0.267,
+                          "adds_to_cart": 12,
+                          "orders": 8,
+                          "revenue": 4200.00
+                        },
+                        "urls": [
+                          {
+                            "id": 631197,
+                            "utm_campaign": "202501-Welcome-Product-Page",
+                            "utm_source": "LINE",
+                            "utm_medium": "message",
+                            "utm_content": "welcome-new-user",
+                            "clicks": 50,
+                            "adds_to_cart": 8,
+                            "transactions": 5,
+                            "transaction_revenue": 2800.00,
+                            "link": 631197,
+                            "tags": ["welcome", "new_user"]
+                          }
+                        ],
+                        "messages": [
+                          {
+                            "id": 124817,
+                            "message": "Learn More",
+                            "tags": ["info"],
+                            "clicks": 180
+                          }
+                        ]
+                      },
+                      "original_friend": {
+                        "total": {
+                          "triggers": 500,
+                          "replies": 490,
+                          "opens": 330,
+                          "unique_opens": 315,
+                          "clicks": 130,
+                          "unique_clicks": 122,
+                          "click_rate": 0.26,
+                          "adds_to_cart": 18,
+                          "orders": 11,
+                          "revenue": 6100.00
+                        },
+                        "urls": [],
+                        "messages": []
+                      },
+                      "bound_friend": {
+                        "total": {
+                          "triggers": 200,
+                          "replies": 195,
+                          "opens": 120,
+                          "unique_opens": 115,
+                          "clicks": 50,
+                          "unique_clicks": 48,
+                          "click_rate": 0.25,
+                          "adds_to_cart": 8,
+                          "orders": 5,
+                          "revenue": 2900.00
+                        },
+                        "urls": [],
+                        "messages": []
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": 2,
+                  "name": "Follow Auto Reply",
+                  "created_at": "2025-01-02T11:00:00+08:00",
+                  "start_date": "2025-01-01",
+                  "end_date": "2025-01-07",
+                  "total": {
+                    "triggers": 350,
+                    "replies": 340,
+                    "opens": 280,
+                    "unique_opens": 270,
+                    "clicks": 120,
+                    "unique_clicks": 115,
+                    "click_rate": 0.343,
+                    "adds_to_cart": 15,
+                    "orders": 10,
+                    "revenue": 5500.00
+                  },
+                  "channel_setting_reports": [
+                    {
+                      "id": 102,
+                      "channel_id": 501,
+                      "channel_type": "line",
+                      "channel_name": "Official LINE Bot",
+                      "total": {
+                        "triggers": 350,
+                        "replies": 340,
+                        "opens": 280,
+                        "unique_opens": 270,
+                        "clicks": 120,
+                        "unique_clicks": 115,
+                        "click_rate": 0.343,
+                        "adds_to_cart": 15,
+                        "orders": 10,
+                        "revenue": 5500.00
+                      },
+                      "new_friend": {
+                        "total": {
+                          "triggers": 350,
+                          "replies": 340,
+                          "opens": 280,
+                          "unique_opens": 270,
+                          "clicks": 120,
+                          "unique_clicks": 115,
+                          "click_rate": 0.343,
+                          "adds_to_cart": 15,
+                          "orders": 10,
+                          "revenue": 5500.00
+                        },
+                        "urls": [],
+                        "messages": []
+                      },
+                      "original_friend": {
+                        "total": {
+                          "triggers": 0,
+                          "replies": 0,
+                          "opens": 0,
+                          "unique_opens": 0,
+                          "clicks": 0,
+                          "unique_clicks": 0,
+                          "click_rate": 0.0,
+                          "adds_to_cart": 0,
+                          "orders": 0,
+                          "revenue": 0.0
+                        },
+                        "urls": [],
+                        "messages": []
+                      },
+                      "bound_friend": {
+                        "total": {
+                          "triggers": 0,
+                          "replies": 0,
+                          "opens": 0,
+                          "unique_opens": 0,
+                          "clicks": 0,
+                          "unique_clicks": 0,
+                          "click_rate": 0.0,
+                          "adds_to_cart": 0,
+                          "orders": 0,
+                          "revenue": 0.0
+                        },
+                        "urls": [],
+                        "messages": []
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+
++ Response 400 (application/json)
+
+    + Attributes (object)
+        + `message` (string) - Error message
+        + `errors` (array) - Error details
+            + (object)
+                + `loc` (array[string]) - Error field location
+                + `msg` (string) - Error message
+                + `type` (string) - Error type
+
+    + Body
+
+            {
+              "message": "",
+              "errors": [
+                {
+                  "loc": ["__root__"],
+                  "msg": "Invalid start_date format. Use YYYY-MM-DD.",
+                  "type": "value_error"
+                }
+              ]
+            }
+
++ Response 403 (application/json)
+    + Body
+
+            {
+              "detail": "You do not have permission to perform this action."
+            }
+
++ Response 404 (application/json)
+    + Body
+
+            {
+              "message": "Bot does not exist"
+            }
+
+
+# Group SMS+
+
+This section describes how to use SMS+ related APIs.
+
+## SMS+ campaign [/openapi/v1/pnp/setting/]
+
+When sending a SMS+ message, you need to fill in a SMS+ campagin ID.
+If the campaign enables Line Notification Message, the template needs to be reviewed by the LINE official first; Crescendo Lab will assist in completing the application.
+
+Please contact [Customer support](mailto:customer-supoort@cresclab.com) for the
+application.
+
+### Get SMS+ campaign [GET /openapi/v1/pnp/setting/{?start}]
+
+Get the list of SMS+ campaigns. The list is paginated for every
+`300` campaigns.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + start : `OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D`(optional, string) -
+      The cursor of the next page. It will be returned in the `next` parameter of the previous page.
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `results` (array) - The array of SMS+ campaigns
+            + (object)
+                + `id` (number) - SMS+ campaign ID
+                + `name` (string) - SMS+ campaign name
+                + `status` (string) - SMS+ campaign status
+                + `line_push_enabled` (boolean) - Enable LINE PUSH Message or not
+                + `pnp_enabled` (boolean) - Enable LINE Notification Message or not
+                + `fallback_enabled` (boolean) - Enable SMS Message or not
+                + `fallback_period` (number) - Forwarding SMS waiting time (minutes)
+                + `parameters` (array) - Parameter array in LINE Notification Message
+                    + (string) - parameter name
+                + `sms_parameters` (array) - Parameter array in SMS message
+                    + (string) - parameter name
+        + `next` (string) - the page token of the next page. `null` if no next page.
+
+
+    + Body
+
+            {
+                "results": [
+                    "id": 1111,
+                    "name": "Arrival Notice",
+                    "status": "enable",
+                    "line_push_enabled": true,
+                    "pnp_enabled": true,
+                    "fallback_enabled": true,
+                    "fallback_period": 1440,
+                    "parameters": [
+                        "days",
+                        "location_name",
+                        "order_number",
+                        "arrival_date",
+                        "order_url"
+                    ],
+                    "sms_parameters": [
+                        "order_number",
+                        "arrival_date",
+                        "location_name",
+                        "days"
+                    ]
+                ],
+                "next": null
+            }
+
+### Get SMS+ campaign info [GET /openapi/v1/pnp/setting/{pnp_setting_id}/]
+
+Get the specified SMS+ campaign and its statistics metrics.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + `pnp_setting_id` : 1111 (required, number) - SMS+ campaign ID
+
++ Response 200 (application/json)
+
+    + Attributes (object)
+        + `id` (number) - SMS+ campaign ID
+        + `name` (string) - SMS+ campaign name
+        + `status` (string) - SMS+ campaign stauts
+        + `line_push_enabled` (boolean) - Enable LINE PUSH Message or not
+        + `pnp_enabled` (boolean) - Enable LINE Notification Message or not
+        + `fallback_enabled` (boolean) - Enable SMS Message or not
+        + `fallback_period` (number) - Forwarding SMS waiting time (minutes)
+        + `parameters` (array) - Parameter array in LINE Notification Message
+            + (string) - parameter name
+        + `sms_parameters` (array) - Parameter array in SMS message
+            + (string) - parameter name
+        + `metric` (object) - SMS+ message statistics
+            + `all` (number) - Total number of SMS+ message triggered
+            + `fail` (number) - Total number of SMS+ message fail
+            + `pnp` (number) - Total number of LINE Notification Messages
+            + `sms` (number) - Total number of SMS Messages
+
+    + Body
+
+            {
+                "id": 1111,
+                "name": "Arrival Notice",
+                "status": "enable",
+                "line_push_enabled": true,
+                "pnp_enabled": true,
+                "fallback_enabled": true,
+                "fallback_period": 1440,
+                "parameters": [
+                    "days",
+                    "location_name",
+                    "order_number",
+                    "arrival_date",
+                    "order_url"
+                ],
+                "sms_parameters": [
+                    "order_number",
+                    "arrival_date",
+                    "location_name",
+                    "days"
+                ],
+                "metric": {
+                    "all": 0,
+                    "fail": 0,
+                    "pnp": 0,
+                    "sms": 0
+                }
+            }
+
+
+## Send SMS+ message [/openapi/v1/pnp/message/]
+
+Required information for sending SMS+ messages
+
+- `pnp_setting_id`: SMS+ campaign ID, which needs to be approved by LINE.
+- `phone_number`: The mobile phone number of the user.
+
+The phone number format supports the following formats:
+- **E.164** format: An international telephone numbering plan (e.g., `+886912345678`).
+- **SHA256-hashed** format: A SHA256-hashed E.164 phone number (64 lowercase hexadecimal characters, e.g., `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). **Note: SHA256-hashed phone numbers are only accepted if SMS is disabled in the given SMS+ template (PNP setting). Also, LINE Push only supports exact match, so E.164 and SHA256 are incompatible for LINE Push.**
+
+The content of LINE Notification Message must be approved by LINE before it can be used.
+
+### Send single LINE SMS+ message [POST /openapi/v1/pnp/message/push/]
+
+Send SMS+ message to a single user.
+
++ **Notes**
++ Once you get `200` status code from the API, it means we already kept your LINE
+Notification Message request in our system. You don't need to retry in this case.
++ We would automatically fallback to SMS if SMS+ message cannot be
+delivered successfully in the `fallback_period`.
++ MAAC will track the performance of the message event, if you want to track the performance of the message push, please fill in `event_id`
+
+
++ Request (application/json)
+    + Attributes (object)
+        + `pnp_setting_id` (required, number) - SMS+ campaign ID
+        + `event_id` (optional, number) - message event ID, required if you want to track the performance
+        + `data` (required, object) - setting
+            + `phone_number` (required, string) - The contact's phone number. Accepts E.164 format (e.g., `+886912345678`) or SHA256-hashed E.164 format (64 hex chars). SHA256 is only accepted when SMS is disabled in the SMS+ template. LINE Push only supports exact match (E.164 and SHA256 incompatible).
+            + `line_push_template_id` (optional, number) - The ID of MESSAGE TEMPLATE. Required for SMS+ campaigns which enables LINE Push Message.
+            + `line_push` (optional, object) - LINE Push Message setting. Required for SMS+ campaigns which enables LINE Push Message.
+                + `PARAM_1` (optional, string) - parameter in the LINE Push Message template: name vs. value
+                + `PARAM_2` (optional, string) - parameter in the LINE Push Message template: name vs. value
+            + `pnp` (required, object) - LINE Notification Message setting
+                + `PARAM_1` (optional, string) - parameter in the LINE Notification Message template: name vs. value
+                + `PARAM_2` (optional, string) - parameter in the LINE Notification Message template: name vs. value
+            + `sms` (required, object) - SMS setting
+                + `PARAM_1` (optional, string) - parameter in the SMS template: name vs. value
+                + `PARAM_2` (optional, string) - parameter in the SMS template: name vs. value
+            + `whatsapp` (optional, object) - WhatsApp Template Message setting
+                + `template_name` (required, string) - WhatsApp template name
+                + `language` (required, string) - WhatsApp template language
+                + `template_data` (required, object) - WhatsApp template variables
+                    + `header` (optional, object) - whatsapp template header
+                        + `parameters` (array) - whatsapp template header parameters
+                            + (string) - parameter content
+                            + (object) - parameter content
+                                + `type` (enum) - parameter type
+                                    + text - text type
+                                    + image - image type
+                                    + video - video type
+                                    + document - document type
+                                    + location - location type
+                                + `text` (optional, string) - text content. Required if type is text.
+                                + `media_id` (optional, string) - WhatsApp Media Object ID. Required if type is image, video or document and media_url is not used.
+                                + `media_url` (optional, string) - Media URL. Required if type is image, video or document and media_id is not used.
+                                + `filename` (optional, string) - filename. Required if type is document.
+                                + `latitude` (optional, string) - latitude value. Required if type is location.
+                                + `longitude` (optional, string) - longitude value. Required if type is location.
+                                + `name` (optional, string) - name. Required if type is location.
+                                + `address` (optional, string) - address. Required if type is location.
+                    + `body` (optional, object) - WhatsApp template body
+                        + `parameters` (array[string]) - whatsapp template body parameters
+            + `customized_id` (optional, string) - A user-defined ID for tracking or correlating messages across systems.
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "pnp_setting_id": 1111,
+                "event_id": 123,
+                "data": {
+                    "phone_number": "+886912345678",
+                    "line_push_template_id": 123,
+                    "line_push": {
+                        "days": "7",
+                        "location_name": "A store",
+                        "order_number": "AJ1234567",
+                        "arrival_date": "2020/7/30",
+                        "order_url": "http://your.domain.com/order/"
+                    },
+                    "pnp": {
+                        "days": "7",
+                        "location_name": "A store",
+                        "order_number": "AJ1234567",
+                        "arrival_date": "2020/7/30",
+                        "order_url": "http://your.domain.com/order/"
+                    },
+                    "sms": {
+                        "order_number": "AJ1234567",
+                        "arrival_date": "2020/7/30",
+                        "location_name": "A store",
+                        "days": "7"
+                    },
+                    "whatsapp": {
+                        "template_name": "deliver_confirmation_test",
+                        "template_data": {
+                            "header": {
+                                "parameters": [
+                                    {
+                                        "type": "text",
+                                        "text": "A store"
+                                    }
+                                ]
+                            },
+                            "body": {
+                                "parameters": ["AJ1234567"]
+                            }
+                        },
+                        "language": "en_US"
+                     },
+                     "customized_id": "AJ1234567890"
+                }
+            }
+
++ Request Use WhatsApp image header template message (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "pnp_setting_id": 1111,
+                "event_id": 123,
+                "data": {
+                    "phone_number": "+886912345678",
+                    "pnp": {},
+                    "sms": {
+                        "order_number": "AJ1234567",
+                        "arrival_date": "2020/7/30",
+                        "location_name": "A store",
+                        "days": "7"
+                    },
+                    "whatsapp": {
+                        "template_name": "deliver_confirmation_test",
+                        "template_data": {
+                            "header": {
+                                "parameters": [
+                                    {
+                                        "type": "image",
+                                        "media_url": "http://maac.io/xxxxx.jpg"
+                                    }
+                                ]
+                            },
+                            "body": {
+                                "parameters": ["AJ1234567"]
+                            }
+                        },
+                        "language": "en_US"
+                     },
+                     "customized_id": "AJ1234567890"
+                }
+            }
+
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `id` (number) - SMS+ message ID.  Matches the `pnp_message_id` in the webhook and the `pnp_message_id` field in the "Get Sending Records List" API.
+        + `result` (string)
+          SMS+ message status
+            + `success` - This message has been submitted to LINE.
+            + `we're under maintenance` - LINE is under maintaince; this message will be delivered via SMS after `fallback_period`.
+            + `failed to send messages` - LINE cannot match the phone number; this message will be delivered via SMS after `fallback_period`.
+            + `access token expired` - LINE token is not valid; this message will be delivered via SMS after `fallback_period`.
+            + `timeout` - LINE API timeout; this message will be delivered via SMS after `fallback_period`.
+            + There might be other unlisted status. The system would deliver the message via SMS after `fallback_period`.
+    + Body
+
+            {
+                "id": 1342,
+                "result": "success"
+            }
+
++ Response 400 (text/plain)
+    - `pnp setting not found` - SMS+ campaign ID is invalid
+    - `xxx field is required` - Missing required field in the used SMS+ campaign
+    - `this value does not match the required pattern` - The phone number format is invalid
+    - `your SMS points are insufficient, please recharge before sending` - You don't have enough MAAC point quato; please contact us
+
+    + Body
+
+            pnp setting not found
+
++ Response 403 (text/plain)
+    - `You do not have permission to perform this action` - The authorization token is invalid
+
+    + Body
+
+            You do not have permission to perform this action
+
++ Response 503 (text/plain)
+    - `failed to emit messages` - The request meets a temporarily service unavailable. Please try again later.
+
+    + Body
+
+            failed to emit messages
+
+### Send multicast SMS+ messages [POST /openapi/v1/pnp/message/multicast/]
+
+Send multicast SMS+ messages to multiple users (up to **150** users). The parameter
+settings of each user could be different.
+**Noted, the API does not support LINE Push Message.**
+
++ **Notes**
++ Once you get `200` status code from the API, it means we already kept your LINE
+Notification Message request in our system. You don't need to retry in this case.
++ The system will process the messages asynchronously, so the status of the API response is `pending`.
++ We would automatically fallback to SMS if SMS+ message cannot be
+delivered successfully in the `fallback_period`.
++ MAAC will track the performance of the message event, if you want to track the performance of the message push, please fill in `event_id`
+
+
++ Request (application/json)
+    + Attributes (object)
+        + `pnp_setting_id` (required, number) - SMS+ campaign ID
+        + `event_id` (optional, number) - message event ID, required if you want to track the performance
+        + `data` (required, array) - the array of SMS+ campaign setting
+            + (object)
+                + `phone_number` (required, string) - The contact's phone number. Accepts E.164 format (e.g., `+886912345678`) or SHA256-hashed E.164 format (64 hex chars). SHA256 is only accepted when SMS is disabled in the SMS+ template.
+                + `pnp` (required, object) - LINE Notification Message setting
+                    + `PARAM_1` (optional, string) - parameter in the LINE Notification Message template: name vs. value
+                    + `PARAM_2` (optional, string) - parameter in the LINE Notification Message template: name vs. value
+                + `sms` (required, object) - SMS setting
+                    + `PARAM_1` (optional, string) - parameter in the SMS template: name vs. value
+                    + `PARAM_2` (optional, string) - parameter in the SMS template: name vs. value
+                + `customized_id` (optional, string) - A user-defined ID for tracking or correlating messages across systems.
+
+    + Headers
+
+            Authorization: Bearer {Access token}
+
+    + Body
+
+            {
+                "pnp_setting_id": 1111,
+                "event_id": 123,
+                "data": [
+                    {
+                        "phone_number": "+886912345678",
+                        "pnp": {
+                            "days": "7",
+                            "location_name": "A store",
+                            "order_number": "AJ1234567",
+                            "arrival_date": "2020/7/30",
+                            "order_url": "http://maac.io/xxxxx"
+                        },
+                        "sms": {
+                            "order_number": "AJ1234567",
+                            "arrival_date": "2020/7/30",
+                            "location_name": "A store",
+                            "days": "7"
+                        },
+                        "customized_id": "AJ1234567890"
+                    },
+                    {
+                        "phone_number": "+886912345679",
+                        "pnp": {
+                            "days": "7",
+                            "location_name": "B store",
+                            "order_number": "BK7654321",
+                            "arrival_date": "2020/7/30",
+                            "order_url": "http://maac.io/xxxxx"
+                        },
+                        "sms": {
+                            "order_number": "BK7654321",
+                            "arrival_date": "2020/7/30",
+                            "location_name": "B store",
+                            "days": "7"
+                        },
+                        "customized_id": "BK7654321890"
+                    }
+                ]
+            }
+
++ Response 200 (application/json)
+    + Attributes (array)
+        + (object)
+            + `id` (number) - SMS+ message ID
+            + `result` (string)
+              SMS+ message status
+                + `pending` - We are processing this message
+
+    + Body
+
+            [
+                {
+                  "id": 1111,
+                  "result": "pending"
+                },
+                {
+                  "id": 1112,
+                  "result": "pending"
+                }
+            ]
+
++ Response 400 (text/plain)
+    - `pnp setting not found` - SMS+ campaign ID is invalid
+    - `field is required` - Missing required field in LINE Notification Message or SMS setting
+    - `this value does not match the required pattern` - The phone number format is invalid
+    - `your SMS points are insufficient, please recharge before sending` - You don't have enough MAAC points; please contact us
+
+    + Body
+
+            pnp setting not found
+
++ Response 403 (text/plain)
+    - `You do not have permission to perform this action` - The authorization token is invalid
+
+    + Body
+
+            You do not have permission to perform this action
+
+### Get Sending Records List  [GET /openapi/v1/pnp/message/{?pnp_setting_id,updated_at_min,updated_at_max,start}]
+
+After sending a SMS+ message, you can get its sending record. This API can be used to track the status change of sending records.
+The list is paged for every 300 tags, and the result data is ordered by `updated_at` descend.
+
+> Filter with a time range (from `updated_at_min` to `updated_at_max`) to get the records that were updated during this time period.
+
++ **Notes**
++ We only accept ISO 8601 datetime format in `updated_at_min` and `updated_at_max`.
++ Please encode the `+` character in the datetime string (the URL encoded result of `+` is `%2B`). If not, the response will be a `400` format error.
++ If the datetime string does not contain a timezone, we will use this as the timezone of `Asia/Taipei`.
+
++ Request (application/json)
+    + Headers
+
+            Authorization: Bearer {Access token}
+
++ Parameters
+    + pnp_setting_id (required, number) - SMS+ campaign ID
+    + updated_at_min : `2022-10-13T16:03:15.248652%2B08:00` (required, string) - date time string that `updated_at` query range starts at (ISO 8601)
+    + updated_at_max : `2022-10-18T16:03:15.248652%2B08:00` (required, string) - date time string that `updated_at` query range ends at (ISO 8601)
+    + customized_id (optional, string) - A user-defined ID.
+    + start : `OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D`(optional, string) -
+    The cursor of the next page. It will be returned in the `next` parameter of the previous page.
+
++ Response 200 (application/json)
+    + Attributes (object)
+        + `results` (array) - array of sending records
+            + (object)
+                + `pnp_message_id` (number) - ID of sending record. Corresponding to the `id` in the response of "Send single LINE SMS+ message" API
+                + `phone_number` (string) -  The mobile phone number of the user.
+                + `status` (enum) - The final status of this sending record.
+                    + line_push_preparing - Start LINE Push sending process.
+                    + line_push_delivered - The LINE Push Message has been delivered to the user.
+                    + line_push_failed - The LINE Push Message failed to send.
+                    + line_push_undeliverable - The LINE push message cannot be delivered (e.g., reach monthly limit, inactive customers, Line API timeout).
+                    + pnp_preparing - start LINE notification message sending process.
+                    + pnp_accepted - LINE accepted LINE notification message send request
+                    + pnp_delivered - LINE notification message has been delivered to the user
+                    + pnp_failed - LINE notification message failed to send
+                    + pnp_undeliverable - LINE notification message cannot be delivered (e.g., blocked LINE OA)
+                    + sms_preparing - start SMS message sending process.
+                    + sms_accepted - SMS provider accepted SMS send request
+                    + sms_delivered - SMS has been delivered to the user
+                    + sms_failed - SMS failed to send
+                    + sms_undeliverable - SMS cannot be delivered(ex: Poor signal, shutdown)
+                    + sms_blocked - The SMS was blocked because the phone number was in the blocked list
+                    + sms_temporary_error - The SMS vendor is temporarily broken. MAAC will retry sending until the end of the retry time period. If all retries are failed, this status would be changed to `sms_failed`.
+                    + sms_callback_timeout - MAAC did not receive SMS vendor's response within timeout period.
+                + `line_push_template_id` (number, nullable) - LINE Message Template ID.
+                + `line_push_status` (string, nullable) - Process status of LINE Push Message.
+                + `line_push_delivered_at` (string, nullable) - Delivery time of LINE Push Message (ISO 8601).
+                + `line_push_error_category` (enum, nullable) - The error category of the Line Push message.
+                    + member_not_found - The Line push cannot be delivered because we can’t locate only one active contact in MAAC.(e.g. user block LINE OA, find more than 1 contact with the receiver phone number.)
+                    + reach_monthly_limit - The Line push cannot be delivered because you have reached the Line msg month limit.
+                    + others - Other errors.
+                + `pnp_status` (string, nullable) - Process status of LINE Notification Message.
+                + `pnp_delivered_at` (string, nullable) - Delivery time of a LINE Notification Message (ISO 8601).
+                + `sms_status` (string, nullable) - Process status of SMS Message.
+                + `sms_delivered_at` (string, nullable) - Sending time of a SMS message (ISO 8601)
+                + `sms_error_category` (enum, nullable) - The error category of the SMS message.
+                    + target_reception_issue - The SMS cannot be delivered due to telecom or reception issue (e.g., target is offline, base station has issue)
+                    + invalid_phone_number - The phone number is invalid or does not exist.
+                    + sensitive_words - The message contains sensitive words.
+                    + others - Other errors
+                + `updated_at` (string) - The update time of this sending record (ISO 8601)
+                + `event_id` (number) - message event ID
+                + `customized_id` (string, nullable) - A user-defined ID.
+        + `next` (string) - page token of the next page
+
+    + Body
+
+            {
+                "next": "OwNdFUXTfIyunwhn55vJh4fE0wu13wSPRTCUiaqhN1Nu0vLXHpzatVFtb9ZYKBxwGKoy3jOfvxSzEfOOZnFz5Y%2BKcvexmL39l5xQqQSwtiA%3D",
+                "results": [
+                    {
+                        "phone_number": "+886912345678",
+                        "pnp_message_id": 5,
+                        "status": "line_push_delivered",
+                        "line_push_template_id": 1,
+                        "line_push_status": "line_push_delivered",
+                        "line_push_delivered_at": "2022-10-14T10:33:41.343356+08:00",
+                        "line_push_error_category": null,
+                        "pnp_status": null,
+                        "pnp_delivered_at": null,
+                        "sms_status": null,
+                        "sms_delivered_at": null,
+                        "sms_error_category": null,
+                        "updated_at": "2022-10-14T10:33:41.343356+08:00",
+                        "event_id": 123,
+                        "customized_id": "AJ1234567890"
+                    },
+                    {
+                        "phone_number": "+886912345678",
+                        "pnp_message_id": 4,
+                        "status": "pnp_preparing",
+                        "line_push_template_id": null,
+                        "line_push_status": null,
+                        "line_push_delivered_at": null,
+                        "line_push_error_category": null,
+                        "pnp_status": "pnp_preparing",
+                        "pnp_delivered_at": null,
+                        "sms_status": null,
+                        "sms_delivered_at": null,
+                        "sms_error_category": null,
+                        "updated_at": "2022-10-14T10:33:41.343356+08:00",
+                        "event_id": 123,
+                        "customized_id": "AJ1234567890"
+                    },
+                    {
+                        "phone_number": "+886912345678",
+                        "pnp_message_id": 3,
+                        "status": "pnp_delivered",
+                        "line_push_template_id": null,
+                        "line_push_status": null,
+                        "line_push_delivered_at": null,
+                        "line_push_error_category": null,
+                        "pnp_status": "pnp_delivered",
+                        "pnp_delivered_at": "2022-10-13T16:39:15.248652+08:00",
+                        "sms_status": null,
+                        "sms_delivered_at": null,
+                        "sms_error_category": null,
+                        "updated_at": "2022-10-13T16:39:15.248652+08:00",
+                        "event_id": 123,
+                        "customized_id": "AJ1234567890"
+                    },
+                    {
+                        "phone_number": "+886912345678",
+                        "pnp_message_id": 2,
+                        "status": "sms_delivered",
+                        "line_push_template_id": null,
+                        "line_push_status": null,
+                        "line_push_delivered_at": null,
+                        "line_push_error_category": null,
+                        "pnp_status": "pnp_undeliverable",
+                        "pnp_delivered_at": null,
+                        "sms_status": "sms_delivered",
+                        "sms_delivered_at": "2022-10-13T16:39:15.248652+08:00",
+                        "sms_error_category": null,
+                        "pnp_delivered_at": null,
+                        "sms_status": "sms_delivered",
+                        "sms_delivered_at": "2022-10-13T16:39:15.248652+08:00",
+                        "sms_error_category": null,
+                        "updated_at": "2022-10-13T16:36:48.440109+08:00",
+                        "event_id": 123,
+                        "customized_id": "AJ1234567890"
+                    },
+                    {
+                        "phone_number": "+886912345678",
+                        "pnp_message_id": 1,
+                        "status": "sms_undeliverable",
+                        "line_push_template_id": null,
+                        "line_push_status": null,
+                        "line_push_delivered_at": null,
+                        "line_push_error_category": null,
+                        "pnp_status": "pnp_undeliverable",
+                        "pnp_delivered_at": null,
+                        "sms_status": "sms_undeliverable",
+                        "sms_delivered_at": null,
+                        "sms_error_category": "target_reception_issue"
+                        "updated_at": "2022-10-13T16:35:10.200642+08:00",
+                        "event_id": 123,
+                        "customized_id": "AJ1234567890"
+                    }
+                ]
+            }
+
++ Response 400 (application/json)
+    + Body
+
+            {
+                "updated_at_min": [
+                    "Datetime has wrong format. Use one of these formats instead: YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]."
+                ],
+                 "pnp_setting_id": [
+                    "This field is required."
+                ]
+            }
+
++ Response 404 (application/json)
+    + Body
+
+            {
+                "detail": "pnp_setting_id not found"
+            }
+
++ Response 403 (application/json)
+    + Body
+
+            {
+                "detail": "You do not have permission to perform this action."
+            }
+
+
+# Group Webhook
+
+You can use webhook subscriptions to receive notifications about particular events. After you've subscribed to a webhook topic, your app can execute code immediately after specific events occur in bots that have your app installed, instead of having to make API calls periodically to check their status.
+
+(To use in to the webhook, please contact [Customer support](mailto:customer-supoort@cresclab.com))
+
+#### Considerations
+
+MAAC OpenAPI does not have the endpoint `/partner/maac/binding/webhook/`, please do not use this for testing, this is just a design example, for reference only
+
+| Topics                                    | Event                     |
+| ----------------------------------------- | ------------------------- |
+| receipt                                   | receipt.receipt_validated |
+| form                                      | form.surveycake_submitted |
+| LINE notification message status updated  | pnp.status_updated        |
+| LINE notification message profile updated | pnp.profile_updated       |
+| Prize Points Added                        | prize.points_added        |
+
+> #### **Request**
+
+`POST https://your-api-domain.com/your/webhook/endpoint`
+
+> #### **Headers**
+
+| column                   | value                                                                                                                   |
+| :----------------------- | :---------------------------------------------------------------------------------------------------------------------- |
+| Content-Type             | application/json; charset=utf-8                                                                                         |
+| CrescLab-Idempotency-Key | A unique string identifier generated by MAAC. Uses this identifier to recognize subsequent retries of the same request. |
+| CrescLab-Signature       | To confirm that the request was sent from the MAAC Platform.                                                            |
+
+> #### **Body**
+
+| column    | type   | description        |
+| :-------- | :----- | :----------------- |
+| timestamp | String | event triggered at |
+| topic     | String | event topic        |
+| data      | Object | event payload      |
+
+## Webhook [/partner/maac/webhook/]
+
+### Receipt Validated [POST]
+
++ Request (application/json; charset=utf-8)
+    + Attributes (object)
+        + `timestamp` (string) - event triggered at
+        + `topic` (string) - event topic
+        + `data` (object) - event payload
+            + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `customer_id` (string, nullable) - User ID of the third-party system
+            + `campaign_name` (string, nullable) - campaign name
+            + `number` (string) - receipt number
+            + `datetime` (string) - transaction date time
+            + `upload_datetime` (string) - receipt uploaded date time
+            + `random_number` (string) - receipt random number
+            + `channel` (string) - purchase channel
+            + `items` (array) - purchase details
+                + (object)
+                    + `description` (string) - product description
+                    + `unit_price` (number) - product prize
+                    + `quantity` (number) - purchase counts
+                    + `amount` (number) - total amount
+
+    + Headers
+
+            CrescLab-Idempotency-Key: 191fecc0b2644d3f875ce84b1340b645
+            CrescLab-Signature: 0ff864b8f3bf8353e9a8e0b62f17da3be16cb66adf653561da482be93c836df5
+
+    + Body
+
+            {
+                "timestamp": "2021-11-29T15:43:26.582968+08:00",
+                "topic": "receipt.receipt_validated",
+                "data": {
+                    "line_uid": "U58c280fca6ea81aa18330cee7269d36b",
+                    "customer_id": null,
+                    "campaign_name": "串接測試",
+                    "number": "JA87857072",
+                    "datetime": "2021-11-09T12:05:36+08:00",
+                    "upload_datetime": "2021-11-29T07:43:26.540452+08:00",
+                    "random_number": "5067",
+                    "channel": "師傅萬隆捷運站店",
+                    "items": [
+                        {
+                            "description": "檸檬肉桂堅果橘皮",
+                            "unit_price": 65.0,
+                            "quantity": 1.0,
+                            "amount": 65.0
+                        },
+                        {
+                            "description": "烤布丁(2入)",
+                            "unit_price": 105.0,
+                            "quantity": 1.0,
+                            "amount": 105.0
+                        }
+                    ]
+                }
+            }
+
++ Response 200 (text/plain)
+    + Body
+
+            OK
+
+### SurveyCake Submitted [POST]
+
+For detailed information on submit events, please refer to [SurveyCake API](https://github.com/SurveyCake/webhook/blob/master/README-en.md#1-what-format-are-answers-in)
+
++ Request (application/json; charset=utf-8)
+    + Attributes (object)
+        + `timestamp` (string) - event triggered at
+        + `topic` (string) - event topic
+        + `data` (object) - event payload
+            + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `customer_id` (string, nullable) - User ID of the third-party system
+            + `survey_name` (string, nullable) - survey name
+            + `answer_hash` (string) - Hash value of answer content. This value can be used to search logs in SurveyCake.
+            + `answer` (array) - survey details
+                + (object)
+                    + `id` (string)
+                    + `svid` (string) - survey id
+                    + `title` (string) - survey title
+                    + `status` (string)
+                    + `submitTime` (string)
+                    + `mbunq` (string, nullable)
+                    + `meta` (object)
+                    + `mbrid` (string, nullable)
+                    + `alias` (object)
+                        + your_alias_key (array[string])
+                    + `result` (array)
+                        + (object)
+                            + `subject` (string)
+                            + `type` (string) - subject type
+                            + `sn` (string)
+                            + `label` (string)
+                            + `alias` (string)
+                            + `answer` (array[string])
+                            + `otherAnswer` (array[string])
+                            + `answerLabel` (array[string])
+                            + `answerAlias` (array[string])
+
+    + Headers
+
+            CrescLab-Idempotency-Key: 191fecc0b2644d3f875ce84b1340b645
+            CrescLab-Signature: 0ff864b8f3bf8353e9a8e0b62f17da3be16cb66adf653561da482be93c836df5
+
+    + Body
+
+            {
+                "timestamp": "2021-11-30T17:51:26.018507+08:00",
+                "topic": "form.surveycake_submitted",
+                "data": {
+                    "line_uid": "U0123456789abcdef0123456789abcdef",
+                    "customer_id": "12345678",
+                    "survey_name": "survey1",
+                    "answer": {
+                        "id": 1234,
+                        "svid": "abcde",
+                        "title": "MAAC 串接",
+                        "status": "FINISH",
+                        "submitTime": "2021-07-15 07:32:23",
+                        "mbunq": null,
+                        "meta": {
+                            "isolated": {
+                                "status": false,
+                                "type": null
+                            }
+                        },
+                        "mbrid": null,
+                        "alias": {
+                            "maac_member_line_uid": [
+                                "U0123456789abcdef0123456789abcdef"
+                            ],
+                            "maac_member_name": [
+                                "CrescLab"
+                            ],
+                            "maac_member_mobile": [
+                                "0987654321"
+                            ],
+                            "maac_member_birthday": [
+                                "2021-01-01"
+                            ],
+                            "maac_member_customer_id": [
+                                "12345678"
+                            ],
+                            "maac_member_email": [],
+                            "maac_member_gender": [
+                                "female"
+                            ]
+                        },
+                        "result": [
+                            {
+                                "subject": "LINE UID",
+                                "type": "TXTSHORT",
+                                "sn": 0,
+                                "label": "",
+                                "alias": "maac_member_line_uid",
+                                "answer": [
+                                    "U0123456789abcdef0123456789abcdef"
+                                ],
+                                "otherAnswer": [],
+                                "answerLabel": [],
+                                "answerAlias": []
+                            },
+                            {
+                                "subject": "姓名",
+                                "type": "TXTSHORT",
+                                "sn": 1,
+                                "label": "",
+                                "alias": "maac_member_name",
+                                "answer": [
+                                    "CrescLab"
+                                ],
+                                "otherAnswer": [],
+                                "answerLabel": [],
+                                "answerAlias": []
+                            },
+                            {
+                                "subject": "手機號碼",
+                                "type": "TXTSHORT",
+                                "sn": 17,
+                                "label": "",
+                                "alias": "maac_member_mobile",
+                                "answer": [
+                                    "0987654321"
+                                ],
+                                "otherAnswer": [],
+                                "answerLabel": [],
+                                "answerAlias": []
+                            },
+                            {
+                                "subject": "生日",
+                                "type": "DATEPICKER",
+                                "sn": 23,
+                                "label": "birth",
+                                "alias": "maac_member_birthday",
+                                "answer": [
+                                    "2021-01-01"
+                                ],
+                                "otherAnswer": [],
+                                "answerLabel": [],
+                                "answerAlias": []
+                            },
+                            {
+                                "subject": "customer_id",
+                                "type": "TXTSHORT",
+                                "sn": 18,
+                                "label": "cid",
+                                "alias": "maac_member_customer_id",
+                                "answer": [
+                                    "12345678"
+                                ],
+                                "otherAnswer": [],
+                                "answerLabel": [],
+                                "answerAlias": []
+                            },
+                            {
+                                "subject": "Email",
+                                "type": "TXTSHORT",
+                                "sn": 21,
+                                "label": "email,email_test",
+                                "alias": "maac_member_email",
+                                "answer": [],
+                                "otherAnswer": [],
+                                "answerLabel": [],
+                                "answerAlias": []
+                            },
+                            {
+                                "subject": "Gender",
+                                "type": "CHOICEONE",
+                                "sn": 22,
+                                "label": "",
+                                "alias": "maac_member_gender",
+                                "answer": [
+                                    "女"
+                                ],
+                                "otherAnswer": [],
+                                "answerLabel": [
+                                    "girl"
+                                ],
+                                "answerAlias": [
+                                    "female"
+                                ]
+                            },
+                            {
+                                "subject": "Tag",
+                                "type": "CHOICEMULTI",
+                                "sn": 24,
+                                "label": "",
+                                "alias": "",
+                                "answer": [
+                                    "Tag1",
+                                    "Tag2"
+                                ],
+                                "otherAnswer": [],
+                                "answerLabel": [
+                                    "1,2",
+                                    ""
+                                ],
+                                "answerAlias": [
+                                    "",
+                                    ""
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+
++ Response 200 (text/plain)
+    + Body
+
+            OK
+
+### SMS+ Message Status Updated [POST]
+
++ Request (application/json; charset=utf-8)
+    + Attributes (object)
+        + `timestamp` (string) - event triggered at
+        + `topic` (string) - event topic
+        + `data` (object) - event payload
+            + `pnp_setting_id` (number) - SMS+ campaign ID
+            + `pnp_setting_name` (string) - SMS+ campaign name
+            + `pnp_message_id` (number) - sending SMS+ message ID. Matches the `id` in the response of "Send single LINE SMS+ message" API.
+            + `event_id` (number) - message event ID
+            + `customized_id` (string, nullable) - A user-defined ID.
+            + `phone_number` (string) - The phone number of the user. Can be E.164 format (e.g., `+886912345678`) or SHA256-hashed E.164 format (64 hex chars), depending on the format used in the original API request.
+            + `status` (enum) - final status of sending message
+              + line_push_preparing - Start LINE Push sending process.
+              + line_push_delivered - The LINE Push Message has been delivered to the user.
+              + line_push_failed - The LINE Push Message failed to send.
+              + line_push_undeliverable - The LINE push message cannot be delivered (e.g., reach monthly limit, inactive customers, Line API timeout).
+              + pnp_accepted - LINE accepted LINE notification message send request
+              + pnp_delivered - LINE notification message has been delivered to the user
+              + pnp_failed - LINE notification message failed to send
+              + pnp_undeliverable - LINE notification message cannot be delivered (e.g., blocked LINE OA)
+              + sms_accepted - SMS provider accepted SMS send request
+              + sms_delivered - SMS has been delivered to the user
+              + sms_failed - SMS failed to send
+              + sms_undeliverable - SMS cannot be delivered(e.g., Poor signal, shutdown)
+              + sms_blocked - The SMS was blocked because the phone number was in the blocked list
+              + sms_temporary_error - The SMS vendor is temporarily broken. MAAC will retry sending until the end of the retry time period. If all retries are failed, this status would be changed to `sms_failed`.
+              + sms_callback_timeout - MAAC did not receive SMS vendor's response within timeout period.
+            + `line_push_template_id` (number, nullable) - LINE Message Template ID.
+            + `line_push_status` (string, nullable) - Process status of LINE Push Message.
+            + `line_push_delivered_at` (string, nullable) - Delivery time of LINE Push Message (ISO 8601).
+            + `line_push_error_category` (enum, nullable) - The error category of the Line Push message.
+                + member_not_found - The Line push cannot be delivered because we can’t locate only one active contact in MAAC.(e.g. user block LINE OA, find more than 1 contact with the receiver phone number.)
+                + reach_monthly_limit - The Line push cannot be delivered because you have reached the Line msg month limit.
+                + others - Other errors.
+            + `pnp_status` (string, nullable) - Process status of LINE Notification Message.
+            + `pnp_delivered_at` (string, nullable) - Delivery time of a LINE Notification Message (ISO 8601).
+            + `sms_status` (string, nullable) - Process status of SMS Message.
+            + `sms_delivered_at` (string, nullable) - Sending time of a SMS message (ISO 8601)
+            + `sms_error_category` (enum, nullable) - The error category of the SMS message.
+                + target_reception_issue - The SMS cannot be delivered due to telecom or reception issue (e.g., target is offline, base station has issue)
+                + invalid_phone_number - The phone number is invalid or does not exist.
+                + sensitive_words - The message contains sensitive words.
+                + others - Other errors
+    + Headers
+
+            CrescLab-Idempotency-Key: 191fecc0b2644d3f875ce84b1340b645
+            CrescLab-Signature: 0ff864b8f3bf8353e9a8e0b62f17da3be16cb66adf653561da482be93c836df5
+
+    + Body
+
+            {
+                "timestamp": "2021-11-30T17:51:26.018507+08:00",
+                "topic": "pnp.status_updated",
+                "data": {
+                    "pnp_setting_id": 0,
+                    "pnp_setting_name": "testing name",
+                    "pnp_message_id": 0,
+                    "event_id": 123,
+                    "customized_id": "AJ1234567890",
+                    "phone_number": "+886912345678",
+                    "status": "pnp_delivered",
+                    "line_push_template_id": 1,
+                    "line_push_status": "line_push_failed",
+                    "line_push_delivered_at": null,
+                    "line_push_error_category": null,
+                    "pnp_status": "pnp_delivered",
+                    "pnp_delivered_at": "2021-11-30T17:51:26.018507+08:00",
+                    "sms_status": null,
+                    "sms_delivered_at": null,
+                    "sms_error_category": null
+                }
+            }
+
++ Response 200 (text/plain)
+    + Body
+
+            OK
+
+### SMS+ Profile Updated [POST]
+
++ Request (application/json; charset=utf-8)
+    + Attributes (object)
+        + `timestamp` (string) - event triggered at
+        + `topic` (string) - event topic
+        + `data` (object) - event payload
+            + `pnp_setting_id` (number) - SMS+ campagin ID
+            + `pnp_setting_name` (string) - SMS+ campaign name
+            + `phone_number` (string) - The phone number of the user. Can be E.164 format (e.g., `+886912345678`) or SHA256-hashed E.164 format (64 hex chars), depending on the format used in the original API request.
+            + `source` (enum) - event soruce
+              + pnp - Events from the Line Notification Message binding process
+              + sms - Events from SMS binding process
+            + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `customer_id` (string, nullable) - User ID of the third-party system
+
+    + Headers
+
+            CrescLab-Idempotency-Key: 191fecc0b2644d3f875ck84b1340b645
+            CrescLab-Signature: 0ff864b8f3bf8353e9a8e0b62f17da3be16cb66adf655361da482be93c836df5
+
+    + Body
+
+            {
+                "timestamp": "2022-05-09T16:51:48.320132+08:00",
+                "topic": "pnp.profile_updated",
+                "data": {
+                    "pnp_setting_id": 0,
+                    "pnp_setting_name": "testing name",
+                    "source": "pnp",
+                    "phone_number": "+886912345678",
+                    "line_uid": "U0123456789abcdef0123456789abcdef",
+                    "customer_id": null
+                }
+            }
+
++ Response 200 (text/plain)
+    + Body
+
+            OK
+
+### Prize Points Added [POST]
+
++ Request (application/json; charset=utf-8)
+    + Attributes (object)
+        + `timestamp` (string) - event triggered at
+        + `topic` (string) - event topic
+        + `data` (object) - event payload
+            + `prize_name` (string) - Prize Name
+            + `points_id` (string) - The unique identification ID of the prize message, which can be used to identify the same point addition request
+            + `points_category` (string, nullable) - Reward Points Category, the default is null, if MAAC has a setting, it will have a value
+            + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `customer_id` (string) - User ID of the third-party system
+            + `points_memo` (string) - Reward Points Reason
+            + `points_count` (number) - Reward Points Amount
+            + `points_expire_date` (string, nullable) - Reward Points Expiration Date (ISO 8601 Format), the default is null, if MAAC has a setting, it will have a value
+
+    + Headers
+
+            CrescLab-Idempotency-Key: 191fecc0b2644d3f875ce84b1340b645
+            CrescLab-Signature: 0ff864b8f3bf8353e9a8e0b62f17da3be16cb66adf653561da482be93c836df5
+
+    + Body
+
+            {
+                "timestamp": "2021-11-29T15:43:26.582968+08:00",
+                "topic": "prize.points_added",
+                "data": {
+                    "prize_name": "Prize Name",
+                    "points_id": "550e8400-e29b-41d4-a716-446655440000",
+                    "line_uid": "U7ee656c217619d09bb51cd0198df98fd",
+                    "customer_id": "xxx",
+                    "points_memo": "reason",
+                    "points_count": 999,
+                    "points_expire_date": "2022-01-01T00:00:00+08:00",
+                    "points_category": "points category"
+                }
+            }
+
+
++ Response 200 (text/plain)
+    + Body
+
+            OK
+
+### Message First Open [POST]
+Once the messages sent via OpenAPI with the `event_id`, the webhook events will be delivered. Otherwise, there won't be any webhook events.
+
++ Request (application/json; charset=utf-8)
+    + Attributes (object)
+        + `timestamp` (string) - event triggered at
+        + `topic` (string) - event topic
+        + `data` (object) - event payload
+            + `message_type` (string) - The type of the message. The value of this field will be one of the below, broadcast/openapi.
+            + `message_id` (number) - The identification of each message. When `message_type` is `openapi`, the value of this field will be `event_id`.
+            + `line_uid` (string) - The unique user ID of the contact in the LINE official account, 33 characters in length
+            + `customer_id` (string) - User ID of the third-party system
+
+    + Headers
+
+            CrescLab-Idempotency-Key: 191fecc0b2644d3f875ce84b1340b645
+            CrescLab-Signature: 0ff864b8f3bf8353e9a8e0b62f17da3be16cb66adf653561da482be93c836df5
+
+    + Body
+
+            {
+                "timestamp": "2022-08-31T17:17:13.064761+08:00",
+                "topic": "message.first_open",
+                "data": {
+                    "message_type": "broadcast",
+                    "message_id": 999,
+                    "line_uid": "U7ee656c217619d09bb51cd0198df98fd",
+                    "customer_id": "xxx"
+                }
+            }
+
+
++ Response 200 (text/plain)
+    + Body
+
+            OK

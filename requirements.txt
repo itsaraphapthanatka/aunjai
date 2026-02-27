@@ -1,0 +1,14 @@
+youtube-transcript-api>=0.6.1
+pandas>=2.0.0
+pinecone>=3.0.0
+sentence-transformers>=2.2.2
+python-dotenv>=1.0.0
+tqdm>=4.65.0
+fastapi>=0.100.0
+uvicorn>=0.22.0
+psycopg2-binary>=2.9.0
+requests>=2.31.0
+httpx>=0.24.0
+yt-dlp>=2023.0.0
+ffmpeg-python>=0.2.0
+

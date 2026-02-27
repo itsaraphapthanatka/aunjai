@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nong Unjai - Video Editor</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header
+            class="mb-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center glass-panel p-6 rounded-2xl">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                    <i class="fas fa-video text-blue-500"></i>
+                    น้องอุ่นใจ Video Editor
+                </h1>
+                <p class="text-gray-600 mt-2">ค้นหาประโยคที่ต้องการ และสั่งตัดคลิปเพื่อส่งให้ผู้ใช้งาน</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <a href="/admin" class="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left Column: Search & Results -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Action Tabs -->
+                <div class="glass-panel flex gap-2 p-2 rounded-2xl w-full">
+                    <button id="tabSearch"
+                        class="flex-1 bg-white text-blue-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none">
+                        <i class="fas fa-search mr-2"></i> ค้นหาคลิป
+                    </button>
+                    <button id="tabImport"
+                        class="flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none">
+                        <i class="fas fa-cloud-download-alt mr-2"></i> นำเข้า
+                    </button>
+                    <button id="tabHighlight"
+                        class="flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none">
+                        <i class="fas fa-star mr-2"></i> Highlight
+                    </button>
+                    <button id="tabChannel"
+                        class="flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none">
+                        <i class="fab fa-youtube mr-2"></i> Channel
+                    </button>
+                </div>
+
+                <!-- Search Panel -->
+                <div id="panelSearch" class="glass-panel rounded-2xl p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">ค้นหาในระบบ</h2>
+                    <form id="searchForm" class="flex gap-3">
+                        <div class="relative flex-grow">
+                            <i
+                                class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchInput"
+                                placeholder="เช่น https://youtu.be/xxx แล้วตามด้วยคำค้นหา หรือค้นหาปกติ"
+                                class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all shadow-sm">
+                        </div>
+                        <button type="submit" id="searchBtn"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-md flex items-center gap-2 whitespace-nowrap">
+                            <span>ค้นหา</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Import Panel (Hidden by default) -->
+                <div id="panelImport" class="glass-panel rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">นำเข้าวิดีโอไปยังระบบ (Knowledge Base)</h2>
+                    <form id="importForm" class="flex gap-3">
+                        <div class="relative flex-grow">
+                            <i
+                                class="fab fa-youtube absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+                            <input type="text" id="importInput" placeholder="วาง YouTube Link หรือ Video ID ที่นี่..."
+                                required
+                                class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all shadow-sm">
+                        </div>
+                        <button type="submit" id="importBtn"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-md flex items-center gap-2 whitespace-nowrap">
+                            <i class="fas fa-cloud-upload-alt"></i> <span>นำเข้า</span>
+                        </button>
+                    </form>
+
+                    <!-- Import Status -->
+                    <div id="importStatus" class="mt-4 hidden p-4 rounded-xl border">
+                        <div class="flex items-center gap-3">
+                            <i id="importStatusIcon" class="fas fa-circle-notch fa-spin text-indigo-500 text-xl"></i>
+                            <div>
+                                <h3 id="importStatusTitle" class="font-medium text-gray-800">กำลังนำเข้าข้อมูล...</h3>
+                                <p id="importStatusMsg" class="text-sm text-gray-500 mt-1">ระบบกำลังดาวน์โหลด Transcript
+                                    และประมวลผล (1-2 นาที)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Highlight Panel (Hidden by default) -->
+                <div id="panelHighlight" class="glass-panel rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800"><i
+                            class="fas fa-star text-amber-500 mr-2"></i>วิเคราะห์ Highlight อัตโนมัติ</h2>
+                    <p class="text-sm text-gray-500 mb-4">วาง YouTube Link → ถอด Transcript → OpenClaw
+                        วิเคราะห์ช่วงที่น่าสนใจ → ตัดคลิปอัตโนมัติ</p>
+                    <form id="highlightForm" class="flex gap-3">
+                        <div class="relative flex-grow">
+                            <i
+                                class="fab fa-youtube absolute left-4 top-1/2 transform -translate-y-1/2 text-red-400 text-lg"></i>
+                            <input type="text" id="highlightInput"
+                                placeholder="วาง YouTube Link ที่นี่... เช่น https://youtu.be/xxx" required
+                                class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 outline-none transition-all shadow-sm">
+                        </div>
+                        <button type="submit" id="highlightBtn"
+                            class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-md flex items-center gap-2 whitespace-nowrap">
+                            <i class="fas fa-magic"></i> <span>วิเคราะห์</span>
+                        </button>
+                    </form>
+
+                    <!-- Highlight Status -->
+                    <div id="highlightStatus" class="mt-4 hidden">
+                        <div class="p-4 rounded-xl border border-amber-100 bg-amber-50">
+                            <div class="flex items-center gap-3">
+                                <i id="highlightStatusIcon"
+                                    class="fas fa-circle-notch fa-spin text-amber-500 text-xl"></i>
+                                <div class="flex-grow">
+                                    <h3 id="highlightStatusTitle" class="font-medium text-amber-800">กำลังวิเคราะห์...
+                                    </h3>
+                                    <p id="highlightStatusMsg" class="text-sm text-amber-600 mt-1">ถอด Transcript
+                                        และส่งให้ AI วิเคราะห์ (อาจใช้เวลา 1-3 นาที)</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 w-full bg-amber-200 rounded-full h-1.5 overflow-hidden">
+                                <div class="bg-amber-500 h-1.5 rounded-full"
+                                    style="animation: slideProgress 1.5s infinite linear; width: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Results -->
+                    <div id="highlightResults"
+                        class="mt-4 hidden space-y-3 custom-scrollbar max-h-[500px] overflow-y-auto pr-1">
+                    </div>
+                </div>
+
+                <!-- Channel Panel (Hidden by default) -->
+                <div id="panelChannel" class="glass-panel rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800"><i
+                            class="fab fa-youtube text-red-500 mr-2"></i>ดึงวิดีโอจาก Channel</h2>
+                    <p class="text-sm text-gray-500 mb-4">ใส่ URL ของ YouTube Channel เพื่อดึงรายการวิดีโอทั้งหมด
+                        แล้วเลือกวิดีโอที่ต้องการวิเคราะห์ Highlight</p>
+                    <form id="channelForm" class="flex gap-3">
+                        <div class="relative flex-grow">
+                            <i
+                                class="fab fa-youtube absolute left-4 top-1/2 transform -translate-y-1/2 text-red-400 text-lg"></i>
+                            <input type="text" id="channelInput" placeholder="เช่น https://www.youtube.com/@ChannelName"
+                                required
+                                class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all shadow-sm">
+                        </div>
+                        <button type="submit" id="channelBtn"
+                            class="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-md flex items-center gap-2 whitespace-nowrap">
+                            <i class="fas fa-search"></i> <span>ดึงวิดีโอ</span>
+                        </button>
+                    </form>
+
+                    <!-- Channel Status -->
+                    <div id="channelStatus" class="mt-4 hidden">
+                        <div class="p-4 rounded-xl border border-purple-100 bg-purple-50">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-circle-notch fa-spin text-purple-500 text-xl"></i>
+                                <span class="text-sm text-purple-700">กำลังดึงรายการวิดีโอ...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Channel Results -->
+                    <div id="channelResults"
+                        class="mt-4 hidden space-y-2 custom-scrollbar max-h-[550px] overflow-y-auto pr-1">
+                    </div>
+                </div>
+
+                <!-- Results List -->
+                <div class="glass-panel rounded-2xl p-6 min-h-[400px]">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800 flex justify-between items-center">
+                        ผลลัพธ์การค้นหา
+                        <span id="resultCount"
+                            class="text-sm font-normal text-gray-500 bg-gray-100 px-3 py-1 rounded-full">0 รายการ</span>
+                    </h2>
+
+                    <!-- Loading State -->
+                    <div id="searchLoading"
+                        class="hidden flex flex-col items-center justify-center py-12 text-gray-500">
+                        <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i>
+                        <p>กำลังค้นหาใน Knowledge Base...</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="flex flex-col items-center justify-center py-16 text-gray-400">
+                        <i class="fas fa-search text-5xl mb-4 opacity-50"></i>
+                        <p class="text-lg">พิมพ์ข้อความด้านบนเพื่อค้นหาคลิปวิดีโอ</p>
+                    </div>
+
+                    <!-- Results Container -->
+                    <div id="resultsContainer"
+                        class="hidden space-y-4 custom-scrollbar max-h-[600px] overflow-y-auto pr-2">
+                        <!-- Items will be injected here via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Player & Processing -->
+            <div class="space-y-6">
+
+                <!-- Active Clip Info -->
+                <div class="glass-panel rounded-2xl p-6 sticky top-6">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">คลิปที่เลือก</h2>
+
+                    <div id="noClipSelected"
+                        class="text-center py-10 text-gray-500 border-2 border-dashed border-gray-300 rounded-xl">
+                        <i class="far fa-hand-pointer text-3xl mb-2"></i>
+                        <p>ยังไม่ได้เลือกคลิป</p>
+                    </div>
+
+                    <div id="clipEditor" class="hidden flex-col gap-4">
+                        <div class="relative w-full pt-[56.25%] bg-black rounded-xl overflow-hidden shadow-inner">
+                            <iframe id="previewPlayer" class="absolute inset-0 w-full h-full" src="" frameborder="0"
+                                allowfullscreen></iframe>
+                        </div>
+
+                        <div class="text-sm bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-600">Video ID:</span>
+                                <span id="lblVideoId" class="font-mono text-blue-700 font-medium"></span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-600">เริ่ม:</span>
+                                <span class="font-mono"><span id="lblStart"></span> วินาที</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">สิ้นสุด:</span>
+                                <span class="font-mono"><span id="lblEnd"></span> วินาที</span>
+                            </div>
+                        </div>
+
+                        <!-- Processing Status UI -->
+                        <div id="processingUI" class="hidden">
+                            <div class="mb-2 flex justify-between text-sm items-center">
+                                <span class="text-gray-600 font-medium flex items-center gap-2">
+                                    <i class="fas fa-cog fa-spin text-blue-500"></i> กำลังตัดต่อ...
+                                </span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                                <!-- Indeterminate progress bar -->
+                                <div class="bg-blue-600 h-2.5 rounded-full w-1/2 animate-[pulse_2s_ease-in-out_infinite]"
+                                    style="transform-origin: left; animation: slideProgress 1.5s infinite linear;">
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 text-center">อาจใช้เวลา 10-30 วินาที</p>
+                        </div>
+
+                        <!-- Success UI -->
+                        <div id="successUI" class="hidden mt-2">
+                            <div class="bg-green-50 border border-green-200 p-4 rounded-xl text-center">
+                                <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
+                                <h3 class="font-medium text-green-800">ตัดต่อสำเร็จ!</h3>
+                            </div>
+                            <a id="downloadBtn" href="#" target="_blank"
+                                class="mt-3 w-full block text-center bg-gray-800 hover:bg-black text-white px-4 py-3 rounded-xl font-medium transition-colors shadow-md">
+                                <i class="fas fa-download mr-2"></i> ดาวน์โหลดไฟล์ MP4
+                            </a>
+                        </div>
+
+                        <!-- Error UI -->
+                        <div id="errorUI" class="hidden mt-2 bg-red-50 border border-red-200 p-4 rounded-xl">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
+                                <div>
+                                    <h3 class="font-medium text-red-800">เกิดข้อผิดพลาด</h3>
+                                    <p id="errorMsg" class="text-sm text-red-600 mt-1"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="trimBtn"
+                            class="w-full mt-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-3 rounded-xl font-medium transition-colors shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2">
+                            <i class="fas fa-cut"></i> สั่งตัดคลิปตอนนี้
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animation for progress bar -->
+    <style>
+        @keyframes slideProgress {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(200%);
+            }
+        }
+    </style>
+
+    <script>
+        // State
+        let currentVideoParams = null;
+        let activeTaskId = null;
+        let pollInterval = null;
+
+        // Elements
+        const form = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+
+        const tabSearch = document.getElementById('tabSearch');
+        const tabImport = document.getElementById('tabImport');
+        const panelSearch = document.getElementById('panelSearch');
+        const panelImport = document.getElementById('panelImport');
+
+        const importForm = document.getElementById('importForm');
+        const importInput = document.getElementById('importInput');
+        const importBtn = document.getElementById('importBtn');
+        const importStatus = document.getElementById('importStatus');
+        const importStatusIcon = document.getElementById('importStatusIcon');
+        const importStatusTitle = document.getElementById('importStatusTitle');
+        const importStatusMsg = document.getElementById('importStatusMsg');
+
+        const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('searchLoading');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultCount = document.getElementById('resultCount');
+
+        const noClipSelected = document.getElementById('noClipSelected');
+        const clipEditor = document.getElementById('clipEditor');
+        const previewPlayer = document.getElementById('previewPlayer');
+        const lblVideoId = document.getElementById('lblVideoId');
+        const lblStart = document.getElementById('lblStart');
+        const lblEnd = document.getElementById('lblEnd');
+        const trimBtn = document.getElementById('trimBtn');
+
+        const processingUI = document.getElementById('processingUI');
+        const successUI = document.getElementById('successUI');
+        const errorUI = document.getElementById('errorUI');
+        const errorMsg = document.getElementById('errorMsg');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Highlight Elements
+        const tabHighlight = document.getElementById('tabHighlight');
+        const panelHighlight = document.getElementById('panelHighlight');
+        const highlightForm = document.getElementById('highlightForm');
+        const highlightInput = document.getElementById('highlightInput');
+        const highlightBtn = document.getElementById('highlightBtn');
+        const highlightStatus = document.getElementById('highlightStatus');
+        const highlightStatusIcon = document.getElementById('highlightStatusIcon');
+        const highlightStatusTitle = document.getElementById('highlightStatusTitle');
+        const highlightStatusMsg = document.getElementById('highlightStatusMsg');
+        const highlightResults = document.getElementById('highlightResults');
+
+        // Channel Elements
+        const tabChannel = document.getElementById('tabChannel');
+        const panelChannel = document.getElementById('panelChannel');
+        const channelForm = document.getElementById('channelForm');
+        const channelInput = document.getElementById('channelInput');
+        const channelBtn = document.getElementById('channelBtn');
+        const channelStatus = document.getElementById('channelStatus');
+        const channelResults = document.getElementById('channelResults');
+
+        // Functions
+        const formatTime = (seconds) => {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        };
+
+        const renderResults = (results) => {
+            resultsContainer.innerHTML = '';
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="text-center py-10 bg-gray-50 rounded-xl border border-gray-100">
+                        <p class="text-gray-500 mt-2">ไม่พบเทปที่เกี่ยวข้อง ลองเปลี่ยนคำค้นหานะครับ</p>
+                    </div>
+                `;
+                return;
+            }
+
+            results.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white border text-left border-gray-100 hover:border-blue-300 p-4 rounded-xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col sm:flex-row gap-4 group";
+
+                // Add click event to load preview
+                card.onclick = () => selectClip(item);
+
+                const thumbUrl = `https://img.youtube.com/vi/${item.video_id}/mqdefault.jpg`;
+                const similarityObj = Math.round(item.score * 100);
+
+                let scoreColor = "text-green-500";
+                if (similarityObj < 60) scoreColor = "text-yellow-500";
+                if (similarityObj < 40) scoreColor = "text-red-400";
+
+                card.innerHTML = `
+                    <div class="relative w-full sm:w-40 h-28 sm:h-24 flex-shrink-0 bg-gray-200 rounded-lg overflow-hidden">
+                        <img src="${thumbUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Thumbnail">
+                        <div class="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded font-mono">
+                            ${formatTime(item.start_time)} - ${formatTime(item.end_time)}
+                        </div>
+                    </div>
+                    <div class="flex-grow flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-mono">${item.video_id}</span>
+                                <span class="text-xs font-medium ${scoreColor} bg-white px-2 py-1 rounded-full shadow-sm border border-gray-100 flex items-center gap-1">
+                                    <i class="fas fa-bullseye"></i> ${similarityObj}%
+                                </span>
+                            </div>
+                            <p class="text-gray-800 text-sm line-clamp-2 mt-2 font-medium leading-relaxed">"${item.text}"</p>
+                        </div>
+                        <div class="mt-3 flex gap-2">
+                             <a href="${item.original_url}" target="_blank" onclick="event.stopPropagation()" class="text-xs text-red-600 hover:text-red-700 hover:underline flex items-center gap-1">
+                                <i class="fab fa-youtube"></i> ดูคลิปเต็ม
+                            </a>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        };
+
+        const selectClip = (item) => {
+            currentVideoParams = {
+                video_id: item.video_id,
+                start_time: Math.floor(item.start_time),
+                end_time: Math.ceil(item.end_time)
+            };
+
+            // Set UI
+            noClipSelected.classList.add('hidden');
+            clipEditor.classList.remove('hidden');
+            processingUI.classList.add('hidden');
+            successUI.classList.add('hidden');
+            errorUI.classList.add('hidden');
+            trimBtn.classList.remove('hidden');
+
+            lblVideoId.textContent = item.video_id;
+            lblStart.textContent = currentVideoParams.start_time;
+            lblEnd.textContent = currentVideoParams.end_time;
+
+            // Load YouTube Embed starting at the time
+            previewPlayer.src = `https://www.youtube.com/embed/${item.video_id}?start=${currentVideoParams.start_time}&end=${currentVideoParams.end_time}`;
+
+            // Scroll to top on mobile
+            if (window.innerWidth < 1024) {
+                clipEditor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        const checkTaskStatus = async () => {
+            try {
+                const res = await fetch(`/editor/api/status/${activeTaskId}`);
+                const data = await res.json();
+
+                if (data.status === "processing") {
+                    // Continue polling
+                    return;
+                }
+
+                // Done or Error
+                clearInterval(pollInterval);
+                processingUI.classList.add('hidden');
+
+                if (data.status === "success" && data.file_url) {
+                    successUI.classList.remove('hidden');
+                    downloadBtn.href = data.file_url;
+                } else if (data.status === "error") {
+                    errorUI.classList.remove('hidden');
+                    errorMsg.textContent = data.message || "Unknown error occurred";
+                    trimBtn.classList.remove('hidden');
+                    trimBtn.innerHTML = '<i class="fas fa-redo"></i> ลองใหม่อีกครั้ง';
+                }
+
+            } catch (error) {
+                console.error("Polling error:", error);
+            }
+        };
+
+        // Tabs Logic
+        tabSearch.addEventListener('click', () => {
+            tabSearch.className = "flex-1 bg-white text-blue-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none";
+            tabImport.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            tabHighlight.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            tabChannel.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            panelSearch.classList.remove('hidden');
+            panelImport.classList.add('hidden');
+            panelHighlight.classList.add('hidden');
+            panelChannel.classList.add('hidden');
+        });
+
+        tabImport.addEventListener('click', () => {
+            tabImport.className = "flex-1 bg-white text-indigo-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none";
+            tabSearch.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            tabHighlight.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            tabChannel.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            panelImport.classList.remove('hidden');
+            panelSearch.classList.add('hidden');
+            panelHighlight.classList.add('hidden');
+            panelChannel.classList.add('hidden');
+        });
+
+        tabHighlight.addEventListener('click', () => {
+            tabHighlight.className = "flex-1 bg-white text-amber-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none";
+            tabSearch.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            tabImport.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            tabChannel.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            panelHighlight.classList.remove('hidden');
+            panelSearch.classList.add('hidden');
+            panelImport.classList.add('hidden');
+            panelChannel.classList.add('hidden');
+        });
+
+        tabChannel.addEventListener('click', () => {
+            tabChannel.className = "flex-1 bg-white text-purple-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none";
+            tabSearch.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            tabImport.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            tabHighlight.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
+            panelChannel.classList.remove('hidden');
+            panelSearch.classList.add('hidden');
+            panelImport.classList.add('hidden');
+            panelHighlight.classList.add('hidden');
+        });
+
+        // Search Form
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            // UI changes
+            searchBtn.disabled = true;
+            searchBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+            emptyState.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            resultCount.textContent = "กำลังค้นหา...";
+
+            try {
+                const res = await fetch('/editor/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query, top_k: 5 })
+                });
+
+                const data = await res.json();
+
+                loadingState.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+
+                if (data.status === 'success') {
+                    renderResults(data.results);
+                    resultCount.textContent = `${data.results.length} รายการ`;
+                } else {
+                    throw new Error(data.detail || "Search failed");
+                }
+            } catch (error) {
+                loadingState.classList.add('hidden');
+                resultsContainer.innerHTML = `<div class="p-4 text-red-500 bg-red-50 rounded-xl border border-red-100"><i class="fas fa-exclamation-triangle mr-2"></i> Error: ${error.message}</div>`;
+                resultsContainer.classList.remove('hidden');
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.innerHTML = '<span>ค้นหา</span>';
+            }
+        });
+
+        trimBtn.addEventListener('click', async () => {
+            if (!currentVideoParams) return;
+
+            // Set UI to loading state
+            trimBtn.classList.add('hidden');
+            errorUI.classList.add('hidden');
+            successUI.classList.add('hidden');
+            processingUI.classList.remove('hidden');
+
+            // Generate simple unique ID
+            activeTaskId = "task_" + Math.random().toString(36).substr(2, 9);
+
+            try {
+                const reqData = {
+                    ...currentVideoParams,
+                    task_id: activeTaskId
+                };
+
+                const res = await fetch('/editor/api/clip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reqData)
+                });
+
+                const data = await res.json();
+                if (data.status === 'accepted') {
+                    // Start polling
+                    pollInterval = setInterval(checkTaskStatus, 2000);
+                } else {
+                    throw new Error(data.message || "Failed to start trim task");
+                }
+            } catch (error) {
+                processingUI.classList.add('hidden');
+                errorUI.classList.remove('hidden');
+                errorMsg.textContent = error.message;
+                trimBtn.classList.remove('hidden');
+            }
+        });
+
+        // Import Form
+        let importPollInterval = null;
+        let activeImportTaskId = null;
+
+        const checkImportStatus = async () => {
+            try {
+                const res = await fetch(`/editor/api/status/${activeImportTaskId}`);
+                const data = await res.json();
+
+                if (data.status === "processing") { return; } // Still polling
+
+                clearInterval(importPollInterval);
+                importBtn.disabled = false;
+                importBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> <span>นำเข้า</span>';
+
+                if (data.status === "success") {
+                    importStatusIcon.className = "fas fa-check-circle text-green-500 text-xl";
+                    importStatus.className = "mt-4 p-4 rounded-xl border border-green-200 bg-green-50";
+                    importStatusTitle.className = "font-medium text-green-800";
+                    importStatusTitle.textContent = "นำเข้าสำเร็จ!";
+                    importStatusMsg.className = "text-sm text-green-600 mt-1";
+                    importStatusMsg.textContent = data.message;
+
+                    // Pre-fill search and switch tab
+                    setTimeout(() => {
+                        searchInput.value = data.video_id + " ";
+                        tabSearch.click();
+                        searchInput.focus();
+                    }, 2000);
+                } else if (data.status === "error") {
+                    importStatusIcon.className = "fas fa-exclamation-circle text-red-500 text-xl";
+                    importStatus.className = "mt-4 p-4 rounded-xl border border-red-200 bg-red-50";
+                    importStatusTitle.className = "font-medium text-red-800";
+                    importStatusTitle.textContent = "เกิดข้อผิดพลาด";
+                    importStatusMsg.className = "text-sm text-red-600 mt-1";
+                    importStatusMsg.textContent = data.message || "Unknown error";
+                }
+            } catch (error) {
+                console.error("Polling error:", error);
+            }
+        };
+
+        importForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = importInput.value.trim();
+            if (!url) return;
+
+            // UI changes
+            importBtn.disabled = true;
+            importBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+            importStatus.classList.remove('hidden');
+
+            importStatusIcon.className = "fas fa-circle-notch fa-spin text-indigo-500 text-xl";
+            importStatus.className = "mt-4 p-4 rounded-xl border border-indigo-100 bg-indigo-50";
+            importStatusTitle.className = "font-medium text-indigo-800";
+            importStatusTitle.textContent = "กำลังคัดลอก Transcript และข้อความเข้าฐานข้อมูล...";
+            importStatusMsg.className = "text-sm text-indigo-600 mt-1";
+            importStatusMsg.textContent = "ระบบกำลังดึงข้อมูลและทำ Semantic Chunking อาจใช้เวลา 1-2 นาที";
+
+            activeImportTaskId = "import_" + Math.random().toString(36).substr(2, 9);
+
+            try {
+                const res = await fetch('/editor/api/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url, task_id: activeImportTaskId })
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'accepted') {
+                    importPollInterval = setInterval(checkImportStatus, 2500);
+                } else {
+                    throw new Error(data.message || "Failed to start import task");
+                }
+            } catch (error) {
+                importBtn.disabled = false;
+                importBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> <span>นำเข้า</span>';
+
+                importStatusIcon.className = "fas fa-exclamation-circle text-red-500 text-xl";
+                importStatus.className = "mt-4 p-4 rounded-xl border border-red-200 bg-red-50";
+                importStatusTitle.className = "font-medium text-red-800";
+                importStatusTitle.textContent = "ข้อผิดพลาดระบบ";
+                importStatusMsg.className = "text-sm text-red-600 mt-1";
+                importStatusMsg.textContent = error.message;
+            }
+        });
+
+        // ─────────────────────────────────────────
+        // Highlight Feature
+        // ─────────────────────────────────────────
+        let highlightPollInterval = null;
+        let activeHighlightTaskId = null;
+
+        const renderHighlightResults = (data) => {
+            highlightResults.innerHTML = '';
+
+            if (!data.highlights || data.highlights.length === 0) {
+                highlightResults.innerHTML = `
+                    <div class="text-center py-8 bg-gray-50 rounded-xl border border-gray-100">
+                        <i class="fas fa-info-circle text-gray-400 text-2xl mb-2"></i>
+                        <p class="text-gray-500">ไม่พบ highlights ที่น่าสนใจ</p>
+                    </div>`;
+                return;
+            }
+
+            // Summary header
+            const summary = document.createElement('div');
+            summary.className = 'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-4 rounded-xl mb-2';
+            summary.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-fire text-orange-500"></i>
+                        <span class="font-medium text-amber-800">พบ ${data.highlights.length} Highlights</span>
+                    </div>
+                    <span class="text-xs text-gray-500 font-mono">${data.video_id}</span>
+                </div>
+                <p class="text-sm text-amber-700 mt-1">${data.message}</p>`;
+            highlightResults.appendChild(summary);
+
+            // Each highlight card
+            data.highlights.forEach((h, i) => {
+                const card = document.createElement('div');
+                const scorePercent = Math.round(h.score * 100);
+                let scoreBg = 'from-green-400 to-emerald-500';
+                if (scorePercent < 60) scoreBg = 'from-yellow-400 to-amber-500';
+                if (scorePercent < 40) scoreBg = 'from-red-400 to-pink-500';
+
+                const hasClip = h.clip_status === 'success' && h.clip_url;
+                const clipError = h.clip_status === 'error';
+
+                card.className = 'bg-white border border-gray-100 p-4 rounded-xl shadow-sm hover:shadow-md transition-all';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-gradient-to-r ${scoreBg} text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
+                                ⭐ ${scorePercent}%
+                            </span>
+                            <span class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded">
+                                ${formatTime(h.start_time)} → ${formatTime(h.end_time)}
+                            </span>
+                        </div>
+                        <span class="text-xs text-gray-400">#${i + 1}</span>
+                        ${h.pinecone_id ? `<span class="text-xs text-gray-300 font-mono" title="Pinecone ID: ${h.pinecone_id}">🗄️ ${h.pinecone_id.substring(0, 8)}...</span>` : ''}
+                    </div>
+                    <p class="text-sm text-gray-700 mb-2 leading-relaxed">
+                        <i class="fas fa-lightbulb text-amber-400 mr-1"></i> ${h.reason}
+                    </p>
+                    ${h.transcript ? `
+                    <details class="mb-2">
+                        <summary class="text-xs text-gray-500 cursor-pointer hover:text-gray-700 flex items-center gap-1">
+                            <i class="fas fa-file-alt"></i> ดู Transcript
+                        </summary>
+                        <div class="mt-2 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 leading-relaxed max-h-32 overflow-y-auto custom-scrollbar">
+                            ${h.transcript}
+                        </div>
+                    </details>` : ''}
+                    ${h.quiz && h.quiz.length > 0 ? `
+                    <details class="mb-3">
+                        <summary class="text-xs text-purple-500 cursor-pointer hover:text-purple-700 flex items-center gap-1">
+                            <i class="fas fa-question-circle"></i> Quiz (${h.quiz.length} ข้อ)
+                        </summary>
+                        <div class="mt-2 space-y-2">
+                            ${h.quiz.map((q, qi) => `
+                            <div class="bg-purple-50 border border-purple-100 p-3 rounded-lg">
+                                <p class="text-xs font-medium text-purple-800">
+                                    <span class="bg-purple-200 text-purple-700 px-1.5 py-0.5 rounded mr-1">Q${qi + 1}</span>
+                                    ${q.question}
+                                </p>
+                                <details class="mt-1">
+                                    <summary class="text-xs text-purple-400 cursor-pointer hover:text-purple-600">ดูคำตอบ</summary>
+                                    <p class="text-xs text-green-700 mt-1 pl-2 border-l-2 border-green-300">
+                                        <i class="fas fa-check-circle text-green-500 mr-1"></i>${q.answer}
+                                    </p>
+                                </details>
+                            </div>`).join('')}
+                        </div>
+                    </details>` : ''}
+                    <div class="flex gap-2">
+                        <button onclick="selectClip({video_id:'${data.video_id}',start_time:${h.start_time},end_time:${h.end_time},text:'${h.reason.replace(/'/g, "\\'")}'})" 
+                            class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                            <i class="fas fa-play"></i> ดูตัวอย่าง
+                        </button>
+                        ${hasClip ? `
+                            <a href="${h.clip_url}" target="_blank" 
+                                class="text-xs bg-green-50 hover:bg-green-100 text-green-600 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                                <i class="fas fa-download"></i> ดาวน์โหลด MP4
+                            </a>` : ''}
+                        ${clipError ? `
+                            <span class="text-xs text-red-500 flex items-center gap-1">
+                                <i class="fas fa-exclamation-triangle"></i> ตัดคลิปไม่สำเร็จ
+                            </span>` : ''}
+                        ${h.clip_status === 'pending' ? `
+                            <span class="text-xs text-gray-400 flex items-center gap-1">
+                                <i class="fas fa-clock"></i> ยังไม่ได้ตัด
+                            </span>` : ''}
+                    </div>`;
+                highlightResults.appendChild(card);
+            });
+        };
+
+        const checkHighlightStatus = async () => {
+            try {
+                const res = await fetch(`/editor/api/status/${activeHighlightTaskId}`);
+                const data = await res.json();
+
+                if (data.status === 'processing') {
+                    // Update progress text if available
+                    if (data.progress) {
+                        highlightStatusMsg.textContent = data.progress;
+                    }
+                    return;
+                }
+
+                clearInterval(highlightPollInterval);
+                highlightBtn.disabled = false;
+                highlightBtn.innerHTML = '<i class="fas fa-magic"></i> <span>วิเคราะห์</span>';
+
+                if (data.status === 'success') {
+                    highlightStatus.classList.add('hidden');
+                    highlightResults.classList.remove('hidden');
+                    renderHighlightResults(data);
+                } else if (data.status === 'error') {
+                    highlightStatusIcon.className = 'fas fa-exclamation-circle text-red-500 text-xl';
+                    highlightStatusTitle.textContent = 'เกิดข้อผิดพลาด';
+                    highlightStatusTitle.className = 'font-medium text-red-800';
+                    highlightStatusMsg.textContent = data.message || 'Unknown error';
+                    highlightStatusMsg.className = 'text-sm text-red-600 mt-1';
+                    highlightStatus.querySelector('.p-4').className = 'p-4 rounded-xl border border-red-200 bg-red-50';
+                    // Hide progress bar
+                    const progressBar = highlightStatus.querySelector('.mt-3');
+                    if (progressBar) progressBar.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Highlight polling error:', error);
+            }
+        };
+
+        highlightForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = highlightInput.value.trim();
+            if (!url) return;
+
+            // Reset UI
+            highlightBtn.disabled = true;
+            highlightBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+            highlightResults.classList.add('hidden');
+            highlightStatus.classList.remove('hidden');
+
+            highlightStatusIcon.className = 'fas fa-circle-notch fa-spin text-amber-500 text-xl';
+            highlightStatusTitle.className = 'font-medium text-amber-800';
+            highlightStatusTitle.textContent = 'กำลังวิเคราะห์...';
+            highlightStatusMsg.className = 'text-sm text-amber-600 mt-1';
+            highlightStatusMsg.textContent = 'ถอด Transcript และส่งให้ AI วิเคราะห์ (อาจใช้เวลา 1-3 นาที)';
+            highlightStatus.querySelector('.p-4').className = 'p-4 rounded-xl border border-amber-100 bg-amber-50';
+            const progressBar = highlightStatus.querySelector('.mt-3');
+            if (progressBar) progressBar.classList.remove('hidden');
+
+            activeHighlightTaskId = 'hl_' + Math.random().toString(36).substr(2, 9);
+
+            try {
+                const res = await fetch('/editor/api/highlight', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url, task_id: activeHighlightTaskId, auto_clip: true })
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'accepted') {
+                    highlightPollInterval = setInterval(checkHighlightStatus, 3000);
+                } else {
+                    throw new Error(data.message || 'Failed to start highlight task');
+                }
+            } catch (error) {
+                highlightBtn.disabled = false;
+                highlightBtn.innerHTML = '<i class="fas fa-magic"></i> <span>วิเคราะห์</span>';
+                highlightStatusIcon.className = 'fas fa-exclamation-circle text-red-500 text-xl';
+                highlightStatusTitle.className = 'font-medium text-red-800';
+                highlightStatusTitle.textContent = 'เกิดข้อผิดพลาด';
+                highlightStatusMsg.className = 'text-sm text-red-600 mt-1';
+                highlightStatusMsg.textContent = error.message;
+                highlightStatus.querySelector('.p-4').className = 'p-4 rounded-xl border border-red-200 bg-red-50';
+            }
+        });
+
+        // ─────────────────────────────────────────
+        // Channel Scraper Feature
+        // ─────────────────────────────────────────
+        window.analyzeFromChannel = (videoUrl) => {
+            // Switch to Highlight tab and pre-fill the URL
+            tabHighlight.click();
+            highlightInput.value = videoUrl;
+            highlightResults.classList.add('hidden');
+            highlightStatus.classList.add('hidden');
+        };
+
+        channelForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = channelInput.value.trim();
+            if (!url) return;
+
+            // UI: loading
+            channelBtn.disabled = true;
+            channelBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+            channelStatus.classList.remove('hidden');
+            channelResults.classList.add('hidden');
+
+            try {
+                const res = await fetch('/editor/api/channel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await res.json();
+                channelStatus.classList.add('hidden');
+                channelBtn.disabled = false;
+                channelBtn.innerHTML = '<i class="fas fa-search"></i> <span>ดึงวิดีโอ</span>';
+
+                if (data.status === 'success' && data.videos?.length > 0) {
+                    channelResults.classList.remove('hidden');
+                    channelResults.innerHTML = '';
+
+                    // Store videos for batch processing
+                    window._channelVideos = data.videos;
+
+                    // Header with analyze-all button
+                    const header = document.createElement('div');
+                    header.className = 'bg-gradient-to-r from-purple-50 to-fuchsia-50 border border-purple-200 p-4 rounded-xl mb-1';
+                    header.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fab fa-youtube text-red-500"></i>
+                                <span class="font-medium text-purple-800">${data.channel_name}</span>
+                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">${data.videos.length} วิดีโอ</span>
+                            </div>
+                            <button id="analyzeAllBtn" onclick="analyzeAllVideos()"
+                                class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm px-4 py-2 rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+                                <i class="fas fa-magic"></i> วิเคราะห์ทั้งหมด
+                            </button>
+                        </div>
+                        <div id="batchProgress" class="hidden mt-3">
+                            <div class="flex items-center justify-between text-xs text-purple-700 mb-1">
+                                <span id="batchProgressText">กำลังวิเคราะห์...</span>
+                                <span id="batchProgressCount">0/0</span>
+                            </div>
+                            <div class="w-full bg-purple-200 rounded-full h-1.5">
+                                <div id="batchProgressBar" class="bg-purple-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+                            </div>
+                        </div>`;
+                    channelResults.appendChild(header);
+
+                    // Video cards
+                    data.videos.forEach((v, i) => {
+                        const card = document.createElement('div');
+                        card.id = `ch-video-${v.video_id}`;
+                        card.className = 'bg-white border border-gray-100 p-3 rounded-xl shadow-sm hover:shadow-md transition-all flex gap-3 items-center';
+                        card.innerHTML = `
+                            <img src="${v.thumbnail}" alt="" class="w-28 h-16 rounded-lg object-cover flex-shrink-0" loading="lazy">
+                            <div class="flex-grow min-w-0">
+                                <h3 class="text-sm font-medium text-gray-800 truncate" title="${v.title}">${v.title}</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-gray-400 font-mono">${v.duration_text}</span>
+                                    <span class="text-xs text-gray-300">|</span>
+                                    <span class="text-xs text-gray-400">${v.video_id}</span>
+                                </div>
+                            </div>
+                            <span id="ch-status-${v.video_id}" class="hidden flex-shrink-0 text-xs px-2 py-1 rounded-lg"></span>
+                            <button id="ch-btn-${v.video_id}" onclick="analyzeFromChannel('${v.url}')"
+                                class="flex-shrink-0 text-xs bg-amber-50 hover:bg-amber-100 text-amber-600 px-3 py-2 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap">
+                                <i class="fas fa-star"></i> วิเคราะห์
+                            </button>`;
+                        channelResults.appendChild(card);
+                    });
+                } else {
+                    channelResults.classList.remove('hidden');
+                    channelResults.innerHTML = `
+                        <div class="text-center py-8 bg-gray-50 rounded-xl border border-gray-100">
+                            <i class="fas fa-info-circle text-gray-400 text-2xl mb-2"></i>
+                            <p class="text-gray-500">${data.message || 'ไม่พบวิดีโอ'}</p>
+                        </div>`;
+                }
+            } catch (error) {
+                channelStatus.classList.add('hidden');
+                channelBtn.disabled = false;
+                channelBtn.innerHTML = '<i class="fas fa-search"></i> <span>ดึงวิดีโอ</span>';
+                channelResults.classList.remove('hidden');
+                channelResults.innerHTML = `
+                    <div class="text-center py-4 bg-red-50 rounded-xl border border-red-200">
+                        <i class="fas fa-exclamation-circle text-red-400 text-xl mb-1"></i>
+                        <p class="text-red-500 text-sm">${error.message}</p>
+                    </div>`;
+            }
+        });
+
+        // ─────────────────────────────────────────
+        // Batch Analyze All Videos
+        // ─────────────────────────────────────────
+        window.analyzeAllVideos = async () => {
+            const videos = window._channelVideos;
+            if (!videos || videos.length === 0) return;
+
+            const analyzeAllBtn = document.getElementById('analyzeAllBtn');
+            const batchProgress = document.getElementById('batchProgress');
+            const batchProgressText = document.getElementById('batchProgressText');
+            const batchProgressCount = document.getElementById('batchProgressCount');
+            const batchProgressBar = document.getElementById('batchProgressBar');
+
+            // Disable button
+            analyzeAllBtn.disabled = true;
+            analyzeAllBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> กำลังวิเคราะห์...';
+            analyzeAllBtn.className = 'bg-gray-400 text-white text-sm px-4 py-2 rounded-lg font-medium flex items-center gap-2 cursor-not-allowed';
+            batchProgress.classList.remove('hidden');
+
+            let completed = 0;
+            let success = 0;
+            let errors = 0;
+
+            for (let i = 0; i < videos.length; i++) {
+                const v = videos[i];
+                const statusEl = document.getElementById(`ch-status-${v.video_id}`);
+                const btnEl = document.getElementById(`ch-btn-${v.video_id}`);
+                const cardEl = document.getElementById(`ch-video-${v.video_id}`);
+
+                // Update progress
+                batchProgressText.textContent = `กำลังวิเคราะห์: ${v.title.substring(0, 30)}...`;
+                batchProgressCount.textContent = `${i + 1}/${videos.length}`;
+                batchProgressBar.style.width = `${((i) / videos.length) * 100}%`;
+
+                // Show spinner on this card
+                if (statusEl) {
+                    statusEl.classList.remove('hidden');
+                    statusEl.className = 'flex-shrink-0 text-xs text-blue-500 px-2 py-1';
+                    statusEl.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+                }
+                if (btnEl) btnEl.classList.add('hidden');
+                if (cardEl) cardEl.className = 'bg-blue-50 border border-blue-200 p-3 rounded-xl shadow-sm flex gap-3 items-center';
+
+                try {
+                    const taskId = 'batch_' + v.video_id + '_' + Date.now();
+                    const res = await fetch('/editor/api/highlight', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: v.url, task_id: taskId, auto_clip: true })
+                    });
+                    const data = await res.json();
+
+                    if (data.status === 'accepted') {
+                        // Poll until done
+                        let done = false;
+                        while (!done) {
+                            await new Promise(r => setTimeout(r, 3000));
+                            const statusRes = await fetch(`/editor/api/status/${taskId}`);
+                            const statusData = await statusRes.json();
+                            if (statusData.status !== 'processing') {
+                                done = true;
+                                if (statusData.status === 'success') {
+                                    success++;
+                                    const hlCount = statusData.highlights?.length || 0;
+                                    if (statusEl) {
+                                        statusEl.className = 'flex-shrink-0 text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg';
+                                        statusEl.innerHTML = `<i class="fas fa-check"></i> ${hlCount} highlights`;
+                                    }
+                                    if (cardEl) cardEl.className = 'bg-green-50 border border-green-200 p-3 rounded-xl shadow-sm flex gap-3 items-center';
+                                } else {
+                                    errors++;
+                                    if (statusEl) {
+                                        statusEl.className = 'flex-shrink-0 text-xs bg-red-100 text-red-500 px-2 py-1 rounded-lg';
+                                        statusEl.innerHTML = '<i class="fas fa-times"></i> error';
+                                    }
+                                    if (cardEl) cardEl.className = 'bg-red-50 border border-red-200 p-3 rounded-xl shadow-sm flex gap-3 items-center';
+                                }
+                            } else if (statusData.progress) {
+                                if (statusEl) statusEl.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${statusData.progress.substring(0, 20)}`;
+                            }
+                        }
+                    } else {
+                        errors++;
+                        if (statusEl) {
+                            statusEl.className = 'flex-shrink-0 text-xs bg-red-100 text-red-500 px-2 py-1 rounded-lg';
+                            statusEl.innerHTML = '<i class="fas fa-times"></i> error';
+                        }
+                        if (cardEl) cardEl.className = 'bg-red-50 border border-red-200 p-3 rounded-xl shadow-sm flex gap-3 items-center';
+                    }
+                } catch (err) {
+                    errors++;
+                    if (statusEl) {
+                        statusEl.className = 'flex-shrink-0 text-xs bg-red-100 text-red-500 px-2 py-1 rounded-lg';
+                        statusEl.innerHTML = '<i class="fas fa-times"></i> error';
+                    }
+                    if (cardEl) cardEl.className = 'bg-red-50 border border-red-200 p-3 rounded-xl shadow-sm flex gap-3 items-center';
+                }
+
+                completed++;
+            }
+
+            // Done
+            batchProgressBar.style.width = '100%';
+            batchProgressText.textContent = `เสร็จแล้ว! สำเร็จ ${success}, ล้มเหลว ${errors}`;
+            batchProgressCount.textContent = `${completed}/${videos.length}`;
+            analyzeAllBtn.innerHTML = '<i class="fas fa-check"></i> เสร็จแล้ว';
+            analyzeAllBtn.className = 'bg-green-500 text-white text-sm px-4 py-2 rounded-lg font-medium flex items-center gap-2';
+        };
+
+    </script>
+</body>
+
+</html>
