@@ -13,19 +13,28 @@ from typing import Optional
 from channel_scraper import scrape_channel_videos
 from highlight_pipeline import run_highlight_pipeline
 
+import os
+
 # ตั้งค่า Logging ให้ออกทั้ง Console และไฟล์สำหรับ background processing
+log_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "channel_process.log")
 log_formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s', datefmt="%Y-%m-%d %H:%M:%S")
 
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(log_formatter)
 
-file_handler = logging.FileHandler("channel_process.log", mode='a', encoding='utf-8')
-file_handler.setFormatter(log_formatter)
+try:
+    file_handler = logging.FileHandler(log_file_path, mode='a', encoding='utf-8')
+    file_handler.setFormatter(log_formatter)
+    has_file_handler = True
+except PermissionError:
+    print(f"Warning: Permission denied to write to {log_file_path}. Logging to console only.")
+    has_file_handler = False
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(console_handler)
-logger.addHandler(file_handler)
+if has_file_handler:
+    logger.addHandler(file_handler)
 
 def clean_progress(step: str, detail: str = ""):
     """Callback สำหรับพิมพ์ progress ลง Log"""

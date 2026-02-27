@@ -20,11 +20,6 @@ if "%CHANNEL_URL%"=="" (
     exit /b
 )
 
-:: ใส่จำนวนวิดีโอสูงสุด (ปล่อยว่าง = ทั้งหมด)
-set /p "MAX_VIDEOS=📦 ใส่จำนวนวิดีโอสูงสุด (กด Enter เพื่อดึงทั้งหมด): "
-
-if "!MAX_VIDEOS!"=="" set MAX_VIDEOS=0
-
 echo.
 echo ⏳ กำลังเริ่มการทำงาน...
 echo โปรเซสนี้จะทำงานอยู่เบื้องหลังหลังจากหน้าต่างนี้ปิดลง
@@ -40,7 +35,7 @@ if exist ".venv\Scripts\activate.bat" (
 )
 
 :: Run script in background without showing the window
-start "" /b pythonw process_channel.py "!CHANNEL_URL!" --max !MAX_VIDEOS! > channel_process.log 2>&1
+start "" /b pythonw process_channel.py "!CHANNEL_URL!" --max 0 > channel_process.log 2>&1
 
 echo ✅ เริ่มทำงานใน Background แล้ว!
 echo ท่านสามารถปิดหน้าต่างนี้ได้เลย
