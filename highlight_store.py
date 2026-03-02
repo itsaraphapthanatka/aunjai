@@ -91,7 +91,10 @@ def store_highlights(video_id: str, highlights: list[dict]) -> int:
             embed_parts.append(h["reason"])
         if h.get("quiz"):
             for q in h["quiz"]:
-                embed_parts.append(f"Q: {q.get('question', '')} A: {q.get('answer', '')}")
+                embed_parts.append(f"Q: {q.get('question', '')}")
+                if q.get("options"):
+                    embed_parts.append(f"Options: {', '.join(q['options'])}")
+                embed_parts.append(f"A: {q.get('answer', '')}")
 
         embed_text = " ".join(embed_parts) if embed_parts else h.get("reason", "highlight")
 
@@ -206,4 +209,7 @@ if __name__ == "__main__":
         if r.get("quiz"):
             for q in r["quiz"]:
                 print(f"     ❓ {q['question']}")
+                if q.get("options"):
+                    for i, opt in enumerate(q["options"]):
+                        print(f"        {chr(65+i)}. {opt}")
                 print(f"     ✅ {q['answer']}")

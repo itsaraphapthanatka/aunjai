@@ -821,7 +821,16 @@
                                     <span class="bg-purple-200 text-purple-700 px-1.5 py-0.5 rounded mr-1">Q${qi + 1}</span>
                                     ${q.question}
                                 </p>
-                                <details class="mt-1">
+                                ${q.options ? `
+                                <div class="mt-2 space-y-1">
+                                    ${q.options.map((opt, opti) => `
+                                        <div class="text-[10px] text-purple-600 flex items-start gap-1">
+                                            <span class="font-bold">${String.fromCharCode(65 + opti)}.</span>
+                                            <span>${opt}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>` : ''}
+                                <details class="mt-2">
                                     <summary class="text-xs text-purple-400 cursor-pointer hover:text-purple-600">ดูคำตอบ</summary>
                                     <p class="text-xs text-green-700 mt-1 pl-2 border-l-2 border-green-300">
                                         <i class="fas fa-check-circle text-green-500 mr-1"></i>${q.answer}
