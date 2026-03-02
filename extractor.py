@@ -8,13 +8,29 @@ extractor.py — Module 1: Data Extraction (YouTube Transcription)
 """
 
 import logging
+import time
+import random
 from youtube_transcript_api import YouTubeTranscriptApi
+from config import get_yt_proxy_config
 
 # ตั้งค่า Logger
 logger = logging.getLogger(__name__)
 
-# สร้าง API client (ใช้ร่วมกันทั้งโมดูล)
-_api = YouTubeTranscriptApi()
+# Exponential Backoff Configuration
+MAX_RETRIES = 3
+BASE_DELAY = 2  # วินาที (จะเพิ่มเป็น 2, 4, 8, ...)
+
+# สร้าง API client พร้อม proxy (ถ้าตั้งค่าไว้)
+_proxy_config = get_yt_proxy_config()
+_api = YouTubeTranscriptApi(proxy_config=_proxy_config) if _proxy_config else YouTubeTranscriptApi()
+if _proxy_config:
+    logger.info("🔀 ใช้ Proxy สำหรับ YouTube Transcript API")
+
+
+def _is_retryable_error(e: Exception) -> bool:
+    """ตรวจสอบว่า error นี้ควร retry หรือไม่"""
+    error_name = type(e).__name__
+    return error_name in ("RequestBlocked", "IpBlocked", "TooManyRequests")
 
 
 def extract_transcripts(video_id_list: list[str]) -> list[dict]:
@@ -41,10 +57,30 @@ def extract_transcripts(video_id_list: list[str]) -> list[dict]:
     all_transcripts: list[dict] = []
 
     for video_id in video_id_list:
-        try:
-            # ดึง Transcript โดยลองภาษาไทยก่อน → fallback เป็นอังกฤษ
-            fetched = _api.fetch(video_id, languages=["th", "en"])
+        fetched = None
 
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                # ดึง Transcript โดยลองภาษาไทยก่อน → fallback เป็นอังกฤษ
+                fetched = _api.fetch(video_id, languages=["th", "en"])
+                break  # สำเร็จ ออกจาก retry loop
+
+            except Exception as e:
+                error_name = type(e).__name__
+
+                if _is_retryable_error(e) and attempt < MAX_RETRIES:
+                    # Exponential backoff with jitter
+                    delay = BASE_DELAY * (2 ** (attempt - 1)) + random.uniform(0, 1)
+                    logger.warning(
+                        f"⏳ {video_id} — {error_name}, "
+                        f"retry {attempt}/{MAX_RETRIES} หลัง {delay:.1f}s..."
+                    )
+                    time.sleep(delay)
+                else:
+                    logger.warning(f"⚠️ ข้ามวิดีโอ {video_id} — {error_name}: {e}")
+                    break  # ไม่ retry (ไม่ใช่ retryable หรือ หมด retry)
+
+        if fetched:
             # แปลง snippets ให้อยู่ในรูปแบบ dict มาตรฐาน
             for snippet in fetched.snippets:
                 all_transcripts.append({
@@ -58,13 +94,6 @@ def extract_transcripts(video_id_list: list[str]) -> list[dict]:
                 f"✅ ดึง Transcript สำเร็จ: video_id={video_id} "
                 f"(ภาษา: {fetched.language}, {len(fetched.snippets)} ประโยค)"
             )
-
-        except Exception as e:
-            # youtube-transcript-api v1.x ใช้ exception hierarchy ต่างๆ เช่น
-            # TranscriptsDisabled, NoTranscriptFound, VideoUnavailable ฯลฯ
-            # จับทั้งหมดแล้ว log เพื่อไม่ให้ pipeline หยุด
-            error_name = type(e).__name__
-            logger.warning(f"⚠️ ข้ามวิดีโอ {video_id} — {error_name}: {e}")
 
     logger.info(f"📊 รวมทั้งหมด: {len(all_transcripts)} ประโยคจาก {len(video_id_list)} วิดีโอ")
     return all_transcripts

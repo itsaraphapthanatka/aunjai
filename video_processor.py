@@ -6,8 +6,11 @@ Handles downloading video clips from YouTube and trimming them using FFmpeg.
 
 import os
 import logging
+import time
+import random
 import ffmpeg
 import yt_dlp
+from config import get_ytdlp_proxy
 from typing import Optional, Dict
 
 try:
@@ -18,9 +21,18 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# Exponential Backoff Configuration
+MAX_RETRIES = 3
+BASE_DELAY = 2  # วินาที
+
 # Output directory for trimmed clips
 OUTPUT_DIR = "static/clips"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+def _is_retryable_error(e: Exception) -> bool:
+    """ตรวจสอบว่า error ควร retry (บล็อก IP / rate limit)"""
+    err_str = str(e).lower()
+    return any(kw in err_str for kw in ("429", "too many", "blocked", "sign in"))
 
 def _get_video_url(video_id: str) -> Optional[str]:
     """Get the direct download URL for the best mp4 format of a YouTube video"""
@@ -33,15 +45,28 @@ def _get_video_url(video_id: str) -> Optional[str]:
         'no_warnings': True,
         'skip_download': True,
     }
-    
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            # The 'best' format guarantees a single URL in info['url']
-            return info.get('url')
-    except Exception as e:
-        logger.error(f"Failed to extract video info for {video_id}: {e}")
-        return None
+
+    # เพิ่ม Proxy ถ้าตั้งค่าไว้
+    proxy = get_ytdlp_proxy()
+    if proxy:
+        ydl_opts['proxy'] = proxy
+
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+                return info.get('url')
+        except Exception as e:
+            if _is_retryable_error(e) and attempt < MAX_RETRIES:
+                delay = BASE_DELAY * (2 ** (attempt - 1)) + random.uniform(0, 1)
+                logger.warning(
+                    f"⏳ {video_id} — YouTube บล็อก, "
+                    f"retry {attempt}/{MAX_RETRIES} หลัง {delay:.1f}s..."
+                )
+                time.sleep(delay)
+            else:
+                logger.error(f"Failed to extract video info for {video_id}: {e}")
+                return None
 
 def process_video_clip(video_id: str, start_time: float, end_time: float, margin: float = 1.0) -> Dict[str, str]:
     """

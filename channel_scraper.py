@@ -6,10 +6,23 @@ channel_scraper.py — ดึงรายชื่อวิดีโอทั้
 """
 
 import logging
+import time
+import random
 from typing import Optional
 import yt_dlp
+from config import get_ytdlp_proxy
 
 logger = logging.getLogger(__name__)
+
+# Exponential Backoff Configuration
+MAX_RETRIES = 3
+BASE_DELAY = 2  # วินาที
+
+
+def _is_retryable_error(e: Exception) -> bool:
+    """ตรวจสอบว่า error ควร retry (บล็อก IP / rate limit)"""
+    err_str = str(e).lower()
+    return any(kw in err_str for kw in ("429", "too many", "blocked", "sign in"))
 
 
 def scrape_channel_videos(
@@ -51,62 +64,79 @@ def scrape_channel_videos(
     if max_videos > 0:
         ydl_opts["playlistend"] = max_videos
 
-    try:
-        logger.info(f"🔍 กำลังดึงรายชื่อวิดีโอจาก: {channel_url}")
+    # เพิ่ม Proxy ถ้าตั้งค่าไว้
+    proxy = get_ytdlp_proxy()
+    if proxy:
+        ydl_opts["proxy"] = proxy
+        logger.info(f"🔀 ใช้ Proxy สำหรับ yt-dlp: {proxy[:30]}...")
 
-        # Ensure URL points to channel videos
-        url = channel_url.rstrip("/")
-        if "/videos" not in url:
-            url = url + "/videos"
+    # Ensure URL points to channel videos
+    url = channel_url.rstrip("/")
+    if "/videos" not in url:
+        url = url + "/videos"
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
+    info = None
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            logger.info(f"🔍 กำลังดึงรายชื่อวิดีโอจาก: {channel_url} (ครั้งที่ {attempt})")
 
-        if not info:
-            result["message"] = "ไม่พบข้อมูล channel"
-            return result
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+            break  # สำเร็จ
 
-        channel_name = info.get("channel", "") or info.get("uploader", "") or info.get("title", "Unknown")
-        result["channel_name"] = channel_name
+        except Exception as e:
+            if _is_retryable_error(e) and attempt < MAX_RETRIES:
+                delay = BASE_DELAY * (2 ** (attempt - 1)) + random.uniform(0, 1)
+                logger.warning(
+                    f"⏳ YouTube บล็อก, retry {attempt}/{MAX_RETRIES} "
+                    f"หลัง {delay:.1f}s..."
+                )
+                time.sleep(delay)
+            else:
+                result["message"] = f"ดึงข้อมูล channel ไม่สำเร็จ: {str(e)}"
+                logger.error(f"❌ {result['message']}")
+                return result
 
-        entries = info.get("entries", [])
-        if not entries:
-            result["message"] = f"ไม่พบวิดีโอใน channel: {channel_name}"
-            return result
-
-        videos = []
-        for entry in entries:
-            if not entry:
-                continue
-
-            video_id = entry.get("id", "")
-            if not video_id:
-                continue
-
-            # Duration comes in seconds from yt-dlp
-            duration = entry.get("duration") or 0
-
-            videos.append({
-                "video_id": video_id,
-                "title": entry.get("title", "ไม่มีชื่อ"),
-                "duration": duration,
-                "duration_text": _format_duration(duration),
-                "thumbnail": f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg",
-                "upload_date": entry.get("upload_date", ""),
-                "url": f"https://www.youtube.com/watch?v={video_id}",
-            })
-
-        result["status"] = "success"
-        result["videos"] = videos
-        result["message"] = f"พบ {len(videos)} วิดีโอจาก {channel_name}"
-
-        logger.info(f"✅ {result['message']}")
+    if not info:
+        result["message"] = "ไม่พบข้อมูล channel"
         return result
 
-    except Exception as e:
-        result["message"] = f"ดึงข้อมูล channel ไม่สำเร็จ: {str(e)}"
-        logger.error(f"❌ {result['message']}")
+    channel_name = info.get("channel", "") or info.get("uploader", "") or info.get("title", "Unknown")
+    result["channel_name"] = channel_name
+
+    entries = info.get("entries", [])
+    if not entries:
+        result["message"] = f"ไม่พบวิดีโอใน channel: {channel_name}"
         return result
+
+    videos = []
+    for entry in entries:
+        if not entry:
+            continue
+
+        video_id = entry.get("id", "")
+        if not video_id:
+            continue
+
+        # Duration comes in seconds from yt-dlp
+        duration = entry.get("duration") or 0
+
+        videos.append({
+            "video_id": video_id,
+            "title": entry.get("title", "ไม่มีชื่อ"),
+            "duration": duration,
+            "duration_text": _format_duration(duration),
+            "thumbnail": f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg",
+            "upload_date": entry.get("upload_date", ""),
+            "url": f"https://www.youtube.com/watch?v={video_id}",
+        })
+
+    result["status"] = "success"
+    result["videos"] = videos
+    result["message"] = f"พบ {len(videos)} วิดีโอจาก {channel_name}"
+
+    logger.info(f"✅ {result['message']}")
+    return result
 
 
 def _format_duration(seconds) -> str:

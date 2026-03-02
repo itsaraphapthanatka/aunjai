@@ -39,3 +39,31 @@ YOUTUBE_URL_TEMPLATE: str = "https://www.youtube.com/watch?v={video_id}"
 OPENCLAW_API_URL: str = os.getenv("OPENCLAW_API_URL", "http://localhost:3000")
 OPENCLAW_AGENT_ID: str = os.getenv("OPENCLAW_AGENT_ID", "unjai")
 OPENCLAW_API_KEY: str = os.getenv("OPENCLAW_API_KEY", "")
+
+# ──────────────────────────────────────────────
+# Proxy Configuration (แก้ปัญหา YouTube บล็อก IP)
+# ──────────────────────────────────────────────
+PROXY_HTTP: str = os.getenv("PROXY_HTTP", "")
+PROXY_HTTPS: str = os.getenv("PROXY_HTTPS", "")
+
+
+def get_yt_proxy_config():
+    """
+    สร้าง GenericProxyConfig สำหรับ youtube-transcript-api
+    Return None ถ้าไม่ได้ตั้งค่า proxy
+    """
+    if not PROXY_HTTP and not PROXY_HTTPS:
+        return None
+    from youtube_transcript_api.proxies import GenericProxyConfig
+    return GenericProxyConfig(
+        http_url=PROXY_HTTP or None,
+        https_url=PROXY_HTTPS or None,
+    )
+
+
+def get_ytdlp_proxy() -> str:
+    """
+    Return proxy URL สำหรับ yt-dlp (ใช้ตัวเดียว)
+    Return "" ถ้าไม่ได้ตั้งค่า proxy
+    """
+    return PROXY_HTTPS or PROXY_HTTP or ""

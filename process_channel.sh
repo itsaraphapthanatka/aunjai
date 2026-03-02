@@ -19,20 +19,27 @@ echo "⏳ Starting background processing for: $CHANNEL_URL"
 # Navigate to script directory
 cd "$(dirname "$0")"
 
-# Activate virtual environment if it exists
-if [ -d ".venv" ]; then
-    if [ -f ".venv/Scripts/activate" ]; then
-        source .venv/Scripts/activate
-    elif [ -f ".venv/bin/activate" ]; then
-        source .venv/bin/activate
+# Find the Python binary inside the virtual environment directly
+PYTHON_CMD=""
+for VENV_DIR in venv .venv; do
+    if [ -f "$VENV_DIR/bin/python3" ]; then
+        PYTHON_CMD="$VENV_DIR/bin/python3"
+        break
+    elif [ -f "$VENV_DIR/bin/python" ]; then
+        PYTHON_CMD="$VENV_DIR/bin/python"
+        break
+    elif [ -f "$VENV_DIR/Scripts/python.exe" ]; then
+        PYTHON_CMD="$VENV_DIR/Scripts/python.exe"
+        break
     fi
+done
+
+# Fallback to system python if no venv found
+if [ -z "$PYTHON_CMD" ]; then
+    PYTHON_CMD="python3"
 fi
 
-# Determine which python command to use
-PYTHON_CMD="python3"
-if command -v python &> /dev/null; then
-    PYTHON_CMD="python"
-fi
+echo "🐍 Using Python: $PYTHON_CMD"
 
 # Run python script in background using nohup
 nohup $PYTHON_CMD process_channel.py "$CHANNEL_URL" --max 0 > channel_process.log 2>&1 &
