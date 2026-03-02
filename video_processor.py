@@ -2,6 +2,7 @@
 video_processor.py — Module 2: Video Editor Processing Logic
 
 Handles downloading video clips from YouTube and trimming them using FFmpeg.
+Strategy: Download full video with yt-dlp first, then trim locally with FFmpeg.
 """
 
 import os
@@ -34,16 +35,21 @@ def _is_retryable_error(e: Exception) -> bool:
     err_str = str(e).lower()
     return any(kw in err_str for kw in ("429", "too many", "blocked", "sign in"))
 
-def _get_video_url(video_id: str) -> Optional[str]:
-    """Get the direct download URL for the best mp4 format of a YouTube video"""
+def _download_video(video_id: str) -> Optional[str]:
+    """Download YouTube video to a temp file using yt-dlp. Returns the file path."""
     url = f"https://www.youtube.com/watch?v={video_id}"
+    temp_path = os.path.join(OUTPUT_DIR, f"_temp_{video_id}.mp4")
+
+    # If temp file already exists from a previous download, reuse it
+    if os.path.exists(temp_path) and os.path.getsize(temp_path) > 0:
+        logger.info(f"♻️ Reusing existing temp file: {temp_path}")
+        return temp_path
+
     ydl_opts = {
-        # 'best' gets the best single file with BOTH video and audio (usually 720p).
-        # This avoids the issue of separate video/audio DASH streams losing audio.
         'format': 'best[ext=mp4]/best',
         'quiet': True,
         'no_warnings': True,
-        'skip_download': True,
+        'outtmpl': temp_path,
     }
 
     # เพิ่ม Proxy ถ้าตั้งค่าไว้
@@ -54,8 +60,13 @@ def _get_video_url(video_id: str) -> Optional[str]:
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=False)
-                return info.get('url')
+                ydl.download([url])
+            if os.path.exists(temp_path) and os.path.getsize(temp_path) > 0:
+                logger.info(f"✅ Downloaded video to: {temp_path}")
+                return temp_path
+            else:
+                logger.error(f"Download produced empty file for {video_id}")
+                return None
         except Exception as e:
             if _is_retryable_error(e) and attempt < MAX_RETRIES:
                 delay = BASE_DELAY * (2 ** (attempt - 1)) + random.uniform(0, 1)
@@ -65,8 +76,9 @@ def _get_video_url(video_id: str) -> Optional[str]:
                 )
                 time.sleep(delay)
             else:
-                logger.error(f"Failed to extract video info for {video_id}: {e}")
+                logger.error(f"Failed to download video {video_id}: {e}")
                 return None
+
 
 def process_video_clip(video_id: str, start_time: float, end_time: float, margin: float = 1.0) -> Dict[str, str]:
     """
@@ -83,33 +95,33 @@ def process_video_clip(video_id: str, start_time: float, end_time: float, margin
         
     logger.info(f"Processing clip for {video_id} from {start_time} to {end_time}")
     
-    video_url = _get_video_url(video_id)
-    if not video_url:
-        return {"status": "error", "message": "Could not extract video URL"}
+    # Step 1: Download full video with yt-dlp
+    temp_path = _download_video(video_id)
+    if not temp_path:
+        return {"status": "error", "message": "Could not download video"}
         
     try:
-        # Add margin for smoother transitions
+        # Step 2: Trim the local file with FFmpeg
         actual_start = max(0, start_time - margin)
         duration = (end_time - start_time) + (margin * 2)
         
-        # Try 1: Stream copy (fastest, but may fail with some YouTube formats)
+        # Try stream copy first (fast)
         try:
-            stream = ffmpeg.input(video_url, ss=actual_start, t=duration)
+            stream = ffmpeg.input(temp_path, ss=actual_start, t=duration)
             stream = ffmpeg.output(stream, output_path, c='copy')
-            out, err = ffmpeg.run(stream, cmd=FFMPEG_EXE, capture_stdout=True, capture_stderr=True, overwrite_output=True)
-            logger.info(f"Successfully created clip (stream copy): {output_path}")
+            ffmpeg.run(stream, cmd=FFMPEG_EXE, capture_stdout=True, capture_stderr=True, overwrite_output=True)
+            logger.info(f"✅ Created clip (stream copy): {output_filename}")
             return {"status": "success", "file_url": f"/static/clips/{output_filename}"}
         except ffmpeg.Error:
-            logger.warning(f"Stream copy failed for {video_id}, falling back to re-encode...")
-            # Remove partial file if exists
+            logger.warning(f"Stream copy failed, falling back to re-encode...")
             if os.path.exists(output_path):
                 os.remove(output_path)
 
-        # Try 2: Re-encode (slower but more reliable)
-        stream = ffmpeg.input(video_url, ss=actual_start, t=duration)
+        # Fallback: Re-encode
+        stream = ffmpeg.input(temp_path, ss=actual_start, t=duration)
         stream = ffmpeg.output(stream, output_path, vcodec='libx264', acodec='aac', preset='fast')
-        out, err = ffmpeg.run(stream, cmd=FFMPEG_EXE, capture_stdout=True, capture_stderr=True, overwrite_output=True)
-        logger.info(f"Successfully created clip (re-encoded): {output_path}")
+        ffmpeg.run(stream, cmd=FFMPEG_EXE, capture_stdout=True, capture_stderr=True, overwrite_output=True)
+        logger.info(f"✅ Created clip (re-encoded): {output_filename}")
         
         return {"status": "success", "file_url": f"/static/clips/{output_filename}"}
         
