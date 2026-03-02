@@ -92,13 +92,24 @@ def process_video_clip(video_id: str, start_time: float, end_time: float, margin
         actual_start = max(0, start_time - margin)
         duration = (end_time - start_time) + (margin * 2)
         
-        # Use FFmpeg to download only the required segment and trim it
+        # Try 1: Stream copy (fastest, but may fail with some YouTube formats)
+        try:
+            stream = ffmpeg.input(video_url, ss=actual_start, t=duration)
+            stream = ffmpeg.output(stream, output_path, c='copy')
+            out, err = ffmpeg.run(stream, cmd=FFMPEG_EXE, capture_stdout=True, capture_stderr=True, overwrite_output=True)
+            logger.info(f"Successfully created clip (stream copy): {output_path}")
+            return {"status": "success", "file_url": f"/static/clips/{output_filename}"}
+        except ffmpeg.Error:
+            logger.warning(f"Stream copy failed for {video_id}, falling back to re-encode...")
+            # Remove partial file if exists
+            if os.path.exists(output_path):
+                os.remove(output_path)
+
+        # Try 2: Re-encode (slower but more reliable)
         stream = ffmpeg.input(video_url, ss=actual_start, t=duration)
-        stream = ffmpeg.output(stream, output_path, c='copy')
-        
-        # Run FFmpeg command using the bundled executable if available
+        stream = ffmpeg.output(stream, output_path, vcodec='libx264', acodec='aac', preset='fast')
         out, err = ffmpeg.run(stream, cmd=FFMPEG_EXE, capture_stdout=True, capture_stderr=True, overwrite_output=True)
-        logger.info(f"Successfully created clip: {output_path}")
+        logger.info(f"Successfully created clip (re-encoded): {output_path}")
         
         return {"status": "success", "file_url": f"/static/clips/{output_filename}"}
         
