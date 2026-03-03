@@ -3,6 +3,7 @@ import argparse
 import logging
 import json
 import time
+import random
 import hashlib
 from datetime import datetime
 from typing import Optional, Dict, Any, List
@@ -141,11 +142,18 @@ def main():
         
         # ตรวจสอบ Batch Logic
         if processed_this_run > 0 and processed_this_run % batch_size == 0:
+            # สุ่มเวลาพักเล็กน้อย (Jitter +/- 20% จากเวลาที่ตั้งไว้)
+            jitter_min = delay_min * random.uniform(0.8, 1.2)
             logger.info("=" * 60)
-            logger.info(f"😴 ครบชุด {batch_size} คลิปแล้ว... หยุดพัก {delay_min} นาทีเพื่อป้องกัน Rate Limit")
+            logger.info(f"😴 ครบชุด {batch_size} คลิปแล้ว... หยุดพักประมาณ {jitter_min:.1f} นาทีเพื่อป้องกัน Rate Limit")
             logger.info("=" * 60)
-            time.sleep(delay_min * 60)
+            time.sleep(jitter_min * 60)
             logger.info("⏰ ตื่นแล้ว! เริ่มประมวลผลชุดต่อไป...")
+        elif processed_this_run > 0:
+            # สุ่มหน่วงเวลาระหว่างคลิป (15-25 วินาที) ตามคำแนะนำ
+            video_jitter = random.uniform(15, 25)
+            logger.info(f"⏳ หน่วงเวลาสุ่ม {video_jitter:.1f} วินาทีก่อนเริ่มคลิปถัดไป...")
+            time.sleep(video_jitter)
 
         logger.info("-" * 60)
         logger.info(f"🎬 กำลังประมวลผลคลิปที่ {i+1}/{len(videos)} (ชุดนี้: {processed_this_run + 1}/{batch_size})")
