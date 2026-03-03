@@ -58,8 +58,18 @@ def scrape_channel_videos(
     ydl_opts = {
         "quiet": True,
         "no_warnings": True,
-        "extract_flat": True,       # don't download, just list
+        "extract_flat": True,
+        "cookiefile": "cookies.txt",  # เพิ่มบรรทัดนี้
         "ignoreerrors": True,
+        # --- เพิ่มส่วนนี้เข้าไป ---
+        "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-us,en;q=0.5",
+        },
+        "nocheckcertificate": True,
+        "geo_bypass": True,
+        # -----------------------
     }
     if max_videos > 0:
         ydl_opts["playlistend"] = max_videos
