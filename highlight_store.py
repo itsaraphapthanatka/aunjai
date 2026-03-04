@@ -198,6 +198,42 @@ def search_highlights(query: str, top_k: int = 5, video_id: str = None) -> list[
     return highlights
 
 
+def get_processed_video_ids(video_ids: list[str]) -> list[str]:
+    """
+    ตรวจสอบว่า video_id ไหนมีข้อมูลใน Pinecone แล้วบ้าง (ตรวจได้ทีละหลาย ID)
+    """
+    if not PINECONE_API_KEY or not video_ids:
+        return []
+
+    index = _get_index()
+    processed_ids = set()
+
+    # Pinecone filter รองรับ $in สำหรับ metadata
+    # แต่ถ้า video_ids เยอะเกินไป (เช่น > 100) อาจจะต้องแบ่งชุด (Batch)
+    batch_size = 100
+    for i in range(0, len(video_ids), batch_size):
+        batch = video_ids[i:i + batch_size]
+        try:
+            results = index.query(
+                vector=[0.0] * 384, # Dummy vector (เราใช้ filter อย่างเดียว)
+                top_k=1000,
+                namespace=HIGHLIGHT_NAMESPACE,
+                filter={
+                    "type": "highlight",
+                    "video_id": {"$in": batch}
+                },
+                include_metadata=True
+            )
+            for match in results.get("matches", []):
+                v_id = match.get("metadata", {}).get("video_id")
+                if v_id:
+                    processed_ids.add(v_id)
+        except Exception as e:
+            logger.error(f"❌ Error checking processed IDs: {e}")
+
+    return list(processed_ids)
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(message)s")
 

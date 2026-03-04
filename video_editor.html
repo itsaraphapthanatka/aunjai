@@ -993,15 +993,44 @@
                     header.className = 'bg-gradient-to-r from-purple-50 to-fuchsia-50 border border-purple-200 p-4 rounded-xl mb-1';
                     header.innerHTML = `
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <i class="fab fa-youtube text-red-500"></i>
-                                <span class="font-medium text-purple-800">${data.channel_name}</span>
-                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">${data.videos.length} วิดีโอ</span>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-2 cursor-pointer group">
+                                    <input type="checkbox" id="selectAllVideos" onchange="toggleSelectAll(this)" 
+                                           class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fab fa-youtube text-red-500 text-lg"></i>
+                                        <span class="font-semibold text-purple-900">${data.channel_name}</span>
+                                        <span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">${data.videos.length}</span>
+                                    </div>
+                                </label>
                             </div>
-                            <button id="analyzeAllBtn" onclick="analyzeAllVideos()"
-                                class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm px-4 py-2 rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
-                                <i class="fas fa-magic"></i> วิเคราะห์ทั้งหมด
-                            </button>
+                            <div class="flex items-center gap-3">
+                                <div id="batchSettings" class="flex items-center gap-2 bg-white/50 p-1 px-2 rounded-lg border border-purple-100">
+                                    <div class="flex items-center gap-1.5 mr-2">
+                                        <label class="flex items-center gap-1.5 cursor-pointer">
+                                            <input type="checkbox" id="skipProcessedInput" checked
+                                                   class="w-3.5 h-3.5 rounded border-purple-300 text-purple-600 focus:ring-purple-500">
+                                            <span class="text-[10px] font-bold text-purple-600 uppercase tracking-wider">Skip Done</span>
+                                        </label>
+                                    </div>
+                                    <div class="w-px h-4 bg-purple-100"></div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Batch</span>
+                                        <input type="number" id="batchSizeInput" value="50" min="1" 
+                                               class="w-12 h-7 text-xs border-purple-200 rounded-md focus:ring-purple-500 focus:border-purple-500 text-center">
+                                    </div>
+                                    <div class="w-px h-4 bg-purple-100"></div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Wait (min)</span>
+                                        <input type="number" id="delayMinInput" value="30" min="0" 
+                                               class="w-12 h-7 text-xs border-purple-200 rounded-md focus:ring-purple-500 focus:border-purple-500 text-center">
+                                    </div>
+                                </div>
+                                <button id="analyzeAllBtn" onclick="analyzeAllVideos()"
+                                    class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs px-4 py-2 rounded-lg font-bold transition-all shadow-md flex items-center gap-2">
+                                    <i class="fas fa-magic"></i> วิเคราะห์ที่เลือก
+                                </button>
+                            </div>
                         </div>
                         <div id="batchProgress" class="hidden mt-3">
                             <div class="flex items-center justify-between text-xs text-purple-700 mb-1">
@@ -1023,7 +1052,11 @@
                         const infoRow = document.createElement('div');
                         infoRow.className = 'flex gap-3 items-center';
                         infoRow.innerHTML = `
-                            <img src="${v.thumbnail}" alt="" class="w-28 h-16 rounded-lg object-cover flex-shrink-0" loading="lazy">
+                            <div class="flex-shrink-0">
+                                <input type="checkbox" name="videoSelect" value="${v.video_id}" data-idx="${i}"
+                                       class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer">
+                            </div>
+                            <img src="${v.thumbnail}" alt="" class="w-24 h-14 rounded-lg object-cover flex-shrink-0 shadow-sm border border-gray-100" loading="lazy">
                             <div class="flex-grow min-w-0">
                                 <h3 class="text-sm font-medium text-gray-800 truncate" title="${v.title}">${v.title}</h3>
                                 <div class="flex items-center gap-2 mt-1">
@@ -1046,6 +1079,9 @@
                         cardContainer.appendChild(detailsRow);
                         channelResults.appendChild(cardContainer);
                     });
+
+                    // Check which ones are already processed
+                    checkProcessedVideos(data.videos.map(v => v.video_id));
                 } else {
                     channelResults.classList.remove('hidden');
                     channelResults.innerHTML = `
@@ -1067,39 +1103,168 @@
             }
         });
 
+        window.toggleChDetails = (videoId) => {
+            const details = document.getElementById(`ch-details-${videoId}`);
+            const btn = document.getElementById(`ch-toggle-btn-${videoId}`);
+            if (!details) return;
+
+            if (details.classList.contains('hidden')) {
+                details.classList.remove('hidden');
+                details.classList.add('flex');
+                if (btn) btn.innerHTML = '<i class="fas fa-eye-slash"></i> ซ่อนรายละเอียด';
+            } else {
+                details.classList.add('hidden');
+                details.classList.remove('flex');
+                if (btn) btn.innerHTML = '<i class="fas fa-eye"></i> แสดงรายละเอียด';
+            }
+        };
+
+        window.toggleSelectAll = (el) => {
+            const checkboxes = document.querySelectorAll('input[name="videoSelect"]');
+            checkboxes.forEach(cb => {
+                if (!cb.disabled) cb.checked = el.checked;
+            });
+        };
+
+        window.checkProcessedVideos = async (videoIds) => {
+            try {
+                const res = await fetch('/editor/api/channel/check_processed', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ video_ids: videoIds })
+                });
+                const data = await res.json();
+                if (data.status === 'success' && data.processed_ids) {
+                    data.processed_ids.forEach(vid => {
+                        const statusEl = document.getElementById(`ch-status-${vid}`);
+                        const cardEl = document.getElementById(`ch-video-${vid}`);
+                        const cb = document.querySelector(`input[name="videoSelect"][value="${vid}"]`);
+
+                        if (statusEl) {
+                            statusEl.classList.remove('hidden');
+                            statusEl.className = 'flex-shrink-0 text-[10px] font-bold bg-green-100 text-green-600 px-2 py-0.5 rounded-md';
+                            statusEl.innerHTML = '<i class="fas fa-check-circle"></i> DONE';
+                        }
+                        if (cardEl) {
+                            cardEl.classList.add('opacity-75', 'bg-gray-50');
+                            cardEl.setAttribute('data-processed', 'true');
+                        }
+                        if (cb) {
+                            cb.checked = false;
+                            cb.disabled = true;
+                            cb.className += ' opacity-50 cursor-not-allowed';
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error('Error checking processed videos:', err);
+            }
+        };
+
         // ─────────────────────────────────────────
         // Batch Analyze All Videos
         // ─────────────────────────────────────────
         window.analyzeAllVideos = async () => {
-            const videos = window._channelVideos;
-            if (!videos || videos.length === 0) return;
+            const allVideos = window._channelVideos;
+            if (!allVideos || allVideos.length === 0) return;
 
+            const skipProcessed = document.getElementById('skipProcessedInput')?.checked || false;
+
+            // Get selected videos
+            const selectedCheckboxes = document.querySelectorAll('input[name="videoSelect"]:checked');
+            let videosToProcess = [];
+
+            if (selectedCheckboxes.length > 0) {
+                // Process only selected
+                const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+                videosToProcess = allVideos.filter(v => selectedIds.includes(v.video_id));
+            } else {
+                // If nothing selected, process ALL (with skip option)
+                videosToProcess = allVideos.filter(v => {
+                    const card = document.getElementById(`ch-video-${v.video_id}`);
+                    const isProcessed = card?.getAttribute('data-processed') === 'true';
+                    return !(skipProcessed && isProcessed);
+                });
+            }
+
+            if (videosToProcess.length === 0) {
+                alert('ไม่พบวิดีโอที่ต้องประมวลผล (วิดีโอถูกข้ามหรือไม่ได้เลือก)');
+                return;
+            }
+
+            const batchSize = parseInt(document.getElementById('batchSizeInput')?.value || 50);
+            const delayMin = parseInt(document.getElementById('delayMinInput')?.value || 30);
             const analyzeAllBtn = document.getElementById('analyzeAllBtn');
             const batchProgress = document.getElementById('batchProgress');
             const batchProgressText = document.getElementById('batchProgressText');
             const batchProgressCount = document.getElementById('batchProgressCount');
             const batchProgressBar = document.getElementById('batchProgressBar');
 
-            // Disable button
+            // Disable button and inputs
             analyzeAllBtn.disabled = true;
             analyzeAllBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> กำลังวิเคราะห์...';
-            analyzeAllBtn.className = 'bg-gray-400 text-white text-sm px-4 py-2 rounded-lg font-medium flex items-center gap-2 cursor-not-allowed';
+            analyzeAllBtn.className = 'bg-gray-400 text-white text-xs px-4 py-2 rounded-lg font-bold flex items-center gap-2 cursor-not-allowed';
+
+            const batchSizeInput = document.getElementById('batchSizeInput');
+            const delayMinInput = document.getElementById('delayMinInput');
+            const skipProcessedInput = document.getElementById('skipProcessedInput');
+            if (batchSizeInput) batchSizeInput.disabled = true;
+            if (delayMinInput) delayMinInput.disabled = true;
+            if (skipProcessedInput) skipProcessedInput.disabled = true;
+
             batchProgress.classList.remove('hidden');
 
             let completed = 0;
             let success = 0;
             let errors = 0;
 
-            for (let i = 0; i < videos.length; i++) {
-                const v = videos[i];
+            for (let i = 0; i < videosToProcess.length; i++) {
+                const v = videosToProcess[i];
+
+                // Batch Delay Logic (Only if more than 1 batch and not first batch)
+                if (i > 0 && i % batchSize === 0) {
+                    const jitterMin = delayMin * (0.8 + Math.random() * 0.4);
+                    let secondsLeft = Math.floor(jitterMin * 60);
+
+                    const countdownInterval = setInterval(() => {
+                        secondsLeft--;
+                        const mins = Math.floor(secondsLeft / 60);
+                        const secs = secondsLeft % 60;
+                        batchProgressText.innerHTML = `<span class="text-orange-600 font-bold"><i class="fas fa-bed"></i> พักเครื่อง... รออีก ${mins}ม ${secs}ว</span>`;
+                        if (secondsLeft <= 0) clearInterval(countdownInterval);
+                    }, 1000);
+
+                    await new Promise(r => setTimeout(r, jitterMin * 60 * 1000));
+                    clearInterval(countdownInterval);
+                } else if (i > 0) {
+                    // Short jitter between videos (15-25s)
+                    const jitterSec = 15 + Math.random() * 10;
+                    let secondsLeft = Math.floor(jitterSec);
+
+                    const countdownInterval = setInterval(() => {
+                        secondsLeft--;
+                        batchProgressText.textContent = `หน่วงเวลา... รออีก ${secondsLeft} วินาที`;
+                        if (secondsLeft <= 0) clearInterval(countdownInterval);
+                    }, 1000);
+
+                    await new Promise(r => setTimeout(r, jitterSec * 1000));
+                    clearInterval(countdownInterval);
+                }
+
                 const statusEl = document.getElementById(`ch-status-${v.video_id}`);
                 const btnEl = document.getElementById(`ch-btn-${v.video_id}`);
                 const cardEl = document.getElementById(`ch-video-${v.video_id}`);
 
+                // Remove processed styling if we are re-processing it
+                if (cardEl) {
+                    cardEl.classList.remove('opacity-75', 'bg-gray-50');
+                    cardEl.setAttribute('data-processed', 'false');
+                }
+
                 // Update progress
                 batchProgressText.textContent = `กำลังวิเคราะห์: ${v.title.substring(0, 30)}...`;
-                batchProgressCount.textContent = `${i + 1}/${videos.length}`;
-                batchProgressBar.style.width = `${((i) / videos.length) * 100}%`;
+                batchProgressCount.textContent = `${i + 1}/${videosToProcess.length}`;
+                batchProgressBar.style.width = `${((i) / videosToProcess.length) * 100}%`;
 
                 // Show spinner on this card
                 if (statusEl) {
@@ -1134,6 +1299,14 @@
                                     if (statusEl) {
                                         statusEl.className = 'flex-shrink-0 text-xs bg-green-100 text-green-600 px-2 py-1 rounded-lg';
                                         statusEl.innerHTML = `<i class="fas fa-check"></i> ${hlCount} highlights`;
+
+                                        // Add toggle button after status
+                                        const toggleBtn = document.createElement('button');
+                                        toggleBtn.id = `ch-toggle-btn-${v.video_id}`;
+                                        toggleBtn.onclick = () => toggleChDetails(v.video_id);
+                                        toggleBtn.className = 'ml-2 text-[10px] text-purple-500 hover:text-purple-700 underline focus:outline-none';
+                                        toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> ซ่อนรายละเอียด';
+                                        statusEl.parentNode.appendChild(toggleBtn);
                                     }
                                     if (cardEl) {
                                         cardEl.className = 'bg-green-50 border border-green-200 p-3 rounded-xl shadow-sm flex flex-col gap-2 transition-all';

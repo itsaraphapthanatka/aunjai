@@ -15,6 +15,7 @@ from video_processor import process_video_clip
 from pipeline import run_pipeline
 from highlight_pipeline import run_highlight_pipeline
 from channel_scraper import scrape_channel_videos
+from highlight_store import get_processed_video_ids
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,9 @@ class HighlightRequest(BaseModel):
 class ChannelRequest(BaseModel):
     url: str
     max_videos: int = 0
+
+class ProcessedCheckRequest(BaseModel):
+    video_ids: list[str]
 
 @router.get("/", response_class=HTMLResponse)
 @router.get("", response_class=HTMLResponse, include_in_schema=False)
@@ -224,4 +228,16 @@ async def get_channel_videos(req: ChannelRequest):
         return result
     except Exception as e:
         logger.error(f"Channel scrape error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/api/channel/check_processed")
+async def check_processed_videos(req: ProcessedCheckRequest):
+    """ตรวจสอบว่าวิดีโอชุดไหนเคยประมวลผลไปแล้วบ้าง"""
+    try:
+        processed_ids = await asyncio.to_thread(
+            get_processed_video_ids, req.video_ids
+        )
+        return {"status": "success", "processed_ids": processed_ids}
+    except Exception as e:
+        logger.error(f"Check processed error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
