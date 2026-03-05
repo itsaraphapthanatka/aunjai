@@ -1005,13 +1005,24 @@
                                 </label>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div id="batchSettings" class="flex items-center gap-2 bg-white/50 p-1 px-2 rounded-lg border border-purple-100">
+                                <div id="batchSettings" class="flex items-center gap-2 bg-white/50 p-1 px-2 rounded-lg border border-purple-100 flex-wrap">
                                     <div class="flex items-center gap-1.5 mr-2">
                                         <label class="flex items-center gap-1.5 cursor-pointer">
                                             <input type="checkbox" id="skipProcessedInput" checked
                                                    class="w-3.5 h-3.5 rounded border-purple-300 text-purple-600 focus:ring-purple-500">
                                             <span class="text-[10px] font-bold text-purple-600 uppercase tracking-wider">Skip Done</span>
                                         </label>
+                                    </div>
+                                    <div class="w-px h-4 bg-purple-100"></div>
+                                    <div class="flex items-center gap-1.5" title="ลำดับเริ่มต้น (Start Index)">
+                                        <span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Start</span>
+                                        <input type="number" id="startIndexInput" value="1" min="1" 
+                                               class="w-12 h-7 text-xs border-blue-200 rounded-md focus:ring-blue-500 focus:border-blue-500 text-center bg-blue-50">
+                                    </div>
+                                    <div class="flex items-center gap-1.5" title="ลำดับสิ้นสุด (End Index)">
+                                        <span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">End</span>
+                                        <input type="number" id="endIndexInput" value="${data.videos.length}" min="1" max="${data.videos.length}"
+                                               class="w-12 h-7 text-xs border-blue-200 rounded-md focus:ring-blue-500 focus:border-blue-500 text-center bg-blue-50">
                                     </div>
                                     <div class="w-px h-4 bg-purple-100"></div>
                                     <div class="flex items-center gap-1.5">
@@ -1021,7 +1032,7 @@
                                     </div>
                                     <div class="w-px h-4 bg-purple-100"></div>
                                     <div class="flex items-center gap-1.5">
-                                        <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Wait (min)</span>
+                                        <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Wait (m)</span>
                                         <input type="number" id="delayMinInput" value="30" min="0" 
                                                class="w-12 h-7 text-xs border-purple-200 rounded-md focus:ring-purple-500 focus:border-purple-500 text-center">
                                     </div>
@@ -1052,7 +1063,8 @@
                         const infoRow = document.createElement('div');
                         infoRow.className = 'flex gap-3 items-center';
                         infoRow.innerHTML = `
-                            <div class="flex-shrink-0">
+                            <div class="flex-shrink-0 flex items-center gap-2">
+                                <span class="text-[10px] font-bold text-gray-400 w-4 text-center">#${i + 1}</span>
                                 <input type="checkbox" name="videoSelect" value="${v.video_id}" data-idx="${i}"
                                        class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 cursor-pointer">
                             </div>
@@ -1150,9 +1162,9 @@
                             cardEl.setAttribute('data-processed', 'true');
                         }
                         if (cb) {
+                            // Don't disable the checkbox so users can manually override and force re-analyze
+                            // Just uncheck it by default
                             cb.checked = false;
-                            cb.disabled = true;
-                            cb.className += ' opacity-50 cursor-not-allowed';
                         }
                     });
                 }
@@ -1179,8 +1191,17 @@
                 const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
                 videosToProcess = allVideos.filter(v => selectedIds.includes(v.video_id));
             } else {
-                // If nothing selected, process ALL (with skip option)
-                videosToProcess = allVideos.filter(v => {
+                // If nothing selected, process ALL within range (with skip option)
+                const startIndex = parseInt(document.getElementById('startIndexInput')?.value || 1) - 1;
+                const endIndex = parseInt(document.getElementById('endIndexInput')?.value || allVideos.length);
+
+                // Validate range
+                const start = Math.max(0, startIndex);
+                const end = Math.min(allVideos.length, endIndex);
+
+                const rangedVideos = allVideos.slice(start, end);
+
+                videosToProcess = rangedVideos.filter(v => {
                     const card = document.getElementById(`ch-video-${v.video_id}`);
                     const isProcessed = card?.getAttribute('data-processed') === 'true';
                     return !(skipProcessed && isProcessed);
@@ -1321,9 +1342,14 @@
                                     errors++;
                                     if (statusEl) {
                                         statusEl.className = 'flex-shrink-0 text-xs bg-red-100 text-red-500 px-2 py-1 rounded-lg';
-                                        statusEl.innerHTML = '<i class="fas fa-times"></i> error';
+                                        statusEl.innerHTML = '<i class="fas fa-times"></i> ข้อผิดพลาด';
                                     }
                                     if (cardEl) cardEl.className = 'bg-red-50 border border-red-200 p-3 rounded-xl shadow-sm flex gap-3 items-center';
+                                    if (btnEl) {
+                                        btnEl.classList.remove('hidden');
+                                        btnEl.innerHTML = '<i class="fas fa-redo"></i> ลองใหม่';
+                                        btnEl.className = 'flex-shrink-0 text-xs bg-red-100 hover:bg-red-200 text-red-600 px-3 py-2 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap';
+                                    }
                                 }
                             } else if (statusData.progress) {
                                 if (statusEl) statusEl.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> ${statusData.progress.substring(0, 20)}`;
@@ -1333,17 +1359,27 @@
                         errors++;
                         if (statusEl) {
                             statusEl.className = 'flex-shrink-0 text-xs bg-red-100 text-red-500 px-2 py-1 rounded-lg';
-                            statusEl.innerHTML = '<i class="fas fa-times"></i> error';
+                            statusEl.innerHTML = '<i class="fas fa-times"></i> ข้อผิดพลาด (ถูกตัดจบ)';
                         }
                         if (cardEl) cardEl.className = 'bg-red-50 border border-red-200 p-3 rounded-xl shadow-sm flex gap-3 items-center';
+                        if (btnEl) {
+                            btnEl.classList.remove('hidden');
+                            btnEl.innerHTML = '<i class="fas fa-redo"></i> ลองใหม่';
+                            btnEl.className = 'flex-shrink-0 text-xs bg-red-100 hover:bg-red-200 text-red-600 px-3 py-2 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap';
+                        }
                     }
                 } catch (err) {
                     errors++;
                     if (statusEl) {
                         statusEl.className = 'flex-shrink-0 text-xs bg-red-100 text-red-500 px-2 py-1 rounded-lg';
-                        statusEl.innerHTML = '<i class="fas fa-times"></i> error';
+                        statusEl.innerHTML = '<i class="fas fa-times"></i> เครือข่ายขัดข้อง';
                     }
                     if (cardEl) cardEl.className = 'bg-red-50 border border-red-200 p-3 rounded-xl shadow-sm flex gap-3 items-center';
+                    if (btnEl) {
+                        btnEl.classList.remove('hidden');
+                        btnEl.innerHTML = '<i class="fas fa-redo"></i> ลองใหม่';
+                        btnEl.className = 'flex-shrink-0 text-xs bg-red-100 hover:bg-red-200 text-red-600 px-3 py-2 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap';
+                    }
                 }
 
                 completed++;
