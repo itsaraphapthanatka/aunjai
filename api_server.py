@@ -7,6 +7,14 @@ import logging
 from datetime import datetime
 from maac_middleware import MAACMiddleware
 
+# Keep LINE imports separate to avoid failing if not configured properly yet
+try:
+    from line_handler import handler as line_handler
+    from linebot.v3.exceptions import InvalidSignatureError
+except ImportError:
+    line_handler = None
+    InvalidSignatureError = Exception
+
 # Configure Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("MAAC-Web-Middleware")
@@ -88,6 +96,32 @@ async def receive_webhook(payload: bytes = Depends(verify_signature)):
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal processing error")
+
+@app.post("/line/webhook")
+async def line_webhook(request: Request, x_line_signature: str = Header(None)):
+    """
+    Verified endpoint to receive webhook events from LINE Messaging API.
+    """
+    if not x_line_signature:
+        raise HTTPException(status_code=400, detail="Missing X-Line-Signature header")
+        
+    body = await request.body()
+    body_str = body.decode("utf-8")
+    
+    if line_handler is None:
+        logger.error("LINE Messaging API is not configured or failed to initialize.")
+        raise HTTPException(status_code=500, detail="LINE Integration not available")
+        
+    try:
+        line_handler.handle(body_str, x_line_signature)
+    except InvalidSignatureError:
+        logger.error(f"Invalid LINE signature. Signature: {x_line_signature}")
+        raise HTTPException(status_code=400, detail="Invalid signature")
+    except Exception as e:
+        logger.error(f"Error handling LINE webhook: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+        
+    return "OK"
 
 # ─────────────────────────────────────────────────────────────────────────
 # Orchestration Endpoints (Internal)

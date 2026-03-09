@@ -36,9 +36,15 @@ YOUTUBE_URL_TEMPLATE: str = "https://www.youtube.com/watch?v={video_id}"
 # ──────────────────────────────────────────────
 # OpenClaw Configuration
 # ──────────────────────────────────────────────
-OPENCLAW_API_URL: str = os.getenv("OPENCLAW_API_URL", "http://localhost:3000")
+OPENCLAW_API_URL: str = os.getenv("OPENCLAW_API_URL", "http://136.110.50.115:18789")
 OPENCLAW_AGENT_ID: str = os.getenv("OPENCLAW_AGENT_ID", "unjai")
 OPENCLAW_API_KEY: str = os.getenv("OPENCLAW_API_KEY", "")
+
+# ──────────────────────────────────────────────
+# LINE Messaging API Configuration
+# ──────────────────────────────────────────────
+LINE_CHANNEL_SECRET: str = os.getenv("LINE_CHANNEL_SECRET", "")
+LINE_CHANNEL_ACCESS_TOKEN: str = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", "")
 
 # ──────────────────────────────────────────────
 # Proxy Configuration (แก้ปัญหา YouTube บล็อก IP)

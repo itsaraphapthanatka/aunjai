@@ -98,7 +98,7 @@ class MAACMiddleware:
             params["start"] = start_token
             
         response = requests.get(
-            f"{self.base_url}/openapi/v1/message_event/",
+            f"{self.base_url}/openapi/v1/event/",
             headers=self.headers,
             params=params
         )

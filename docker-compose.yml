@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: aunjai-db
+    environment:
+      POSTGRES_USER: aunjai_user
+      POSTGRES_PASSWORD: aunjai_password
+      POSTGRES_DB: aunjai_db
+    ports:
+      - "5432:5432"
+    networks:
+      - aunjai-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aunjai_user -d aunjai_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: aunjai-app
+    ports:
+      - "8001:8000"
+    networks:
+      - aunjai-network
+    environment:
+      - DATABASE_URL=postgresql://aunjai_user:aunjai_password@db:5432/aunjai_db
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME}
+      - MAAC_API_TOKEN=${MAAC_API_TOKEN}
+      - MAAC_WEBHOOK_SECRET=${MAAC_WEBHOOK_SECRET}
+      - MAAC_BASE_URL=${MAAC_BASE_URL}
+      - OPENCLAW_API_URL=${OPENCLAW_API_URL}
+      - OPENCLAW_AGENT_ID=${OPENCLAW_AGENT_ID}
+      - OPENCLAW_API_KEY=${OPENCLAW_API_KEY}
+      - LINE_CHANNEL_SECRET=${LINE_CHANNEL_SECRET}
+      - LINE_CHANNEL_ACCESS_TOKEN=${LINE_CHANNEL_ACCESS_TOKEN}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - static_clips:/app/static/clips
+
+networks:
+  aunjai-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  static_clips:
