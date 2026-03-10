@@ -1,11 +1,11 @@
 import logging
 import httpx
-from linebot.v3 import WebhookHandler
+from linebot.v3 import WebhookHandler, AsyncWebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import (
     Configuration,
-    ApiClient,
-    MessagingApi,
+    AsyncApiClient,
+    AsyncMessagingApi,
     ReplyMessageRequest,
     TextMessage
 )
@@ -13,7 +13,7 @@ from linebot.v3.webhooks import (
     MessageEvent,
     TextMessageContent
 )
-from aunjai.config import (
+from config import (
     LINE_CHANNEL_SECRET, 
     LINE_CHANNEL_ACCESS_TOKEN,
     OPENCLAW_API_URL,
@@ -25,7 +25,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize LINE API configuration
 configuration = Configuration(access_token=LINE_CHANNEL_ACCESS_TOKEN)
-handler = WebhookHandler(LINE_CHANNEL_SECRET)
+handler = AsyncWebhookHandler(LINE_CHANNEL_SECRET)
+async_api_client = AsyncApiClient(configuration)
+line_bot_api = AsyncMessagingApi(async_api_client)
 
 async def call_openclaw(user_message: str, line_user_id: str) -> str:
     """
@@ -77,7 +79,7 @@ async def call_openclaw(user_message: str, line_user_id: str) -> str:
 
 
 @handler.add(MessageEvent, message=TextMessageContent)
-def handle_text_message(event):
+async def handle_text_message(event):
     """
     จัดการข้อความที่ได้รับจาก LINE
     """
@@ -87,28 +89,18 @@ def handle_text_message(event):
     
     logger.info(f"ได้รับข้อความ LINE จาก {line_user_id}: {user_message}")
     
-    # เนื่องจาก handle_text_message จาก line-bot-sdk ทำงานแบบ sync
-    # เราจึงใช้วิธีรัน async function (call_openclaw) ภายในลูปย่อย
-    import asyncio
+    # ดึงคำตอบจาก OpenClaw
+    reply_text = await call_openclaw(user_message, line_user_id)
     
+    # ส่งข้อความกลับไปยังผู้ใช้
     try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        
-    reply_text = loop.run_until_complete(call_openclaw(user_message, line_user_id))
-    
-    try:
-        with ApiClient(configuration) as api_client:
-            line_bot_api = MessagingApi(api_client)
-            line_bot_api.reply_message(
-                ReplyMessageRequest(
-                    reply_token=reply_token,
-                    messages=[TextMessage(text=reply_text)]
-                )
+        await line_bot_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=reply_token,
+                messages=[TextMessage(text=reply_text)]
             )
-            logger.info(f"ส่งข้อความตอบกลับไปยัง {line_user_id} สำเร็จ")
+        )
+        logger.info(f"ส่งข้อความตอบกลับไปยัง {line_user_id} สำเร็จ")
     except Exception as e:
         logger.error(f"เกิดข้อผิดพลาดในการตอบกลับ LINE: {e}")
 
