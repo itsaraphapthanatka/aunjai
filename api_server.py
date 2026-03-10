@@ -183,6 +183,34 @@ async def get_dashboard_performance():
         logger.error(f"Error fetching performance: {str(e)}")
         raise HTTPException(status_code=500, detail="Database Error")
 
+@app.get("/api/settings")
+async def get_settings():
+    """
+    Returns all system settings.
+    """
+    try:
+        return maac.db.get_all_settings()
+    except Exception as e:
+        logger.error(f"Error fetching settings: {str(e)}")
+        raise HTTPException(status_code=500, detail="Database Error")
+
+@app.post("/api/settings")
+async def update_settings(settings: Dict[str, str]):
+    """
+    Updates system settings and refreshes MAAC middleware config.
+    """
+    try:
+        for key, value in settings.items():
+            maac.db.update_setting(key, value)
+        
+        # Refresh the middleware configuration in memory
+        maac.refresh_config()
+        
+        return {"status": "success", "message": "Settings updated and middleware refreshed"}
+    except Exception as e:
+        logger.error(f"Error updating settings: {str(e)}")
+        raise HTTPException(status_code=500, detail="Database Error")
+
 @app.get("/admin", response_class=HTMLResponse)
 @app.get("/admin/", response_class=HTMLResponse, include_in_schema=False)
 async def admin_dashboard():

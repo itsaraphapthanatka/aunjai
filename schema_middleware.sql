@@ -82,3 +82,20 @@ CREATE TABLE IF NOT EXISTS event_performance_bubbles (
     message_label TEXT,
     clicks INT DEFAULT 0
 );
+
+-- 8. System Settings
+CREATE TABLE IF NOT EXISTS system_settings (
+    key VARCHAR(100) PRIMARY KEY,
+    value TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert default settings if they don't exist
+INSERT INTO system_settings (key, value) VALUES 
+('maac_prod_api_token', ''),
+('maac_prod_webhook_secret', ''),
+('maac_sandbox_api_token', ''),
+('maac_sandbox_webhook_secret', ''),
+('maac_active_env', 'production'),
+('maac_custom_base_url', '')
+ON CONFLICT (key) DO NOTHING;

@@ -17,15 +17,39 @@ load_dotenv()
 
 class MAACMiddleware:
     def __init__(self):
-        self.api_token = os.getenv("MAAC_API_TOKEN")
-        self.webhook_secret = os.getenv("MAAC_WEBHOOK_SECRET")
-        self.base_url = os.getenv("MAAC_BASE_URL", "https://api.cresclab.com").rstrip("/")
         self.db = DatabaseHandler()
+        self._load_config()
+
+    def _load_config(self):
+        """Loads configuration from database, falling back to environment variables."""
+        self.active_env = self.db.get_setting("maac_active_env", "production")
+        
+        # Determine base URL
+        if self.active_env == "production":
+            self.base_url = "https://api.cresclab.com"
+            self.api_token = self.db.get_setting("maac_prod_api_token") or os.getenv("MAAC_API_TOKEN")
+            self.webhook_secret = self.db.get_setting("maac_prod_webhook_secret") or os.getenv("MAAC_WEBHOOK_SECRET")
+        elif self.active_env == "sandbox":
+            self.base_url = "https://api.jp.cresclab.com"
+            self.api_token = self.db.get_setting("maac_sandbox_api_token")
+            self.webhook_secret = self.db.get_setting("maac_sandbox_webhook_secret")
+        else: # custom
+            self.base_url = self.db.get_setting("maac_custom_base_url")
+            self.api_token = self.db.get_setting("maac_prod_api_token") # Fallback to prod token for custom if not specified otherwise
+            self.webhook_secret = self.db.get_setting("maac_prod_webhook_secret")
+
+        self.base_url = (self.base_url or "https://api.user360.cresclab.com").rstrip("/")
+        
         self.headers = {
             "Authorization": f"Bearer {self.api_token}",
             "Content-Type": "application/json",
             "User-Agent": "NongUnjai-Middleware/1.0"
         }
+
+    def refresh_config(self):
+        """Forces a reload of configuration from the database."""
+        self._load_config()
+        logger.info("MAAC Middleware configuration refreshed from database.")
 
     # ─────────────────────────────────────────────────────────────────────────
     # 1. Webhook Verification

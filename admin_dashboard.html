@@ -366,6 +366,7 @@
                 <a class="nav-link active" onclick="switchTab('dashboard')">Dashboard</a>
                 <a class="nav-link" onclick="switchTab('contacts')">Contacts</a>
                 <a class="nav-link" onclick="switchTab('campaigns')">Campaigns</a>
+                <a class="nav-link" onclick="switchTab('settings')">Settings</a>
             </div>
             <button class="btn" onclick="triggerSync()">
                 <i data-lucide="refresh-cw"></i>
@@ -500,11 +501,70 @@
         <!-- SETTINGS VIEW -->
         <div id="settingsView" style="display: none;">
             <div class="panel">
-                <h2><i data-lucide="settings"></i> System Settings</h2>
-                <div style="padding: 2rem; color: var(--text-dim); text-align: center;">
-                    <i data-lucide="shield-check"
-                        style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <p>API Authentication & Webhook verification are currently managed via .env configuration.</p>
+                <h2><i data-lucide="settings"></i> MAAC OpenAPI Configuration</h2>
+                <div style="max-width: 600px; margin: 0 auto; padding-top: 1rem;">
+                    <form id="settingsForm" onsubmit="saveSettings(event)">
+                        <!-- Active Environment Selector -->
+                        <div style="margin-bottom: 2rem;">
+                            <label style="display: block; margin-bottom: 1rem; color: var(--text-dim); font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Active Environment</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+                                <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 10px; border: 1px solid var(--card-border); transition: all 0.2s;" id="label_prod">
+                                    <input type="radio" name="maac_active_env" value="production" onchange="updateEnvSelection()">
+                                    <span>Production</span>
+                                </label>
+                                <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 10px; border: 1px solid var(--card-border); transition: all 0.2s;" id="label_sandbox">
+                                    <input type="radio" name="maac_active_env" value="sandbox" onchange="updateEnvSelection()">
+                                    <span>Sandbox</span>
+                                </label>
+                                <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 10px; border: 1px solid var(--card-border); transition: all 0.2s;" id="label_custom">
+                                    <input type="radio" name="maac_active_env" value="custom" onchange="updateEnvSelection()">
+                                    <span>Custom</span>
+                                </label>
+                            </div>
+                            <input type="text" id="maac_custom_base_url" placeholder="https://your-api-base.com" 
+                                style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: white; padding: 0.75rem 1rem; border-radius: 10px; display: none; margin-top: 0.75rem;">
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid var(--card-border); margin-bottom: 2rem;">
+
+                        <!-- Production Credentials -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="globe" style="width:16px;"></i> Production Credentials
+                            </h3>
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; margin-bottom: 0.4rem; color: var(--text-dim); font-size: 0.75rem;">API TOKEN</label>
+                                <input type="password" id="maac_prod_api_token" placeholder="Bearer Token" 
+                                    style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: white; padding: 0.6rem 1rem; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.4rem; color: var(--text-dim); font-size: 0.75rem;">WEBHOOK SECRET</label>
+                                <input type="password" id="maac_prod_webhook_secret" placeholder="Secret Key" 
+                                    style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: white; padding: 0.6rem 1rem; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <!-- Sandbox Credentials -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="font-size: 0.9rem; margin-bottom: 1rem; color: #ffae00; display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="test-tube" style="width:16px;"></i> Sandbox Credentials (Japan)
+                            </h3>
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; margin-bottom: 0.4rem; color: var(--text-dim); font-size: 0.75rem;">API TOKEN</label>
+                                <input type="password" id="maac_sandbox_api_token" placeholder="Bearer Token" 
+                                    style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: white; padding: 0.6rem 1rem; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 0.4rem; color: var(--text-dim); font-size: 0.75rem;">WEBHOOK SECRET</label>
+                                <input type="password" id="maac_sandbox_webhook_secret" placeholder="Secret Key" 
+                                    style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: white; padding: 0.6rem 1rem; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn" style="width: 100%; justify-content: center; padding: 1rem; margin-top: 1rem;">
+                            <i data-lucide="save"></i> Save Configuration
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -551,6 +611,88 @@
                 await fetchContacts(contactLimit, true, contactPage);
             } else if (currentTab === 'campaigns') {
                 await fetchCampaigns();
+            } else if (currentTab === 'settings') {
+                await fetchSettings();
+            }
+        }
+
+        async function fetchSettings() {
+            try {
+                const response = await fetch('/api/settings');
+                const settings = await response.json();
+                
+                if (settings.maac_prod_api_token) document.getElementById('maac_prod_api_token').value = settings.maac_prod_api_token;
+                if (settings.maac_prod_webhook_secret) document.getElementById('maac_prod_webhook_secret').value = settings.maac_prod_webhook_secret;
+                if (settings.maac_sandbox_api_token) document.getElementById('maac_sandbox_api_token').value = settings.maac_sandbox_api_token;
+                if (settings.maac_sandbox_webhook_secret) document.getElementById('maac_sandbox_webhook_secret').value = settings.maac_sandbox_webhook_secret;
+                if (settings.maac_custom_base_url) document.getElementById('maac_custom_base_url').value = settings.maac_custom_base_url;
+                
+                const activeEnv = settings.maac_active_env || "production";
+                const radios = document.getElementsByName('maac_active_env');
+                for (let r of radios) {
+                    if (r.value === activeEnv) {
+                        r.checked = true;
+                        break;
+                    }
+                }
+                updateEnvSelection();
+            } catch (e) { console.error("Error fetching settings", e); }
+        }
+
+        function updateEnvSelection() {
+            const activeEnv = document.querySelector('input[name="maac_active_env"]:checked').value;
+            document.getElementById('maac_custom_base_url').style.display = activeEnv === 'custom' ? 'block' : 'none';
+            
+            // Highlight selected label
+            ['prod', 'sandbox', 'custom'].forEach(env => {
+                const label = document.getElementById('label_' + env);
+                if (activeEnv === (env === 'prod' ? 'production' : env)) {
+                    label.style.borderColor = 'var(--accent-primary)';
+                    label.style.background = 'rgba(0, 242, 255, 0.05)';
+                } else {
+                    label.style.borderColor = 'var(--card-border)';
+                    label.style.background = 'rgba(255, 255, 255, 0.03)';
+                }
+            });
+        }
+
+        async function saveSettings(event) {
+            event.preventDefault();
+            const btn = event.submitter;
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Saving...';
+
+            const activeEnv = document.querySelector('input[name="maac_active_env"]:checked').value;
+
+            const payload = {
+                maac_prod_api_token: document.getElementById('maac_prod_api_token').value,
+                maac_prod_webhook_secret: document.getElementById('maac_prod_webhook_secret').value,
+                maac_sandbox_api_token: document.getElementById('maac_sandbox_api_token').value,
+                maac_sandbox_webhook_secret: document.getElementById('maac_sandbox_webhook_secret').value,
+                maac_active_env: activeEnv,
+                maac_custom_base_url: document.getElementById('maac_custom_base_url').value
+            };
+
+            try {
+                const response = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    alert('Configuration saved successfully!');
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (e) {
+                console.error("Error saving settings", e);
+                alert('Failed to save settings');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                lucide.createIcons();
             }
         }
 

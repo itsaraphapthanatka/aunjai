@@ -205,3 +205,42 @@ class DatabaseHandler:
             with conn.cursor() as cur:
                 cur.execute(sql)
                 return [row[0] for row in cur.fetchall()]
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # 4. System Settings
+    # ─────────────────────────────────────────────────────────────────────────
+    def get_setting(self, key: str, default: str = None) -> str:
+        """
+        Retrieves a system setting by key.
+        """
+        sql = "SELECT value FROM system_settings WHERE key = %s"
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (key,))
+                row = cur.fetchone()
+                return row[0] if row else default
+
+    def update_setting(self, key: str, value: str):
+        """
+        Updates or inserts a system setting.
+        """
+        sql = """
+        INSERT INTO system_settings (key, value, updated_at)
+        VALUES (%s, %s, CURRENT_TIMESTAMP)
+        ON CONFLICT (key) DO UPDATE SET
+            value = EXCLUDED.value,
+            updated_at = EXCLUDED.updated_at;
+        """
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (key, value))
+
+    def get_all_settings(self) -> Dict[str, str]:
+        """
+        Retrieves all system settings.
+        """
+        sql = "SELECT key, value FROM system_settings"
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql)
+                return {row[0]: row[1] for row in cur.fetchall()}
