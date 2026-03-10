@@ -7,6 +7,7 @@ from linebot.v3.messaging import (
     ApiClient,
     MessagingApi,
     ReplyMessageRequest,
+    PushMessageRequest,
     TextMessage
 )
 from linebot.v3.webhooks import (
@@ -50,7 +51,8 @@ def call_openclaw(user_message: str, line_user_id: str) -> str:
     logger.info(f"🚀 กำลังส่งข้อความของ {line_user_id} ไปยัง OpenClaw (agent: {OPENCLAW_AGENT_ID})")
     
     try:
-        response = requests.post(chat_url, json=payload, headers=headers, timeout=30.0)
+        # ปรับลด timeout เหลือ 25 วินาทีเพื่อให้ทัน reply token (30s)
+        response = requests.post(chat_url, json=payload, headers=headers, timeout=25.0)
         response.raise_for_status()
         result = response.json()
         
@@ -92,13 +94,30 @@ def handle_text_message(event):
     try:
         with ApiClient(configuration) as api_client:
             line_bot_api = MessagingApi(api_client)
-            line_bot_api.reply_message(
-                ReplyMessageRequest(
-                    reply_token=reply_token,
-                    messages=[TextMessage(text=reply_text)]
+            
+            try:
+                # พยายามใช้ Reply Message ก่อน (ฟรีและรวดเร็ว)
+                line_bot_api.reply_message(
+                    ReplyMessageRequest(
+                        reply_token=reply_token,
+                        messages=[TextMessage(text=reply_text)]
+                    )
                 )
-            )
-        logger.info(f"ส่งข้อความตอบกลับไปยัง {line_user_id} สำเร็จ")
+                logger.info(f"ส่งข้อความตอบกลับ (Reply) ไปยัง {line_user_id} สำเร็จ")
+            except Exception as reply_error:
+                # ถ้า Reply ไม่สำเร็จ (เช่น Token หมดอายุ) ให้ใช้ Push Message แทน
+                if "Invalid reply token" in str(reply_error):
+                    logger.warning(f"⚠️ Reply token หมดอายุ กำลังลองส่งด้วย Push Message ไปยัง {line_user_id}")
+                    line_bot_api.push_message(
+                        PushMessageRequest(
+                            to=line_user_id,
+                            messages=[TextMessage(text=reply_text)]
+                        )
+                    )
+                    logger.info(f"ส่งข้อความตอบกลับ (Push) ไปยัง {line_user_id} สำเร็จ")
+                else:
+                    raise reply_error
+
     except Exception as e:
         logger.error(f"เกิดข้อผิดพลาดในการตอบกลับ LINE: {e}")
 
