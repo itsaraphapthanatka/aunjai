@@ -1,5 +1,6 @@
 import logging
 import requests
+import threading
 from linebot.v3.webhook import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import (
@@ -51,7 +52,7 @@ def call_openclaw(user_message: str, line_user_id: str) -> str:
     logger.info(f"🚀 กำลังส่งข้อความของ {line_user_id} ไปยัง OpenClaw (agent: {OPENCLAW_AGENT_ID})")
     
     try:
-        # ปรับลด timeout เหลือ 25 วินาทีเพื่อให้ทัน reply token (30s)
+        # ปรับลด timeout เหลือ 25 วินาที
         response = requests.post(chat_url, json=payload, headers=headers, timeout=25.0)
         response.raise_for_status()
         result = response.json()
@@ -76,10 +77,32 @@ def call_openclaw(user_message: str, line_user_id: str) -> str:
         return "ขออภัยค่ะ ระบบกำลังขัดข้อง อุ่นใจจะรีบกลับมาให้บริการโดยเร็วนะคะ"
 
 
+def process_ai_response_background(line_user_id: str, user_message: str):
+    """
+    ฟังก์ชันสำหรับทำงานใน Background: เรียก OpenClaw และส่งคำตอบด้วย Push Message
+    """
+    try:
+        # 1. ดึงคำตอบจาก OpenClaw
+        reply_text = call_openclaw(user_message, line_user_id)
+        
+        # 2. ส่ง Push Message กลับไปหาผู้ใช้
+        with ApiClient(configuration) as api_client:
+            line_bot_api = MessagingApi(api_client)
+            line_bot_api.push_message(
+                PushMessageRequest(
+                    to=line_user_id,
+                    messages=[TextMessage(text=reply_text)]
+                )
+            )
+        logger.info(f"ส่งคำตอบ AI (Push) ไปยัง {line_user_id} สำเร็จ")
+    except Exception as e:
+        logger.error(f"เกิดข้อผิดพลาดในกะบวนการ Background: {e}")
+
+
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_text_message(event):
     """
-    จัดการข้อความที่ได้รับจาก LINE (Synchronous version)
+    จัดการข้อความที่ได้รับจาก LINE: ส่ง Acknowledge ทันที และประมวลผลต่อใน Background
     """
     line_user_id = event.source.user_id
     user_message = event.message.text
@@ -87,37 +110,26 @@ def handle_text_message(event):
     
     logger.info(f"ได้รับข้อความ LINE จาก {line_user_id}: {user_message}")
     
-    # ดึงคำตอบจาก OpenClaw
-    reply_text = call_openclaw(user_message, line_user_id)
-    
-    # ส่งข้อความกลับไปยังผู้ใช้
+    # 1. ส่งข้อความรับทราบ (Acknowledgment) ทันทีด้วย Reply Token
+    # เพื่อให้ผู้ใช้รู้ว่าระบบได้รับข้อความแล้ว และไม่ให้ Token หมดอายุ
     try:
         with ApiClient(configuration) as api_client:
             line_bot_api = MessagingApi(api_client)
-            
-            try:
-                # พยายามใช้ Reply Message ก่อน (ฟรีและรวดเร็ว)
-                line_bot_api.reply_message(
-                    ReplyMessageRequest(
-                        reply_token=reply_token,
-                        messages=[TextMessage(text=reply_text)]
-                    )
+            line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=reply_token,
+                    messages=[TextMessage(text="อุ่นใจรับข้อความแล้วค่ะ กำลังคิดหาคำตอบให้อยู่นะคะ รอสักครู่ค่ะ... ⏳")]
                 )
-                logger.info(f"ส่งข้อความตอบกลับ (Reply) ไปยัง {line_user_id} สำเร็จ")
-            except Exception as reply_error:
-                # ถ้า Reply ไม่สำเร็จ (เช่น Token หมดอายุ) ให้ใช้ Push Message แทน
-                if "Invalid reply token" in str(reply_error):
-                    logger.warning(f"⚠️ Reply token หมดอายุ กำลังลองส่งด้วย Push Message ไปยัง {line_user_id}")
-                    line_bot_api.push_message(
-                        PushMessageRequest(
-                            to=line_user_id,
-                            messages=[TextMessage(text=reply_text)]
-                        )
-                    )
-                    logger.info(f"ส่งข้อความตอบกลับ (Push) ไปยัง {line_user_id} สำเร็จ")
-                else:
-                    raise reply_error
-
+            )
+        logger.info(f"ส่ง Acknowledgment (Reply) ไปยัง {line_user_id} สำเร็จ")
     except Exception as e:
-        logger.error(f"เกิดข้อผิดพลาดในการตอบกลับ LINE: {e}")
+        logger.error(f"ไม่สามารถส่ง Acknowledgment ได้: {e}")
+        # ถ้าส่ง Reply ไม่ได้ (เช่น Token หมดอายุเร็วมาก) จะยังทำขั้นตอนถัดไปต่อ
+
+    # 2. เริ่มทำงานใน Thread แยกต่างหาก เพื่อให้ฟังก์ชันนี้จบการทำงานและคืนค่า 200 OK ให้ LINE ทันที
+    thread = threading.Thread(
+        target=process_ai_response_background, 
+        args=(line_user_id, user_message)
+    )
+    thread.start()
 
