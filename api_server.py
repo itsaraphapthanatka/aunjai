@@ -84,6 +84,10 @@ async def get_all_tags():
 # ─────────────────────────────────────────────────────────────────────────
 # Webhook and Main
 # ─────────────────────────────────────────────────────────────────────────
+@app.get("/webhook")
+async def receive_webhook_get():
+    return {"message": "MAAC Webhook endpoint is active. Please use POST with a valid signature to send data."}
+
 @app.post("/webhook")
 async def receive_webhook(payload: bytes = Depends(verify_signature)):
     """
@@ -96,6 +100,10 @@ async def receive_webhook(payload: bytes = Depends(verify_signature)):
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal processing error")
+
+@app.get("/line/webhook")
+async def line_webhook_get():
+    return {"message": "LINE Webhook endpoint is active. Please use POST with a valid signature to send data."}
 
 @app.post("/line/webhook")
 async def line_webhook(request: Request, x_line_signature: str = Header(None)):
