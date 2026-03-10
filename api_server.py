@@ -123,7 +123,7 @@ async def line_webhook(request: Request, x_line_signature: str = Header(None)):
         raise HTTPException(status_code=500, detail="LINE Integration not available")
         
     try:
-        await line_handler.handle(body_str, x_line_signature)
+        line_handler.handle(body_str, x_line_signature)
     except InvalidSignatureError:
         logger.error(f"Invalid LINE signature. Signature: {x_line_signature}")
         raise HTTPException(status_code=400, detail="Invalid signature")

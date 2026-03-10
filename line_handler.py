@@ -1,11 +1,11 @@
 import logging
-import httpx
-from linebot.v3.webhook import AsyncWebhookHandler
+import requests
+from linebot.v3.webhook import WebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import (
     Configuration,
-    AsyncApiClient,
-    AsyncMessagingApi,
+    ApiClient,
+    MessagingApi,
     ReplyMessageRequest,
     TextMessage
 )
@@ -25,13 +25,11 @@ logger = logging.getLogger(__name__)
 
 # Initialize LINE API configuration
 configuration = Configuration(access_token=LINE_CHANNEL_ACCESS_TOKEN)
-handler = AsyncWebhookHandler(LINE_CHANNEL_SECRET)
-async_api_client = AsyncApiClient(configuration)
-line_bot_api = AsyncMessagingApi(async_api_client)
+handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
-async def call_openclaw(user_message: str, line_user_id: str) -> str:
+def call_openclaw(user_message: str, line_user_id: str) -> str:
     """
-    เรียกใช้งาน OpenClaw API เพื่อตอบคำถามผู้ใช้
+    เรียกใช้งาน OpenClaw API เพื่อตอบคำถามผู้ใช้ (Synchronous version)
     """
     chat_url = f"{OPENCLAW_API_URL.rstrip('/')}/v1/chat/completions"
     headers = {"Content-Type": "application/json"}
@@ -52,25 +50,23 @@ async def call_openclaw(user_message: str, line_user_id: str) -> str:
     logger.info(f"🚀 กำลังส่งข้อความของ {line_user_id} ไปยัง OpenClaw (agent: {OPENCLAW_AGENT_ID})")
     
     try:
-        # ใช้ httpx.AsyncClient สำหรับการเรียก API แบบ async
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(chat_url, json=payload, headers=headers)
-            response.raise_for_status()
-            result = response.json()
+        response = requests.post(chat_url, json=payload, headers=headers, timeout=30.0)
+        response.raise_for_status()
+        result = response.json()
+        
+        ai_text = ""
+        if isinstance(result, dict) and "choices" in result:
+            choices = result.get("choices", [])
+            if choices and isinstance(choices, list):
+                ai_text = choices[0].get("message", {}).get("content", "")
+        
+        if not ai_text:
+            ai_text = "ขออภัยค่ะ อุ่นใจไม่สามารถประมวลผลคำตอบได้ในขณะนี้"
+            logger.error(f"❌ OpenClaw ไม่ได้ตอบข้อความ: {result}")
             
-            ai_text = ""
-            if isinstance(result, dict) and "choices" in result:
-                choices = result.get("choices", [])
-                if choices and isinstance(choices, list):
-                    ai_text = choices[0].get("message", {}).get("content", "")
+        return ai_text
             
-            if not ai_text:
-                ai_text = "ขออภัยค่ะ อุ่นใจไม่สามารถประมวลผลคำตอบได้ในขณะนี้"
-                logger.error(f"❌ OpenClaw ไม่ได้ตอบข้อความ: {result}")
-                
-            return ai_text
-            
-    except httpx.TimeoutException:
+    except requests.exceptions.Timeout:
         logger.error("❌ OpenClaw API timeout")
         return "ขออภัยค่ะ อุ่นใจใช้เวลาคิดนานเกินไป กรุณาลองใหม่อีกครั้งนะคะ"
     except Exception as e:
@@ -79,9 +75,9 @@ async def call_openclaw(user_message: str, line_user_id: str) -> str:
 
 
 @handler.add(MessageEvent, message=TextMessageContent)
-async def handle_text_message(event):
+def handle_text_message(event):
     """
-    จัดการข้อความที่ได้รับจาก LINE
+    จัดการข้อความที่ได้รับจาก LINE (Synchronous version)
     """
     line_user_id = event.source.user_id
     user_message = event.message.text
@@ -90,16 +86,18 @@ async def handle_text_message(event):
     logger.info(f"ได้รับข้อความ LINE จาก {line_user_id}: {user_message}")
     
     # ดึงคำตอบจาก OpenClaw
-    reply_text = await call_openclaw(user_message, line_user_id)
+    reply_text = call_openclaw(user_message, line_user_id)
     
     # ส่งข้อความกลับไปยังผู้ใช้
     try:
-        await line_bot_api.reply_message(
-            ReplyMessageRequest(
-                reply_token=reply_token,
-                messages=[TextMessage(text=reply_text)]
+        with ApiClient(configuration) as api_client:
+            line_bot_api = MessagingApi(api_client)
+            line_bot_api.reply_message(
+                ReplyMessageRequest(
+                    reply_token=reply_token,
+                    messages=[TextMessage(text=reply_text)]
+                )
             )
-        )
         logger.info(f"ส่งข้อความตอบกลับไปยัง {line_user_id} สำเร็จ")
     except Exception as e:
         logger.error(f"เกิดข้อผิดพลาดในการตอบกลับ LINE: {e}")
