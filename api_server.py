@@ -11,7 +11,9 @@ from maac_middleware import MAACMiddleware
 try:
     from line_handler import handler as line_handler
     from linebot.v3.exceptions import InvalidSignatureError
-except ImportError:
+except Exception as e:
+    import logging
+    logging.getLogger("MAAC-Web-Middleware").error(f"Failed to initialize LINE Bot: {e}", exc_info=True)
     line_handler = None
     InvalidSignatureError = Exception
 

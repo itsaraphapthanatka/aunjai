@@ -1,6 +1,6 @@
 import logging
 import httpx
-from linebot.v3 import WebhookHandler, AsyncWebhookHandler
+from linebot.v3.webhook import AsyncWebhookHandler
 from linebot.v3.exceptions import InvalidSignatureError
 from linebot.v3.messaging import (
     Configuration,
