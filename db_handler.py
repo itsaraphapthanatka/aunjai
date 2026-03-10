@@ -244,3 +244,32 @@ class DatabaseHandler:
             with conn.cursor() as cur:
                 cur.execute(sql)
                 return {row[0]: row[1] for row in cur.fetchall()}
+    # ─────────────────────────────────────────────────────────────────────────
+    # 5. Chat History
+    # ─────────────────────────────────────────────────────────────────────────
+    def add_chat_message(self, line_uid: str, role: str, content: str):
+        """
+        Adds a single chat message to history.
+        """
+        sql = "INSERT INTO chat_history (line_uid, role, content) VALUES (%s, %s, %s)"
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (line_uid, role, content))
+
+    def get_chat_history(self, line_uid: str, limit: int = 10) -> List[Dict[str, str]]:
+        """
+        Retrieves the latest chat history for a user.
+        Returns a list of messages in OpenAI format.
+        """
+        sql = """
+        SELECT role, content FROM chat_history 
+        WHERE line_uid = %s 
+        ORDER BY created_at DESC LIMIT %s
+        """
+        with self._get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(sql, (line_uid, limit))
+                results = [dict(row) for row in cur.fetchall()]
+                # History should be in chronological order
+                results.reverse()
+                return results

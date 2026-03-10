@@ -23,15 +23,18 @@ from config import (
     OPENCLAW_API_KEY
 )
 
+from db_handler import DatabaseHandler
+
 logger = logging.getLogger(__name__)
 
 # Initialize LINE API configuration
 configuration = Configuration(access_token=LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
+db = DatabaseHandler()
 
-def call_openclaw(user_message: str, line_user_id: str) -> str:
+def call_openclaw(messages: list, line_user_id: str) -> str:
     """
-    เรียกใช้งาน OpenClaw API เพื่อตอบคำถามผู้ใช้ (Synchronous version)
+    เรียกใช้งาน OpenClaw API โดยส่งประวัติการสนทนา (OpenAI format)
     """
     chat_url = f"{OPENCLAW_API_URL.rstrip('/')}/v1/chat/completions"
     headers = {"Content-Type": "application/json"}
@@ -40,16 +43,11 @@ def call_openclaw(user_message: str, line_user_id: str) -> str:
         
     payload = {
         "model": f"openclaw:{OPENCLAW_AGENT_ID}",
-        "messages": [
-            {
-                "role": "user",
-                "content": user_message,
-            }
-        ],
+        "messages": messages,
         "user_id": line_user_id
     }
     
-    logger.info(f"🚀 กำลังส่งข้อความของ {line_user_id} ไปยัง OpenClaw (agent: {OPENCLAW_AGENT_ID})")
+    logger.info(f"🚀 กำลังส่งข้อความของ {line_user_id} ไปยัง OpenClaw (context: {len(messages)} messages)")
     
     try:
         # ปรับลด timeout เหลือ 25 วินาที
@@ -79,13 +77,22 @@ def call_openclaw(user_message: str, line_user_id: str) -> str:
 
 def process_ai_response_background(line_user_id: str, user_message: str):
     """
-    ฟังก์ชันสำหรับทำงานใน Background: เรียก OpenClaw และส่งคำตอบด้วย Push Message
+    ฟังก์ชันสำหรับทำงานใน Background: จัดการประวัติ, เรียก OpenClaw และส่งคำตอบ
     """
     try:
-        # 1. ดึงคำตอบจาก OpenClaw
-        reply_text = call_openclaw(user_message, line_user_id)
+        # 1. บันทึกข้อความผู้ใช้ลงฐานข้อมูล
+        db.add_chat_message(line_user_id, "user", user_message)
         
-        # 2. ส่ง Push Message กลับไปหาผู้ใช้
+        # 2. ดึงประวัติการสนทนาล่าสุด (10 ข้อความ)
+        history = db.get_chat_history(line_user_id, limit=10)
+        
+        # 3. ดึงคำตอบจาก OpenClaw โดยใช้ History
+        reply_text = call_openclaw(history, line_user_id)
+        
+        # 4. บันทึกคำตอบของ AI ลงฐานข้อมูล
+        db.add_chat_message(line_user_id, "assistant", reply_text)
+        
+        # 5. ส่ง Push Message กลับไปหาผู้ใช้
         with ApiClient(configuration) as api_client:
             line_bot_api = MessagingApi(api_client)
             line_bot_api.push_message(
@@ -96,7 +103,7 @@ def process_ai_response_background(line_user_id: str, user_message: str):
             )
         logger.info(f"ส่งคำตอบ AI (Push) ไปยัง {line_user_id} สำเร็จ")
     except Exception as e:
-        logger.error(f"เกิดข้อผิดพลาดในกะบวนการ Background: {e}")
+        logger.error(f"เกิดข้อผิดพลาดในกระบวนการ Background: {e}")
 
 
 @handler.add(MessageEvent, message=TextMessageContent)

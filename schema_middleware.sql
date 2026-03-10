@@ -99,3 +99,13 @@ INSERT INTO system_settings (key, value) VALUES
 ('maac_active_env', 'production'),
 ('maac_custom_base_url', '')
 ON CONFLICT (key) DO NOTHING;
+-- 9. Chat History (for OpenClaw Sessions)
+CREATE TABLE IF NOT EXISTS chat_history (
+    id SERIAL PRIMARY KEY,
+    line_uid VARCHAR(33), -- Link to contact (simplified)
+    role VARCHAR(10), -- 'user' or 'assistant'
+    content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_chat_history_line_uid ON chat_history(line_uid);
