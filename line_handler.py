@@ -83,8 +83,8 @@ def process_ai_response_background(line_user_id: str, user_message: str):
         # 1. บันทึกข้อความผู้ใช้ลงฐานข้อมูล
         db.add_chat_message(line_user_id, "user", user_message)
         
-        # 2. ดึงประวัติการสนทนาล่าสุด (10 ข้อความ)
-        history = db.get_chat_history(line_user_id, limit=10)
+        # 2. ดึงประวัติการสนทนาล่าสุด (30 ข้อความ)
+        history = db.get_chat_history(line_user_id, limit=30)
         
         # 3. ดึงคำตอบจาก OpenClaw โดยใช้ History
         reply_text = call_openclaw(history, line_user_id)
