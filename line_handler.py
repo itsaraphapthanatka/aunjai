@@ -50,8 +50,8 @@ def call_openclaw(messages: list, line_user_id: str) -> str:
     logger.info(f"🚀 กำลังส่งข้อความของ {line_user_id} ไปยัง OpenClaw (context: {len(messages)} messages)")
     
     try:
-        # ปรับเพิ่ม timeout เป็น 60 วินาที (เนื่องจากทำงานใน background แล้ว)
-        response = requests.post(chat_url, json=payload, headers=headers, timeout=60.0)
+        # ปรับเพิ่ม timeout เป็น 120 วินาที (เนื่องจากทำงานใน background แล้ว)
+        response = requests.post(chat_url, json=payload, headers=headers, timeout=120.0)
         response.raise_for_status()
         result = response.json()
         
@@ -68,7 +68,7 @@ def call_openclaw(messages: list, line_user_id: str) -> str:
         return ai_text
             
     except requests.exceptions.Timeout:
-        logger.error("❌ OpenClaw API timeout (60s)")
+        logger.error("❌ OpenClaw API timeout (120s)")
         return "TIMEOUT_ERROR"
     except Exception as e:
         logger.error(f"❌ เกิดข้อผิดพลาดในการเรียก OpenClaw: {e}")
