@@ -25,6 +25,7 @@ def search_relevant_clip(
     model: SentenceTransformer | None = None,
     index: object | None = None,
     filter: dict | None = None,
+    namespace: str | None = None,
 ) -> list[dict]:
     """
     ค้นหาคลิปวิดีโอที่เกี่ยวข้องกับคำถาม (Semantic Search)
@@ -75,6 +76,7 @@ def search_relevant_clip(
         "vector": query_embedding,
         "top_k": top_k,
         "include_metadata": True,
+        "namespace": namespace,
     }
     if filter:
         query_kwargs["filter"] = filter
@@ -85,13 +87,17 @@ def search_relevant_clip(
     clips: list[dict] = []
     for match in results.get("matches", []):
         metadata = match.get("metadata", {})
+        # รองรับ Metadata หลากหลายชื่อ (เช่นจาก namespace full_clip หรือ highlights)
         clips.append({
             "video_id": metadata.get("video_id", ""),
             "start_time": metadata.get("start_time", 0.0),
             "end_time": metadata.get("end_time", 0.0),
-            "text": metadata.get("text", ""),
-            "original_url": metadata.get("original_url", ""),
+            # แมปฟิลด์ข้อความ (ถ้าไม่มี text ให้ใช้ transcript_summary)
+            "text": metadata.get("text") or metadata.get("transcript_summary") or "",
+            # แมปฟิลด์ URL (ถ้าไม่มี original_url ให้ใช้ video_url)
+            "original_url": metadata.get("original_url") or metadata.get("video_url") or "",
             "score": round(match.get("score", 0.0), 4),
+            "metadata": metadata, # ส่ง metadata ทั้งหมดกลับไปด้วยเพื่อความยืดหยุ่น
         })
 
     logger.info(f"✅ พบ {len(clips)} ผลลัพธ์")
@@ -102,6 +108,7 @@ def search_multiple_queries(
     queries: list[str],
     top_k: int = 1,
     filter: dict | None = None,
+    namespace: str | None = None,
 ) -> dict[str, list[dict]]:
     """
     ค้นหาหลายคำถามพร้อมกัน โดยโหลดโมเดลและเชื่อมต่อ Pinecone เพียงครั้งเดียว
@@ -128,6 +135,7 @@ def search_multiple_queries(
             model=model,
             index=index,
             filter=filter,
+            namespace=namespace,
         )
 
     return results

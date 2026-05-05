@@ -1,0 +1,20 @@
+{
+  "017e7822": {
+    "id": "017e7822",
+    "playlist_url": "https://www.youtube.com/@FEBCChristianMedia/videos",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "channel_name": "FEBC Christian Media",
+    "schedule_type": "cron",
+    "cron_days": [
+      "sat"
+    ],
+    "cron_time": "08:00",
+    "interval_hours": 6,
+    "max_videos": 1,
+    "auto_quiz": true,
+    "enabled": true,
+    "created_at": "2026-04-07T11:01:23.306098",
+    "last_run": "2026-05-02T01:12:14.215323",
+    "last_status": "success"
+  }
+}

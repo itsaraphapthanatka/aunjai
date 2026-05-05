@@ -99,6 +99,7 @@ def main():
         channel_name = checkpoint.get("channel_name", "Unknown Channel")
         start_index = checkpoint["last_index"] + 1
         success_count = checkpoint.get("success_count", 0)
+        skipped_count = checkpoint.get("skipped_count", 0)
         failed_count = checkpoint.get("failed_count", 0)
     else:
         # 1. Scraping Channel
@@ -113,6 +114,7 @@ def main():
         channel_name = scrape_result.get("channel_name", "Unknown Channel")
         start_index = 0
         success_count = 0
+        skipped_count = 0
         failed_count = 0
         
         # บันทึก checkpoint เริ่มต้น
@@ -122,6 +124,7 @@ def main():
             "videos": videos,
             "last_index": -1,
             "success_count": 0,
+            "skipped_count": 0,
             "failed_count": 0,
             "timestamp": datetime.now().isoformat()
         })
@@ -136,6 +139,18 @@ def main():
     processed_this_run = 0
     
     for i in range(start_index, len(videos)):
+        # ตรวจสอบไฟล์ STOP_CHANNEL เพื่อหยุดการทำงานอย่างนิ่มนวล
+        stop_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "STOP_CHANNEL")
+        if os.path.exists(stop_file):
+            logger.info("=" * 60)
+            logger.info("🛑 พบไฟล์ STOP_CHANNEL! กำลังหยุดการทำงาน...")
+            logger.info("=" * 60)
+            try:
+                os.remove(stop_file)
+            except:
+                pass
+            break
+
         video = videos[i]
         video_url = video.get("url")
         video_title = video.get("title")
@@ -171,6 +186,9 @@ def main():
                 success_count += 1
                 highlights = pipeline_result.get("highlights", [])
                 logger.info(f"✅ สำเร็จ! ได้มา {len(highlights)} highlights")
+            elif pipeline_result.get("status") == "skipped":
+                skipped_count += 1
+                logger.info(f"⏩ ข้าม: {pipeline_result.get('message', 'No transcript')}")
             else:
                 failed_count += 1
                 logger.error(f"❌ ล้มเหลว: {pipeline_result.get('message', 'Unknown Error')}")
@@ -186,6 +204,7 @@ def main():
             "videos": videos,
             "last_index": i,
             "success_count": success_count,
+            "skipped_count": skipped_count,
             "failed_count": failed_count,
             "timestamp": datetime.now().isoformat()
         })
@@ -198,6 +217,7 @@ def main():
     logger.info(f"📺 Channel: {channel_name}")
     logger.info(f"📹 วิดีโอทั้งหมด: {len(videos)}")
     logger.info(f"✅ สำเร็จ: {success_count}")
+    logger.info(f"⏩ ข้าม (ไม่มี Transcript): {skipped_count}")
     logger.info(f"❌ ล้มเหลว: {failed_count}")
     logger.info("=" * 60)
 

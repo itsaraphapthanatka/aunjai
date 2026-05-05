@@ -2915,3 +2915,744 @@
 2026-03-03 15:04:46 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/README.md "HTTP/1.1 200 OK"
 2026-03-03 15:04:47 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
 2026-03-03 15:04:47 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-03-03 08:52:41 | INFO | ============================================================
+2026-03-03 08:52:41 | INFO | 🚀 เริ่มต้นการประมวลผล Channel Background Job
+2026-03-03 08:52:41 | INFO | 📍 URL: https://www.youtube.com/@FEBCChristianMedia
+2026-03-03 08:52:41 | INFO | 📦 Batch Size: 5 | Delay: 20 min
+2026-03-03 08:52:41 | INFO | ✂️  Auto-clip: True
+2026-03-03 08:52:41 | INFO | ============================================================
+2026-03-03 08:52:41 | INFO | 🔄 พบข้อมูลเดิม! กำลังดำเนินการต่อจากวิดีโอที่ 38
+2026-03-03 08:52:41 | INFO | ✅ จำนวนวิดีโอทั้งหมดในรายการ: 1213 คลิป
+2026-03-03 08:52:41 | INFO | ------------------------------------------------------------
+2026-03-03 08:52:41 | INFO | 🎬 กำลังประมวลผลคลิปที่ 39/1213 (ชุดนี้: 1/5)
+2026-03-03 08:52:41 | INFO | 📌 รายการเพื่อนใจ - ผู้ช่วยที่สำคัญ (https://www.youtube.com/watch?v=BDuGA5ObV6A)
+2026-03-03 08:52:41 | INFO | ------------------------------------------------------------
+2026-03-03 08:52:41 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-03 08:52:41 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-03 08:52:41 | INFO | ✅ Video ID: BDuGA5ObV6A
+2026-03-03 08:52:41 | INFO |    ➔ ✅ Video ID: BDuGA5ObV6A
+2026-03-03 08:52:41 | INFO | 📝 กำลังถอด Transcript...: BDuGA5ObV6A
+2026-03-03 08:52:41 | INFO |    ➔ 📝 กำลังถอด Transcript...: BDuGA5ObV6A
+2026-03-03 08:52:42 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=BDuGA5ObV6A (ภาษา: Thai (auto-generated), 66 ประโยค)
+2026-03-03 08:52:42 | INFO | 📊 รวมทั้งหมด: 66 ประโยคจาก 1 วิดีโอ
+2026-03-03 08:52:42 | INFO | ✅ ถอด Transcript สำเร็จ: 66 segments
+2026-03-03 08:52:42 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 66 segments
+2026-03-03 08:52:42 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 08:52:42 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 08:52:42 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 08:52:42 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 08:52:42 | INFO | 📝 สร้าง transcript text: 2958 ตัวอักษร จาก 66 segments
+2026-03-03 08:52:42 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-03 08:53:59 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-03 08:53:59 | INFO | ✅ OpenClaw ตอบกลับ: 3443 ตัวอักษร
+2026-03-03 08:53:59 | INFO | 🎯 วิเคราะห์ได้ 5 highlights
+2026-03-03 08:53:59 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 5 highlights
+2026-03-03 08:53:59 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 5 highlights
+2026-03-03 08:53:59 | INFO | ✂️ กำลังตัดวิดีโอ...: 5 clips
+2026-03-03 08:53:59 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 5 clips
+2026-03-03 08:53:59 | INFO | ✂️ กำลังตัด Clip 1/5...: 200.0s - 238.0s
+2026-03-03 08:53:59 | INFO |    ➔ ✂️ กำลังตัด Clip 1/5...: 200.0s - 238.0s
+2026-03-03 08:53:59 | INFO | Processing clip for BDuGA5ObV6A from 200.0 to 238.0
+2026-03-03 08:54:01 | ERROR | Failed to download video BDuGA5ObV6A: [0;31mERROR:[0m [youtube] BDuGA5ObV6A: This video is not available
+2026-03-03 08:54:01 | INFO | ⚠️ Clip 1/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:01 | INFO |    ➔ ⚠️ Clip 1/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:01 | INFO | ✂️ กำลังตัด Clip 2/5...: 118.0s - 162.0s
+2026-03-03 08:54:01 | INFO |    ➔ ✂️ กำลังตัด Clip 2/5...: 118.0s - 162.0s
+2026-03-03 08:54:01 | INFO | Processing clip for BDuGA5ObV6A from 118.0 to 162.0
+2026-03-03 08:54:02 | ERROR | Failed to download video BDuGA5ObV6A: [0;31mERROR:[0m [youtube] BDuGA5ObV6A: This video is not available
+2026-03-03 08:54:02 | INFO | ⚠️ Clip 2/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:02 | INFO |    ➔ ⚠️ Clip 2/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:02 | INFO | ✂️ กำลังตัด Clip 3/5...: 46.0s - 77.0s
+2026-03-03 08:54:02 | INFO |    ➔ ✂️ กำลังตัด Clip 3/5...: 46.0s - 77.0s
+2026-03-03 08:54:02 | INFO | Processing clip for BDuGA5ObV6A from 46.0 to 77.0
+2026-03-03 08:54:03 | ERROR | Failed to download video BDuGA5ObV6A: [0;31mERROR:[0m [youtube] BDuGA5ObV6A: This video is not available
+2026-03-03 08:54:03 | INFO | ⚠️ Clip 3/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:03 | INFO |    ➔ ⚠️ Clip 3/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:03 | INFO | ✂️ กำลังตัด Clip 4/5...: 162.0s - 200.0s
+2026-03-03 08:54:03 | INFO |    ➔ ✂️ กำลังตัด Clip 4/5...: 162.0s - 200.0s
+2026-03-03 08:54:03 | INFO | Processing clip for BDuGA5ObV6A from 162.0 to 200.0
+2026-03-03 08:54:05 | ERROR | Failed to download video BDuGA5ObV6A: [0;31mERROR:[0m [youtube] BDuGA5ObV6A: This video is not available
+2026-03-03 08:54:05 | INFO | ⚠️ Clip 4/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:05 | INFO |    ➔ ⚠️ Clip 4/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:05 | INFO | ✂️ กำลังตัด Clip 5/5...: 0.0s - 32.0s
+2026-03-03 08:54:05 | INFO |    ➔ ✂️ กำลังตัด Clip 5/5...: 0.0s - 32.0s
+2026-03-03 08:54:05 | INFO | Processing clip for BDuGA5ObV6A from 0.0 to 32.0
+2026-03-03 08:54:05 | ERROR | Failed to download video BDuGA5ObV6A: [0;31mERROR:[0m [youtube] BDuGA5ObV6A: This video is not available
+2026-03-03 08:54:05 | INFO | ⚠️ Clip 5/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:05 | INFO |    ➔ ⚠️ Clip 5/5 ล้มเหลว: Could not download video
+2026-03-03 08:54:05 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 08:54:05 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 08:54:05 | INFO | 🧠 โหลดโมเดล embedding: paraphrase-multilingual-MiniLM-L12-v2
+2026-03-03 08:54:05 | INFO | Use pytorch device_name: cpu
+2026-03-03 08:54:05 | INFO | Load pretrained SentenceTransformer: paraphrase-multilingual-MiniLM-L12-v2
+2026-03-03 08:54:06 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:06 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:06 | INFO | HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:06 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:06 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:06 | INFO | HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:06 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:06 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:06 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:06 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/README.md "HTTP/1.1 200 OK"
+2026-03-03 08:54:06 | INFO | HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/README.md "HTTP/1.1 200 OK"
+2026-03-03 08:54:07 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:07 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:07 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:07 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:07 | INFO | HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:07 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-03-03 08:54:07 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:07 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:07 | INFO | HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:08 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-03-03 08:54:08 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/xet-read-token/e8f8c211226b894fcb81acc59f3b34ba3efd5f42 "HTTP/1.1 200 OK"
+2026-03-03 08:54:14 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:14 | WARNING | Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-03-03 08:54:14 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:14 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:14 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:14 | INFO | HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:14 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:14 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:14 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-03-03 08:54:15 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-03-03 08:54:15 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-03-03 08:54:16 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.model "HTTP/1.1 404 Not Found"
+2026-03-03 08:54:16 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/added_tokens.json "HTTP/1.1 404 Not Found"
+2026-03-03 08:54:16 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/special_tokens_map.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:16 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:17 | INFO | HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:17 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-03-03 08:54:20 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 "HTTP/1.1 200 OK"
+2026-03-03 08:54:20 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 08:54:20 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:20 | INFO | HTTP Request: GET https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-03-03 08:54:21 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 "HTTP/1.1 200 OK"
+2026-03-03 08:54:25 | INFO | ✅ บันทึก 5 highlights ลง Pinecone (namespace: highlights)
+2026-03-03 08:54:25 | INFO | ✅ บันทึก Pinecone สำเร็จ: 5 records
+2026-03-03 08:54:25 | INFO |    ➔ ✅ บันทึก Pinecone สำเร็จ: 5 records
+2026-03-03 08:54:25 | INFO | 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 5 highlights, ตัดคลิปสำเร็จ 0/5
+2026-03-03 08:54:25 | INFO |    ➔ 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 5 highlights, ตัดคลิปสำเร็จ 0/5
+2026-03-03 08:54:25 | INFO | ✅ สำเร็จ! ได้มา 5 highlights
+2026-03-03 08:54:25 | INFO | ⏳ หน่วงเวลาสุ่ม 21.4 วินาทีก่อนเริ่มคลิปถัดไป...
+2026-03-03 08:54:46 | INFO | ------------------------------------------------------------
+2026-03-03 08:54:46 | INFO | 🎬 กำลังประมวลผลคลิปที่ 40/1213 (ชุดนี้: 2/5)
+2026-03-03 08:54:46 | INFO | 📌 รายการเพื่อนใจ - จูงมือกันเดิน (https://www.youtube.com/watch?v=8T6tNFvqqmI)
+2026-03-03 08:54:46 | INFO | ------------------------------------------------------------
+2026-03-03 08:54:46 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-03 08:54:46 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-03 08:54:46 | INFO | ✅ Video ID: 8T6tNFvqqmI
+2026-03-03 08:54:46 | INFO |    ➔ ✅ Video ID: 8T6tNFvqqmI
+2026-03-03 08:54:46 | INFO | 📝 กำลังถอด Transcript...: 8T6tNFvqqmI
+2026-03-03 08:54:46 | INFO |    ➔ 📝 กำลังถอด Transcript...: 8T6tNFvqqmI
+2026-03-03 08:54:47 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=8T6tNFvqqmI (ภาษา: Thai (auto-generated), 57 ประโยค)
+2026-03-03 08:54:47 | INFO | 📊 รวมทั้งหมด: 57 ประโยคจาก 1 วิดีโอ
+2026-03-03 08:54:47 | INFO | ✅ ถอด Transcript สำเร็จ: 57 segments
+2026-03-03 08:54:47 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 57 segments
+2026-03-03 08:54:47 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 08:54:47 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 08:54:47 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 08:54:47 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 08:54:47 | INFO | 📝 สร้าง transcript text: 2555 ตัวอักษร จาก 57 segments
+2026-03-03 08:54:47 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-03 08:57:22 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-03 08:57:22 | INFO | ✅ OpenClaw ตอบกลับ: 3342 ตัวอักษร
+2026-03-03 08:57:22 | INFO | 🎯 วิเคราะห์ได้ 4 highlights
+2026-03-03 08:57:22 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 4 highlights
+2026-03-03 08:57:22 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 4 highlights
+2026-03-03 08:57:22 | INFO | ✂️ กำลังตัดวิดีโอ...: 4 clips
+2026-03-03 08:57:22 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 4 clips
+2026-03-03 08:57:22 | INFO | ✂️ กำลังตัด Clip 1/4...: 123.0s - 161.0s
+2026-03-03 08:57:22 | INFO |    ➔ ✂️ กำลังตัด Clip 1/4...: 123.0s - 161.0s
+2026-03-03 08:57:22 | INFO | Processing clip for 8T6tNFvqqmI from 123.0 to 161.0
+2026-03-03 08:57:23 | ERROR | Failed to download video 8T6tNFvqqmI: [0;31mERROR:[0m [youtube] 8T6tNFvqqmI: This video is not available
+2026-03-03 08:57:23 | INFO | ⚠️ Clip 1/4 ล้มเหลว: Could not download video
+2026-03-03 08:57:23 | INFO |    ➔ ⚠️ Clip 1/4 ล้มเหลว: Could not download video
+2026-03-03 08:57:23 | INFO | ✂️ กำลังตัด Clip 2/4...: 30.0s - 66.0s
+2026-03-03 08:57:23 | INFO |    ➔ ✂️ กำลังตัด Clip 2/4...: 30.0s - 66.0s
+2026-03-03 08:57:23 | INFO | Processing clip for 8T6tNFvqqmI from 30.0 to 66.0
+2026-03-03 08:57:24 | ERROR | Failed to download video 8T6tNFvqqmI: [0;31mERROR:[0m [youtube] 8T6tNFvqqmI: This video is not available
+2026-03-03 08:57:24 | INFO | ⚠️ Clip 2/4 ล้มเหลว: Could not download video
+2026-03-03 08:57:24 | INFO |    ➔ ⚠️ Clip 2/4 ล้มเหลว: Could not download video
+2026-03-03 08:57:24 | INFO | ✂️ กำลังตัด Clip 3/4...: 162.0s - 192.0s
+2026-03-03 08:57:24 | INFO |    ➔ ✂️ กำลังตัด Clip 3/4...: 162.0s - 192.0s
+2026-03-03 08:57:24 | INFO | Processing clip for 8T6tNFvqqmI from 162.0 to 192.0
+2026-03-03 08:57:25 | ERROR | Failed to download video 8T6tNFvqqmI: [0;31mERROR:[0m [youtube] 8T6tNFvqqmI: This video is not available
+2026-03-03 08:57:25 | INFO | ⚠️ Clip 3/4 ล้มเหลว: Could not download video
+2026-03-03 08:57:25 | INFO |    ➔ ⚠️ Clip 3/4 ล้มเหลว: Could not download video
+2026-03-03 08:57:25 | INFO | ✂️ กำลังตัด Clip 4/4...: 81.0s - 119.0s
+2026-03-03 08:57:25 | INFO |    ➔ ✂️ กำลังตัด Clip 4/4...: 81.0s - 119.0s
+2026-03-03 08:57:25 | INFO | Processing clip for 8T6tNFvqqmI from 81.0 to 119.0
+2026-03-03 08:57:26 | ERROR | Failed to download video 8T6tNFvqqmI: [0;31mERROR:[0m [youtube] 8T6tNFvqqmI: This video is not available
+2026-03-03 08:57:26 | INFO | ⚠️ Clip 4/4 ล้มเหลว: Could not download video
+2026-03-03 08:57:26 | INFO |    ➔ ⚠️ Clip 4/4 ล้มเหลว: Could not download video
+2026-03-03 08:57:26 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 08:57:26 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 08:57:29 | INFO | ✅ บันทึก 4 highlights ลง Pinecone (namespace: highlights)
+2026-03-03 08:57:29 | INFO | ✅ บันทึก Pinecone สำเร็จ: 4 records
+2026-03-03 08:57:29 | INFO |    ➔ ✅ บันทึก Pinecone สำเร็จ: 4 records
+2026-03-03 08:57:29 | INFO | 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 4 highlights, ตัดคลิปสำเร็จ 0/4
+2026-03-03 08:57:29 | INFO |    ➔ 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 4 highlights, ตัดคลิปสำเร็จ 0/4
+2026-03-03 08:57:29 | INFO | ✅ สำเร็จ! ได้มา 4 highlights
+2026-03-03 08:57:29 | INFO | ⏳ หน่วงเวลาสุ่ม 17.8 วินาทีก่อนเริ่มคลิปถัดไป...
+2026-03-03 08:57:46 | INFO | ------------------------------------------------------------
+2026-03-03 08:57:46 | INFO | 🎬 กำลังประมวลผลคลิปที่ 41/1213 (ชุดนี้: 3/5)
+2026-03-03 08:57:46 | INFO | 📌 รายการผู้ญิ้งผู้หญิง-วิธีเพิ่มความกล้าMove on (https://www.youtube.com/watch?v=VB4aL4pDTr0)
+2026-03-03 08:57:46 | INFO | ------------------------------------------------------------
+2026-03-03 08:57:46 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-03 08:57:46 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-03 08:57:46 | INFO | ✅ Video ID: VB4aL4pDTr0
+2026-03-03 08:57:46 | INFO |    ➔ ✅ Video ID: VB4aL4pDTr0
+2026-03-03 08:57:46 | INFO | 📝 กำลังถอด Transcript...: VB4aL4pDTr0
+2026-03-03 08:57:46 | INFO |    ➔ 📝 กำลังถอด Transcript...: VB4aL4pDTr0
+2026-03-03 08:57:47 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=VB4aL4pDTr0 (ภาษา: Thai (auto-generated), 76 ประโยค)
+2026-03-03 08:57:47 | INFO | 📊 รวมทั้งหมด: 76 ประโยคจาก 1 วิดีโอ
+2026-03-03 08:57:47 | INFO | ✅ ถอด Transcript สำเร็จ: 76 segments
+2026-03-03 08:57:47 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 76 segments
+2026-03-03 08:57:47 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 08:57:47 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 08:57:47 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 08:57:47 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 08:57:47 | INFO | 📝 สร้าง transcript text: 3368 ตัวอักษร จาก 76 segments
+2026-03-03 08:57:47 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-03 09:00:55 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-03 09:00:55 | INFO | ✅ OpenClaw ตอบกลับ: 26 ตัวอักษร
+2026-03-03 09:00:55 | ERROR | ❌ ไม่สามารถ parse highlights จาก response: No response from OpenClaw....
+2026-03-03 09:00:55 | INFO | 🎯 วิเคราะห์ได้ 0 highlights
+2026-03-03 09:00:55 | INFO | ⚠️ ลองใหม่... (1/3)
+2026-03-03 09:00:55 | INFO |    ➔ ⚠️ ลองใหม่... (1/3)
+2026-03-03 09:00:58 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 2/3)
+2026-03-03 09:00:58 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 2/3)
+2026-03-03 09:00:58 | INFO | 📝 สร้าง transcript text: 3368 ตัวอักษร จาก 76 segments
+2026-03-03 09:00:58 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-03 09:03:59 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-03 09:03:59 | INFO | ✅ OpenClaw ตอบกลับ: 3969 ตัวอักษร
+2026-03-03 09:03:59 | INFO | 🎯 วิเคราะห์ได้ 5 highlights
+2026-03-03 09:03:59 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 5 highlights
+2026-03-03 09:03:59 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 5 highlights
+2026-03-03 09:03:59 | INFO | ✂️ กำลังตัดวิดีโอ...: 5 clips
+2026-03-03 09:03:59 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 5 clips
+2026-03-03 09:03:59 | INFO | ✂️ กำลังตัด Clip 1/5...: 12.0s - 47.0s
+2026-03-03 09:03:59 | INFO |    ➔ ✂️ กำลังตัด Clip 1/5...: 12.0s - 47.0s
+2026-03-03 09:03:59 | INFO | Processing clip for VB4aL4pDTr0 from 12.0 to 47.0
+2026-03-03 09:04:00 | ERROR | Failed to download video VB4aL4pDTr0: [0;31mERROR:[0m [youtube] VB4aL4pDTr0: This video is not available
+2026-03-03 09:04:00 | INFO | ⚠️ Clip 1/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:00 | INFO |    ➔ ⚠️ Clip 1/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:00 | INFO | ✂️ กำลังตัด Clip 2/5...: 225.0s - 280.0s
+2026-03-03 09:04:00 | INFO |    ➔ ✂️ กำลังตัด Clip 2/5...: 225.0s - 280.0s
+2026-03-03 09:04:00 | INFO | Processing clip for VB4aL4pDTr0 from 225.0 to 280.0
+2026-03-03 09:04:01 | ERROR | Failed to download video VB4aL4pDTr0: [0;31mERROR:[0m [youtube] VB4aL4pDTr0: This video is not available
+2026-03-03 09:04:01 | INFO | ⚠️ Clip 2/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:01 | INFO |    ➔ ⚠️ Clip 2/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:01 | INFO | ✂️ กำลังตัด Clip 3/5...: 114.0s - 166.0s
+2026-03-03 09:04:01 | INFO |    ➔ ✂️ กำลังตัด Clip 3/5...: 114.0s - 166.0s
+2026-03-03 09:04:01 | INFO | Processing clip for VB4aL4pDTr0 from 114.0 to 166.0
+2026-03-03 09:04:02 | ERROR | Failed to download video VB4aL4pDTr0: [0;31mERROR:[0m [youtube] VB4aL4pDTr0: This video is not available
+2026-03-03 09:04:02 | INFO | ⚠️ Clip 3/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:02 | INFO |    ➔ ⚠️ Clip 3/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:02 | INFO | ✂️ กำลังตัด Clip 4/5...: 60.0s - 103.0s
+2026-03-03 09:04:02 | INFO |    ➔ ✂️ กำลังตัด Clip 4/5...: 60.0s - 103.0s
+2026-03-03 09:04:02 | INFO | Processing clip for VB4aL4pDTr0 from 60.0 to 103.0
+2026-03-03 09:04:04 | ERROR | Failed to download video VB4aL4pDTr0: [0;31mERROR:[0m [youtube] VB4aL4pDTr0: This video is not available
+2026-03-03 09:04:04 | INFO | ⚠️ Clip 4/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:04 | INFO |    ➔ ⚠️ Clip 4/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:04 | INFO | ✂️ กำลังตัด Clip 5/5...: 167.0s - 225.0s
+2026-03-03 09:04:04 | INFO |    ➔ ✂️ กำลังตัด Clip 5/5...: 167.0s - 225.0s
+2026-03-03 09:04:04 | INFO | Processing clip for VB4aL4pDTr0 from 167.0 to 225.0
+2026-03-03 09:04:05 | ERROR | Failed to download video VB4aL4pDTr0: [0;31mERROR:[0m [youtube] VB4aL4pDTr0: This video is not available
+2026-03-03 09:04:05 | INFO | ⚠️ Clip 5/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:05 | INFO |    ➔ ⚠️ Clip 5/5 ล้มเหลว: Could not download video
+2026-03-03 09:04:05 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 09:04:05 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 09:04:07 | INFO | ✅ บันทึก 5 highlights ลง Pinecone (namespace: highlights)
+2026-03-03 09:04:07 | INFO | ✅ บันทึก Pinecone สำเร็จ: 5 records
+2026-03-03 09:04:07 | INFO |    ➔ ✅ บันทึก Pinecone สำเร็จ: 5 records
+2026-03-03 09:04:07 | INFO | 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 5 highlights, ตัดคลิปสำเร็จ 0/5
+2026-03-03 09:04:07 | INFO |    ➔ 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 5 highlights, ตัดคลิปสำเร็จ 0/5
+2026-03-03 09:04:07 | INFO | ✅ สำเร็จ! ได้มา 5 highlights
+2026-03-03 09:04:07 | INFO | ⏳ หน่วงเวลาสุ่ม 16.9 วินาทีก่อนเริ่มคลิปถัดไป...
+2026-03-03 09:04:24 | INFO | ------------------------------------------------------------
+2026-03-03 09:04:24 | INFO | 🎬 กำลังประมวลผลคลิปที่ 42/1213 (ชุดนี้: 4/5)
+2026-03-03 09:04:24 | INFO | 📌 รายการโลกใบใหญ่ - Passion และ วินัย (https://www.youtube.com/watch?v=9Uq5WODjuT4)
+2026-03-03 09:04:24 | INFO | ------------------------------------------------------------
+2026-03-03 09:04:24 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-03 09:04:24 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-03 09:04:24 | INFO | ✅ Video ID: 9Uq5WODjuT4
+2026-03-03 09:04:24 | INFO |    ➔ ✅ Video ID: 9Uq5WODjuT4
+2026-03-03 09:04:24 | INFO | 📝 กำลังถอด Transcript...: 9Uq5WODjuT4
+2026-03-03 09:04:24 | INFO |    ➔ 📝 กำลังถอด Transcript...: 9Uq5WODjuT4
+2026-03-03 09:04:25 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=9Uq5WODjuT4 (ภาษา: Thai (auto-generated), 67 ประโยค)
+2026-03-03 09:04:25 | INFO | 📊 รวมทั้งหมด: 67 ประโยคจาก 1 วิดีโอ
+2026-03-03 09:04:25 | INFO | ✅ ถอด Transcript สำเร็จ: 67 segments
+2026-03-03 09:04:25 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 67 segments
+2026-03-03 09:04:25 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 09:04:25 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 09:04:25 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 09:04:25 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 09:04:25 | INFO | 📝 สร้าง transcript text: 2960 ตัวอักษร จาก 67 segments
+2026-03-03 09:04:25 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-03 09:06:15 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-03 09:06:15 | INFO | ✅ OpenClaw ตอบกลับ: 4018 ตัวอักษร
+2026-03-03 09:06:15 | INFO | 🎯 วิเคราะห์ได้ 5 highlights
+2026-03-03 09:06:15 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 5 highlights
+2026-03-03 09:06:15 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 5 highlights
+2026-03-03 09:06:15 | INFO | ✂️ กำลังตัดวิดีโอ...: 5 clips
+2026-03-03 09:06:15 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 5 clips
+2026-03-03 09:06:15 | INFO | ✂️ กำลังตัด Clip 1/5...: 110.0s - 137.0s
+2026-03-03 09:06:15 | INFO |    ➔ ✂️ กำลังตัด Clip 1/5...: 110.0s - 137.0s
+2026-03-03 09:06:15 | INFO | Processing clip for 9Uq5WODjuT4 from 110.0 to 137.0
+2026-03-03 09:06:16 | ERROR | Failed to download video 9Uq5WODjuT4: [0;31mERROR:[0m [youtube] 9Uq5WODjuT4: This video is not available
+2026-03-03 09:06:16 | INFO | ⚠️ Clip 1/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:16 | INFO |    ➔ ⚠️ Clip 1/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:16 | INFO | ✂️ กำลังตัด Clip 2/5...: 138.0s - 168.0s
+2026-03-03 09:06:16 | INFO |    ➔ ✂️ กำลังตัด Clip 2/5...: 138.0s - 168.0s
+2026-03-03 09:06:16 | INFO | Processing clip for 9Uq5WODjuT4 from 138.0 to 168.0
+2026-03-03 09:06:17 | ERROR | Failed to download video 9Uq5WODjuT4: [0;31mERROR:[0m [youtube] 9Uq5WODjuT4: This video is not available
+2026-03-03 09:06:17 | INFO | ⚠️ Clip 2/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:17 | INFO |    ➔ ⚠️ Clip 2/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:17 | INFO | ✂️ กำลังตัด Clip 3/5...: 49.0s - 79.0s
+2026-03-03 09:06:17 | INFO |    ➔ ✂️ กำลังตัด Clip 3/5...: 49.0s - 79.0s
+2026-03-03 09:06:17 | INFO | Processing clip for 9Uq5WODjuT4 from 49.0 to 79.0
+2026-03-03 09:06:25 | ERROR | Failed to download video 9Uq5WODjuT4: [0;31mERROR:[0m [youtube] 9Uq5WODjuT4: This video is not available
+2026-03-03 09:06:25 | INFO | ⚠️ Clip 3/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:25 | INFO |    ➔ ⚠️ Clip 3/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:25 | INFO | ✂️ กำลังตัด Clip 4/5...: 181.0s - 209.0s
+2026-03-03 09:06:25 | INFO |    ➔ ✂️ กำลังตัด Clip 4/5...: 181.0s - 209.0s
+2026-03-03 09:06:25 | INFO | Processing clip for 9Uq5WODjuT4 from 181.0 to 209.0
+2026-03-03 09:06:26 | ERROR | Failed to download video 9Uq5WODjuT4: [0;31mERROR:[0m [youtube] 9Uq5WODjuT4: This video is not available
+2026-03-03 09:06:26 | INFO | ⚠️ Clip 4/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:26 | INFO |    ➔ ⚠️ Clip 4/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:26 | INFO | ✂️ กำลังตัด Clip 5/5...: 15.0s - 48.0s
+2026-03-03 09:06:26 | INFO |    ➔ ✂️ กำลังตัด Clip 5/5...: 15.0s - 48.0s
+2026-03-03 09:06:26 | INFO | Processing clip for 9Uq5WODjuT4 from 15.0 to 48.0
+2026-03-03 09:06:28 | ERROR | Failed to download video 9Uq5WODjuT4: [0;31mERROR:[0m [youtube] 9Uq5WODjuT4: This video is not available
+2026-03-03 09:06:28 | INFO | ⚠️ Clip 5/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:28 | INFO |    ➔ ⚠️ Clip 5/5 ล้มเหลว: Could not download video
+2026-03-03 09:06:28 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 09:06:28 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 09:06:30 | INFO | ✅ บันทึก 5 highlights ลง Pinecone (namespace: highlights)
+2026-03-03 09:06:30 | INFO | ✅ บันทึก Pinecone สำเร็จ: 5 records
+2026-03-03 09:06:30 | INFO |    ➔ ✅ บันทึก Pinecone สำเร็จ: 5 records
+2026-03-03 09:06:30 | INFO | 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 5 highlights, ตัดคลิปสำเร็จ 0/5
+2026-03-03 09:06:30 | INFO |    ➔ 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 5 highlights, ตัดคลิปสำเร็จ 0/5
+2026-03-03 09:06:30 | INFO | ✅ สำเร็จ! ได้มา 5 highlights
+2026-03-03 09:06:30 | INFO | ⏳ หน่วงเวลาสุ่ม 17.1 วินาทีก่อนเริ่มคลิปถัดไป...
+2026-03-03 09:06:47 | INFO | ------------------------------------------------------------
+2026-03-03 09:06:47 | INFO | 🎬 กำลังประมวลผลคลิปที่ 43/1213 (ชุดนี้: 5/5)
+2026-03-03 09:06:47 | INFO | 📌 รายการผู้ญิ้งผู้หญิง - สาเหตุของการนอกใจกัน3 (https://www.youtube.com/watch?v=JS9pV9bfQrE)
+2026-03-03 09:06:47 | INFO | ------------------------------------------------------------
+2026-03-03 09:06:47 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-03 09:06:47 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-03 09:06:47 | INFO | ✅ Video ID: JS9pV9bfQrE
+2026-03-03 09:06:47 | INFO |    ➔ ✅ Video ID: JS9pV9bfQrE
+2026-03-03 09:06:47 | INFO | 📝 กำลังถอด Transcript...: JS9pV9bfQrE
+2026-03-03 09:06:47 | INFO |    ➔ 📝 กำลังถอด Transcript...: JS9pV9bfQrE
+2026-03-03 09:06:48 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=JS9pV9bfQrE (ภาษา: Thai (auto-generated), 66 ประโยค)
+2026-03-03 09:06:48 | INFO | 📊 รวมทั้งหมด: 66 ประโยคจาก 1 วิดีโอ
+2026-03-03 09:06:48 | INFO | ✅ ถอด Transcript สำเร็จ: 66 segments
+2026-03-03 09:06:48 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 66 segments
+2026-03-03 09:06:48 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 09:06:48 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 09:06:48 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 09:06:48 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 09:06:48 | INFO | 📝 สร้าง transcript text: 2910 ตัวอักษร จาก 66 segments
+2026-03-03 09:06:48 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-03 09:08:38 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-03 09:08:38 | INFO | ✅ OpenClaw ตอบกลับ: 3409 ตัวอักษร
+2026-03-03 09:08:38 | INFO | 🎯 วิเคราะห์ได้ 4 highlights
+2026-03-03 09:08:38 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 4 highlights
+2026-03-03 09:08:38 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 4 highlights
+2026-03-03 09:08:38 | INFO | ✂️ กำลังตัดวิดีโอ...: 4 clips
+2026-03-03 09:08:38 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 4 clips
+2026-03-03 09:08:38 | INFO | ✂️ กำลังตัด Clip 1/4...: 43.0s - 75.0s
+2026-03-03 09:08:38 | INFO |    ➔ ✂️ กำลังตัด Clip 1/4...: 43.0s - 75.0s
+2026-03-03 09:08:38 | INFO | Processing clip for JS9pV9bfQrE from 43.0 to 75.0
+2026-03-03 09:08:39 | ERROR | Failed to download video JS9pV9bfQrE: [0;31mERROR:[0m [youtube] JS9pV9bfQrE: This video is not available
+2026-03-03 09:08:39 | INFO | ⚠️ Clip 1/4 ล้มเหลว: Could not download video
+2026-03-03 09:08:39 | INFO |    ➔ ⚠️ Clip 1/4 ล้มเหลว: Could not download video
+2026-03-03 09:08:39 | INFO | ✂️ กำลังตัด Clip 2/4...: 186.0s - 231.0s
+2026-03-03 09:08:39 | INFO |    ➔ ✂️ กำลังตัด Clip 2/4...: 186.0s - 231.0s
+2026-03-03 09:08:39 | INFO | Processing clip for JS9pV9bfQrE from 186.0 to 231.0
+2026-03-03 09:08:40 | ERROR | Failed to download video JS9pV9bfQrE: [0;31mERROR:[0m [youtube] JS9pV9bfQrE: This video is not available
+2026-03-03 09:08:40 | INFO | ⚠️ Clip 2/4 ล้มเหลว: Could not download video
+2026-03-03 09:08:40 | INFO |    ➔ ⚠️ Clip 2/4 ล้มเหลว: Could not download video
+2026-03-03 09:08:40 | INFO | ✂️ กำลังตัด Clip 3/4...: 109.0s - 140.0s
+2026-03-03 09:08:40 | INFO |    ➔ ✂️ กำลังตัด Clip 3/4...: 109.0s - 140.0s
+2026-03-03 09:08:40 | INFO | Processing clip for JS9pV9bfQrE from 109.0 to 140.0
+2026-03-03 09:08:41 | ERROR | Failed to download video JS9pV9bfQrE: [0;31mERROR:[0m [youtube] JS9pV9bfQrE: This video is not available
+2026-03-03 09:08:41 | INFO | ⚠️ Clip 3/4 ล้มเหลว: Could not download video
+2026-03-03 09:08:41 | INFO |    ➔ ⚠️ Clip 3/4 ล้มเหลว: Could not download video
+2026-03-03 09:08:41 | INFO | ✂️ กำลังตัด Clip 4/4...: 163.0s - 184.0s
+2026-03-03 09:08:41 | INFO |    ➔ ✂️ กำลังตัด Clip 4/4...: 163.0s - 184.0s
+2026-03-03 09:08:41 | INFO | Processing clip for JS9pV9bfQrE from 163.0 to 184.0
+2026-03-03 09:08:50 | ERROR | Failed to download video JS9pV9bfQrE: [0;31mERROR:[0m [youtube] JS9pV9bfQrE: This video is not available
+2026-03-03 09:08:50 | INFO | ⚠️ Clip 4/4 ล้มเหลว: Could not download video
+2026-03-03 09:08:50 | INFO |    ➔ ⚠️ Clip 4/4 ล้มเหลว: Could not download video
+2026-03-03 09:08:50 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 09:08:50 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 09:08:52 | INFO | ✅ บันทึก 4 highlights ลง Pinecone (namespace: highlights)
+2026-03-03 09:08:52 | INFO | ✅ บันทึก Pinecone สำเร็จ: 4 records
+2026-03-03 09:08:52 | INFO |    ➔ ✅ บันทึก Pinecone สำเร็จ: 4 records
+2026-03-03 09:08:52 | INFO | 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 4 highlights, ตัดคลิปสำเร็จ 0/4
+2026-03-03 09:08:52 | INFO |    ➔ 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 4 highlights, ตัดคลิปสำเร็จ 0/4
+2026-03-03 09:08:52 | INFO | ✅ สำเร็จ! ได้มา 4 highlights
+2026-03-03 09:08:52 | INFO | ============================================================
+2026-03-03 09:08:52 | INFO | 😴 ครบชุด 5 คลิปแล้ว... หยุดพักประมาณ 23.8 นาทีเพื่อป้องกัน Rate Limit
+2026-03-03 09:08:52 | INFO | ============================================================
+2026-03-03 09:28:58 | INFO | ============================================================
+2026-03-03 09:28:58 | INFO | 🚀 เริ่มต้นการประมวลผล Channel Background Job
+2026-03-03 09:28:58 | INFO | 📍 URL: https://www.youtube.com/@FEBCChristianMedia
+2026-03-03 09:28:58 | INFO | 📦 Batch Size: 5 | Delay: 20 min
+2026-03-03 09:28:58 | INFO | ✂️  Auto-clip: True
+2026-03-03 09:28:58 | INFO | ============================================================
+2026-03-03 09:28:58 | INFO | 🔄 พบข้อมูลเดิม! กำลังดำเนินการต่อจากวิดีโอที่ 43
+2026-03-03 09:28:58 | INFO | ✅ จำนวนวิดีโอทั้งหมดในรายการ: 1213 คลิป
+2026-03-03 09:28:58 | INFO | ------------------------------------------------------------
+2026-03-03 09:28:58 | INFO | 🎬 กำลังประมวลผลคลิปที่ 44/1213 (ชุดนี้: 1/5)
+2026-03-03 09:28:58 | INFO | 📌 รายการโลกใบใหญ่ - ซึมเศร้าไม่เหงาใจ (https://www.youtube.com/watch?v=OelZGWJXfpU)
+2026-03-03 09:28:58 | INFO | ------------------------------------------------------------
+2026-03-03 09:28:58 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-03 09:28:58 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-03 09:28:58 | INFO | ✅ Video ID: OelZGWJXfpU
+2026-03-03 09:28:58 | INFO |    ➔ ✅ Video ID: OelZGWJXfpU
+2026-03-03 09:28:58 | INFO | 📝 กำลังถอด Transcript...: OelZGWJXfpU
+2026-03-03 09:28:58 | INFO |    ➔ 📝 กำลังถอด Transcript...: OelZGWJXfpU
+2026-03-03 09:28:59 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=OelZGWJXfpU (ภาษา: Thai (auto-generated), 68 ประโยค)
+2026-03-03 09:28:59 | INFO | 📊 รวมทั้งหมด: 68 ประโยคจาก 1 วิดีโอ
+2026-03-03 09:28:59 | INFO | ✅ ถอด Transcript สำเร็จ: 68 segments
+2026-03-03 09:28:59 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 68 segments
+2026-03-03 09:28:59 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 09:28:59 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-03 09:28:59 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 09:28:59 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-03 09:28:59 | INFO | 📝 สร้าง transcript text: 3000 ตัวอักษร จาก 68 segments
+2026-03-03 09:28:59 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-03 09:30:13 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-03 09:30:13 | INFO | ✅ OpenClaw ตอบกลับ: 4566 ตัวอักษร
+2026-03-03 09:30:13 | INFO | 🎯 วิเคราะห์ได้ 6 highlights
+2026-03-03 09:30:13 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 6 highlights
+2026-03-03 09:30:13 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 6 highlights
+2026-03-03 09:30:13 | INFO | ✂️ กำลังตัดวิดีโอ...: 6 clips
+2026-03-03 09:30:13 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 6 clips
+2026-03-03 09:30:13 | INFO | ✂️ กำลังตัด Clip 1/6...: 140.0s - 168.0s
+2026-03-03 09:30:13 | INFO |    ➔ ✂️ กำลังตัด Clip 1/6...: 140.0s - 168.0s
+2026-03-03 09:30:13 | INFO | Processing clip for OelZGWJXfpU from 140.0 to 168.0
+2026-03-03 09:30:15 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-03 09:30:15 | INFO | ⚠️ Clip 1/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:15 | INFO |    ➔ ⚠️ Clip 1/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:15 | INFO | ✂️ กำลังตัด Clip 2/6...: 30.0s - 62.0s
+2026-03-03 09:30:15 | INFO |    ➔ ✂️ กำลังตัด Clip 2/6...: 30.0s - 62.0s
+2026-03-03 09:30:15 | INFO | Processing clip for OelZGWJXfpU from 30.0 to 62.0
+2026-03-03 09:30:16 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-03 09:30:16 | INFO | ⚠️ Clip 2/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:16 | INFO |    ➔ ⚠️ Clip 2/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:16 | INFO | ✂️ กำลังตัด Clip 3/6...: 115.0s - 140.0s
+2026-03-03 09:30:16 | INFO |    ➔ ✂️ กำลังตัด Clip 3/6...: 115.0s - 140.0s
+2026-03-03 09:30:16 | INFO | Processing clip for OelZGWJXfpU from 115.0 to 140.0
+2026-03-03 09:30:17 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-03 09:30:17 | INFO | ⚠️ Clip 3/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:17 | INFO |    ➔ ⚠️ Clip 3/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:17 | INFO | ✂️ กำลังตัด Clip 4/6...: 168.0s - 214.0s
+2026-03-03 09:30:17 | INFO |    ➔ ✂️ กำลังตัด Clip 4/6...: 168.0s - 214.0s
+2026-03-03 09:30:17 | INFO | Processing clip for OelZGWJXfpU from 168.0 to 214.0
+2026-03-03 09:30:18 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-03 09:30:18 | INFO | ⚠️ Clip 4/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:18 | INFO |    ➔ ⚠️ Clip 4/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:18 | INFO | ✂️ กำลังตัด Clip 5/6...: 62.0s - 87.0s
+2026-03-03 09:30:18 | INFO |    ➔ ✂️ กำลังตัด Clip 5/6...: 62.0s - 87.0s
+2026-03-03 09:30:18 | INFO | Processing clip for OelZGWJXfpU from 62.0 to 87.0
+2026-03-03 09:30:19 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-03 09:30:19 | INFO | ⚠️ Clip 5/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:19 | INFO |    ➔ ⚠️ Clip 5/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:19 | INFO | ✂️ กำลังตัด Clip 6/6...: 87.0s - 115.0s
+2026-03-03 09:30:19 | INFO |    ➔ ✂️ กำลังตัด Clip 6/6...: 87.0s - 115.0s
+2026-03-03 09:30:19 | INFO | Processing clip for OelZGWJXfpU from 87.0 to 115.0
+2026-03-03 09:30:21 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-03 09:30:21 | INFO | ⚠️ Clip 6/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:21 | INFO |    ➔ ⚠️ Clip 6/6 ล้มเหลว: Could not download video
+2026-03-03 09:30:21 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 09:30:21 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-03 09:30:21 | INFO | 🧠 โหลดโมเดล embedding: paraphrase-multilingual-MiniLM-L12-v2
+2026-03-03 09:30:21 | INFO | Use pytorch device_name: cpu
+2026-03-03 09:30:21 | INFO | Load pretrained SentenceTransformer: paraphrase-multilingual-MiniLM-L12-v2
+2026-03-03 09:30:21 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 09:30:21 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-03-03 09:30:22 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 09:30:22 | WARNING | Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-03-03 09:30:22 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-03-03 09:30:22 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 09:30:22 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-03-03 09:30:22 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 09:30:22 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/README.md "HTTP/1.1 200 OK"
+2026-03-03 09:30:22 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-03 09:30:22 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-03-04 02:39:25 | INFO | ============================================================
+2026-03-04 02:39:25 | INFO | 🚀 เริ่มต้นการประมวลผล Channel Background Job
+2026-03-04 02:39:25 | INFO | 📍 URL: https://www.youtube.com/@FEBCChristianMedia
+2026-03-04 02:39:25 | INFO | 📦 Batch Size: 5 | Delay: 20 min
+2026-03-04 02:39:25 | INFO | ✂️  Auto-clip: True
+2026-03-04 02:39:25 | INFO | ============================================================
+2026-03-04 02:39:25 | INFO | 🔄 พบข้อมูลเดิม! กำลังดำเนินการต่อจากวิดีโอที่ 43
+2026-03-04 02:39:25 | INFO | ✅ จำนวนวิดีโอทั้งหมดในรายการ: 1213 คลิป
+2026-03-04 02:39:25 | INFO | ------------------------------------------------------------
+2026-03-04 02:39:25 | INFO | 🎬 กำลังประมวลผลคลิปที่ 44/1213 (ชุดนี้: 1/5)
+2026-03-04 02:39:25 | INFO | 📌 รายการโลกใบใหญ่ - ซึมเศร้าไม่เหงาใจ (https://www.youtube.com/watch?v=OelZGWJXfpU)
+2026-03-04 02:39:25 | INFO | ------------------------------------------------------------
+2026-03-04 02:39:25 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-04 02:39:25 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-04 02:39:25 | INFO | ✅ Video ID: OelZGWJXfpU
+2026-03-04 02:39:25 | INFO |    ➔ ✅ Video ID: OelZGWJXfpU
+2026-03-04 02:39:25 | INFO | 📝 กำลังถอด Transcript...: OelZGWJXfpU
+2026-03-04 02:39:25 | INFO |    ➔ 📝 กำลังถอด Transcript...: OelZGWJXfpU
+2026-03-04 02:39:26 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=OelZGWJXfpU (ภาษา: Thai (auto-generated), 68 ประโยค)
+2026-03-04 02:39:26 | INFO | 📊 รวมทั้งหมด: 68 ประโยคจาก 1 วิดีโอ
+2026-03-04 02:39:26 | INFO | ✅ ถอด Transcript สำเร็จ: 68 segments
+2026-03-04 02:39:26 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 68 segments
+2026-03-04 02:39:26 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-04 02:39:26 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-04 02:39:26 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-04 02:39:26 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-04 02:39:26 | INFO | 📝 สร้าง transcript text: 3000 ตัวอักษร จาก 68 segments
+2026-03-04 02:39:26 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-04 02:41:22 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-04 02:41:22 | INFO | ✅ OpenClaw ตอบกลับ: 2939 ตัวอักษร
+2026-03-04 02:41:22 | INFO | 🎯 วิเคราะห์ได้ 4 highlights
+2026-03-04 02:41:22 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 4 highlights
+2026-03-04 02:41:22 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 4 highlights
+2026-03-04 02:41:22 | INFO | ✂️ กำลังตัดวิดีโอ...: 4 clips
+2026-03-04 02:41:22 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 4 clips
+2026-03-04 02:41:22 | INFO | ✂️ กำลังตัด Clip 1/4...: 30.0s - 76.0s
+2026-03-04 02:41:22 | INFO |    ➔ ✂️ กำลังตัด Clip 1/4...: 30.0s - 76.0s
+2026-03-04 02:41:22 | INFO | Processing clip for OelZGWJXfpU from 30.0 to 76.0
+2026-03-04 02:41:23 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-04 02:41:23 | INFO | ⚠️ Clip 1/4 ล้มเหลว: Could not download video
+2026-03-04 02:41:23 | INFO |    ➔ ⚠️ Clip 1/4 ล้มเหลว: Could not download video
+2026-03-04 02:41:23 | INFO | ✂️ กำลังตัด Clip 2/4...: 88.0s - 134.0s
+2026-03-04 02:41:23 | INFO |    ➔ ✂️ กำลังตัด Clip 2/4...: 88.0s - 134.0s
+2026-03-04 02:41:23 | INFO | Processing clip for OelZGWJXfpU from 88.0 to 134.0
+2026-03-04 02:41:24 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-04 02:41:24 | INFO | ⚠️ Clip 2/4 ล้มเหลว: Could not download video
+2026-03-04 02:41:24 | INFO |    ➔ ⚠️ Clip 2/4 ล้มเหลว: Could not download video
+2026-03-04 02:41:24 | INFO | ✂️ กำลังตัด Clip 3/4...: 138.0s - 178.0s
+2026-03-04 02:41:24 | INFO |    ➔ ✂️ กำลังตัด Clip 3/4...: 138.0s - 178.0s
+2026-03-04 02:41:24 | INFO | Processing clip for OelZGWJXfpU from 138.0 to 178.0
+2026-03-04 02:41:25 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-04 02:41:25 | INFO | ⚠️ Clip 3/4 ล้มเหลว: Could not download video
+2026-03-04 02:41:25 | INFO |    ➔ ⚠️ Clip 3/4 ล้มเหลว: Could not download video
+2026-03-04 02:41:25 | INFO | ✂️ กำลังตัด Clip 4/4...: 184.0s - 214.0s
+2026-03-04 02:41:25 | INFO |    ➔ ✂️ กำลังตัด Clip 4/4...: 184.0s - 214.0s
+2026-03-04 02:41:25 | INFO | Processing clip for OelZGWJXfpU from 184.0 to 214.0
+2026-03-04 02:41:26 | ERROR | Failed to download video OelZGWJXfpU: [0;31mERROR:[0m [youtube] OelZGWJXfpU: This video is not available
+2026-03-04 02:41:26 | INFO | ⚠️ Clip 4/4 ล้มเหลว: Could not download video
+2026-03-04 02:41:26 | INFO |    ➔ ⚠️ Clip 4/4 ล้มเหลว: Could not download video
+2026-03-04 02:41:26 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-04 02:41:26 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-04 02:41:26 | INFO | 🧠 โหลดโมเดล embedding: paraphrase-multilingual-MiniLM-L12-v2
+2026-03-04 02:41:26 | INFO | Use pytorch device_name: cpu
+2026-03-04 02:41:26 | INFO | Load pretrained SentenceTransformer: paraphrase-multilingual-MiniLM-L12-v2
+2026-03-04 02:41:26 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:26 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:26 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:26 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:26 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:26 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:26 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:26 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/README.md "HTTP/1.1 200 OK"
+2026-03-04 02:41:27 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:27 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/modules.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:27 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:27 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:27 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-03-04 02:41:27 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:27 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:29 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:29 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/config.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:29 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:29 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:29 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:29 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:29 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-03-04 02:41:30 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-03-04 02:41:34 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 "HTTP/1.1 200 OK"
+2026-03-04 02:41:34 | INFO | HTTP Request: HEAD https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-03-04 02:41:34 | INFO | HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/e8f8c211226b894fcb81acc59f3b34ba3efd5f42/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-03-04 02:41:35 | INFO | HTTP Request: GET https://huggingface.co/api/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2 "HTTP/1.1 200 OK"
+2026-03-04 02:41:39 | INFO | ✅ บันทึก 4 highlights ลง Pinecone (namespace: highlights)
+2026-03-04 02:41:39 | INFO | ✅ บันทึก Pinecone สำเร็จ: 4 records
+2026-03-04 02:41:39 | INFO |    ➔ ✅ บันทึก Pinecone สำเร็จ: 4 records
+2026-03-04 02:41:39 | INFO | 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 4 highlights, ตัดคลิปสำเร็จ 0/4
+2026-03-04 02:41:39 | INFO |    ➔ 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 4 highlights, ตัดคลิปสำเร็จ 0/4
+2026-03-04 02:41:39 | INFO | ✅ สำเร็จ! ได้มา 4 highlights
+2026-03-04 02:41:40 | INFO | ⏳ หน่วงเวลาสุ่ม 17.3 วินาทีก่อนเริ่มคลิปถัดไป...
+2026-03-04 02:41:57 | INFO | ------------------------------------------------------------
+2026-03-04 02:41:57 | INFO | 🎬 กำลังประมวลผลคลิปที่ 45/1213 (ชุดนี้: 2/5)
+2026-03-04 02:41:57 | INFO | 📌 รายการเพื่อนใจ-ความรักมีความถ่อมใจ (https://www.youtube.com/watch?v=5ZjIa3_M6qQ)
+2026-03-04 02:41:57 | INFO | ------------------------------------------------------------
+2026-03-04 02:41:57 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-04 02:41:57 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-04 02:41:57 | INFO | ✅ Video ID: 5ZjIa3_M6qQ
+2026-03-04 02:41:57 | INFO |    ➔ ✅ Video ID: 5ZjIa3_M6qQ
+2026-03-04 02:41:57 | INFO | 📝 กำลังถอด Transcript...: 5ZjIa3_M6qQ
+2026-03-04 02:41:57 | INFO |    ➔ 📝 กำลังถอด Transcript...: 5ZjIa3_M6qQ
+2026-03-04 02:41:58 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=5ZjIa3_M6qQ (ภาษา: Thai (auto-generated), 50 ประโยค)
+2026-03-04 02:41:58 | INFO | 📊 รวมทั้งหมด: 50 ประโยคจาก 1 วิดีโอ
+2026-03-04 02:41:58 | INFO | ✅ ถอด Transcript สำเร็จ: 50 segments
+2026-03-04 02:41:58 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 50 segments
+2026-03-04 02:41:58 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-04 02:41:58 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-04 02:41:58 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-04 02:41:58 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-04 02:41:58 | INFO | 📝 สร้าง transcript text: 2276 ตัวอักษร จาก 50 segments
+2026-03-04 02:41:58 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-04 02:42:56 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-04 02:42:56 | INFO | ✅ OpenClaw ตอบกลับ: 2876 ตัวอักษร
+2026-03-04 02:42:56 | INFO | 🎯 วิเคราะห์ได้ 4 highlights
+2026-03-04 02:42:56 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 4 highlights
+2026-03-04 02:42:56 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 4 highlights
+2026-03-04 02:42:56 | INFO | ✂️ กำลังตัดวิดีโอ...: 4 clips
+2026-03-04 02:42:56 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 4 clips
+2026-03-04 02:42:56 | INFO | ✂️ กำลังตัด Clip 1/4...: 0.1s - 71.0s
+2026-03-04 02:42:56 | INFO |    ➔ ✂️ กำลังตัด Clip 1/4...: 0.1s - 71.0s
+2026-03-04 02:42:56 | INFO | Processing clip for 5ZjIa3_M6qQ from 0.15 to 71.0
+2026-03-04 02:42:57 | ERROR | Failed to download video 5ZjIa3_M6qQ: [0;31mERROR:[0m [youtube] 5ZjIa3_M6qQ: This video is not available
+2026-03-04 02:42:57 | INFO | ⚠️ Clip 1/4 ล้มเหลว: Could not download video
+2026-03-04 02:42:57 | INFO |    ➔ ⚠️ Clip 1/4 ล้มเหลว: Could not download video
+2026-03-04 02:42:57 | INFO | ✂️ กำลังตัด Clip 2/4...: 108.0s - 150.0s
+2026-03-04 02:42:57 | INFO |    ➔ ✂️ กำลังตัด Clip 2/4...: 108.0s - 150.0s
+2026-03-04 02:42:57 | INFO | Processing clip for 5ZjIa3_M6qQ from 108.0 to 150.0
+2026-03-04 02:42:58 | ERROR | Failed to download video 5ZjIa3_M6qQ: [0;31mERROR:[0m [youtube] 5ZjIa3_M6qQ: This video is not available
+2026-03-04 02:42:58 | INFO | ⚠️ Clip 2/4 ล้มเหลว: Could not download video
+2026-03-04 02:42:58 | INFO |    ➔ ⚠️ Clip 2/4 ล้มเหลว: Could not download video
+2026-03-04 02:42:58 | INFO | ✂️ กำลังตัด Clip 3/4...: 72.0s - 107.0s
+2026-03-04 02:42:58 | INFO |    ➔ ✂️ กำลังตัด Clip 3/4...: 72.0s - 107.0s
+2026-03-04 02:42:58 | INFO | Processing clip for 5ZjIa3_M6qQ from 72.0 to 107.0
+2026-03-04 02:42:59 | ERROR | Failed to download video 5ZjIa3_M6qQ: [0;31mERROR:[0m [youtube] 5ZjIa3_M6qQ: This video is not available
+2026-03-04 02:42:59 | INFO | ⚠️ Clip 3/4 ล้มเหลว: Could not download video
+2026-03-04 02:42:59 | INFO |    ➔ ⚠️ Clip 3/4 ล้มเหลว: Could not download video
+2026-03-04 02:42:59 | INFO | ✂️ กำลังตัด Clip 4/4...: 151.0s - 173.0s
+2026-03-04 02:42:59 | INFO |    ➔ ✂️ กำลังตัด Clip 4/4...: 151.0s - 173.0s
+2026-03-04 02:42:59 | INFO | Processing clip for 5ZjIa3_M6qQ from 151.0 to 173.0
+2026-03-04 02:43:00 | ERROR | Failed to download video 5ZjIa3_M6qQ: [0;31mERROR:[0m [youtube] 5ZjIa3_M6qQ: This video is not available
+2026-03-04 02:43:00 | INFO | ⚠️ Clip 4/4 ล้มเหลว: Could not download video
+2026-03-04 02:43:00 | INFO |    ➔ ⚠️ Clip 4/4 ล้มเหลว: Could not download video
+2026-03-04 02:43:00 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-04 02:43:00 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-04 02:43:02 | INFO | ✅ บันทึก 4 highlights ลง Pinecone (namespace: highlights)
+2026-03-04 02:43:02 | INFO | ✅ บันทึก Pinecone สำเร็จ: 4 records
+2026-03-04 02:43:02 | INFO |    ➔ ✅ บันทึก Pinecone สำเร็จ: 4 records
+2026-03-04 02:43:02 | INFO | 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 4 highlights, ตัดคลิปสำเร็จ 0/4
+2026-03-04 02:43:02 | INFO |    ➔ 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 4 highlights, ตัดคลิปสำเร็จ 0/4
+2026-03-04 02:43:02 | INFO | ✅ สำเร็จ! ได้มา 4 highlights
+2026-03-04 02:43:02 | INFO | ⏳ หน่วงเวลาสุ่ม 21.6 วินาทีก่อนเริ่มคลิปถัดไป...
+2026-03-04 02:43:24 | INFO | ------------------------------------------------------------
+2026-03-04 02:43:24 | INFO | 🎬 กำลังประมวลผลคลิปที่ 46/1213 (ชุดนี้: 3/5)
+2026-03-04 02:43:24 | INFO | 📌 รายการเพื่อนใจ-อาหารรักษ์หัวใจ (https://www.youtube.com/watch?v=gDOjOdjLznw)
+2026-03-04 02:43:24 | INFO | ------------------------------------------------------------
+2026-03-04 02:43:24 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-04 02:43:24 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-04 02:43:24 | INFO | ✅ Video ID: gDOjOdjLznw
+2026-03-04 02:43:24 | INFO |    ➔ ✅ Video ID: gDOjOdjLznw
+2026-03-04 02:43:24 | INFO | 📝 กำลังถอด Transcript...: gDOjOdjLznw
+2026-03-04 02:43:24 | INFO |    ➔ 📝 กำลังถอด Transcript...: gDOjOdjLznw
+2026-03-04 02:43:25 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=gDOjOdjLznw (ภาษา: Thai (auto-generated), 60 ประโยค)
+2026-03-04 02:43:25 | INFO | 📊 รวมทั้งหมด: 60 ประโยคจาก 1 วิดีโอ
+2026-03-04 02:43:25 | INFO | ✅ ถอด Transcript สำเร็จ: 60 segments
+2026-03-04 02:43:25 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 60 segments
+2026-03-04 02:43:25 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-04 02:43:25 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-04 02:43:25 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-04 02:43:25 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-04 02:43:25 | INFO | 📝 สร้าง transcript text: 2698 ตัวอักษร จาก 60 segments
+2026-03-04 02:43:25 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-04 02:46:32 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-04 02:46:32 | INFO | ✅ OpenClaw ตอบกลับ: 26 ตัวอักษร
+2026-03-04 02:46:32 | ERROR | ❌ ไม่สามารถ parse highlights จาก response: No response from OpenClaw....
+2026-03-04 02:46:32 | INFO | 🎯 วิเคราะห์ได้ 0 highlights
+2026-03-04 02:46:32 | INFO | ⚠️ ลองใหม่... (1/3)
+2026-03-04 02:46:32 | INFO |    ➔ ⚠️ ลองใหม่... (1/3)
+2026-03-04 02:46:35 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 2/3)
+2026-03-04 02:46:35 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 2/3)
+2026-03-04 02:46:35 | INFO | 📝 สร้าง transcript text: 2698 ตัวอักษร จาก 60 segments
+2026-03-04 02:46:35 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-04 02:49:20 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-04 02:49:20 | INFO | ✅ OpenClaw ตอบกลับ: 3567 ตัวอักษร
+2026-03-04 02:49:20 | INFO | 🎯 วิเคราะห์ได้ 5 highlights
+2026-03-04 02:49:20 | INFO | ✅ วิเคราะห์ Highlight สำเร็จ: 5 highlights
+2026-03-04 02:49:20 | INFO |    ➔ ✅ วิเคราะห์ Highlight สำเร็จ: 5 highlights
+2026-03-04 02:49:20 | INFO | ✂️ กำลังตัดวิดีโอ...: 5 clips
+2026-03-04 02:49:20 | INFO |    ➔ ✂️ กำลังตัดวิดีโอ...: 5 clips
+2026-03-04 02:49:20 | INFO | ✂️ กำลังตัด Clip 1/5...: 147.0s - 183.0s
+2026-03-04 02:49:20 | INFO |    ➔ ✂️ กำลังตัด Clip 1/5...: 147.0s - 183.0s
+2026-03-04 02:49:20 | INFO | Processing clip for gDOjOdjLznw from 147.0 to 183.0
+2026-03-04 02:49:21 | ERROR | Failed to download video gDOjOdjLznw: [0;31mERROR:[0m [youtube] gDOjOdjLznw: This video is not available
+2026-03-04 02:49:21 | INFO | ⚠️ Clip 1/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:21 | INFO |    ➔ ⚠️ Clip 1/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:21 | INFO | ✂️ กำลังตัด Clip 2/5...: 15.0s - 62.0s
+2026-03-04 02:49:21 | INFO |    ➔ ✂️ กำลังตัด Clip 2/5...: 15.0s - 62.0s
+2026-03-04 02:49:21 | INFO | Processing clip for gDOjOdjLznw from 15.0 to 62.0
+2026-03-04 02:49:22 | ERROR | Failed to download video gDOjOdjLznw: [0;31mERROR:[0m [youtube] gDOjOdjLznw: This video is not available
+2026-03-04 02:49:22 | INFO | ⚠️ Clip 2/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:22 | INFO |    ➔ ⚠️ Clip 2/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:22 | INFO | ✂️ กำลังตัด Clip 3/5...: 183.0s - 221.0s
+2026-03-04 02:49:22 | INFO |    ➔ ✂️ กำลังตัด Clip 3/5...: 183.0s - 221.0s
+2026-03-04 02:49:22 | INFO | Processing clip for gDOjOdjLznw from 183.0 to 221.0
+2026-03-04 02:49:23 | ERROR | Failed to download video gDOjOdjLznw: [0;31mERROR:[0m [youtube] gDOjOdjLznw: This video is not available
+2026-03-04 02:49:23 | INFO | ⚠️ Clip 3/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:23 | INFO |    ➔ ⚠️ Clip 3/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:23 | INFO | ✂️ กำลังตัด Clip 4/5...: 63.0s - 103.0s
+2026-03-04 02:49:23 | INFO |    ➔ ✂️ กำลังตัด Clip 4/5...: 63.0s - 103.0s
+2026-03-04 02:49:23 | INFO | Processing clip for gDOjOdjLznw from 63.0 to 103.0
+2026-03-04 02:49:23 | ERROR | Failed to download video gDOjOdjLznw: [0;31mERROR:[0m [youtube] gDOjOdjLznw: This video is not available
+2026-03-04 02:49:23 | INFO | ⚠️ Clip 4/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:23 | INFO |    ➔ ⚠️ Clip 4/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:23 | INFO | ✂️ กำลังตัด Clip 5/5...: 103.0s - 140.0s
+2026-03-04 02:49:23 | INFO |    ➔ ✂️ กำลังตัด Clip 5/5...: 103.0s - 140.0s
+2026-03-04 02:49:23 | INFO | Processing clip for gDOjOdjLznw from 103.0 to 140.0
+2026-03-04 02:49:25 | ERROR | Failed to download video gDOjOdjLznw: [0;31mERROR:[0m [youtube] gDOjOdjLznw: This video is not available
+2026-03-04 02:49:25 | INFO | ⚠️ Clip 5/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:25 | INFO |    ➔ ⚠️ Clip 5/5 ล้มเหลว: Could not download video
+2026-03-04 02:49:25 | INFO | 💾 กำลังบันทึกลง Pinecone...
+2026-03-04 02:49:25 | INFO |    ➔ 💾 กำลังบันทึกลง Pinecone...
+2026-03-04 02:49:27 | INFO | ✅ บันทึก 5 highlights ลง Pinecone (namespace: highlights)
+2026-03-04 02:49:27 | INFO | ✅ บันทึก Pinecone สำเร็จ: 5 records
+2026-03-04 02:49:27 | INFO |    ➔ ✅ บันทึก Pinecone สำเร็จ: 5 records
+2026-03-04 02:49:27 | INFO | 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 5 highlights, ตัดคลิปสำเร็จ 0/5
+2026-03-04 02:49:27 | INFO |    ➔ 🎉 Pipeline เสร็จสมบูรณ์!: วิเคราะห์สำเร็จ: 5 highlights, ตัดคลิปสำเร็จ 0/5
+2026-03-04 02:49:27 | INFO | ✅ สำเร็จ! ได้มา 5 highlights
+2026-03-04 02:49:27 | INFO | ⏳ หน่วงเวลาสุ่ม 24.3 วินาทีก่อนเริ่มคลิปถัดไป...
+2026-03-04 02:49:52 | INFO | ------------------------------------------------------------
+2026-03-04 02:49:52 | INFO | 🎬 กำลังประมวลผลคลิปที่ 47/1213 (ชุดนี้: 4/5)
+2026-03-04 02:49:52 | INFO | 📌 รายการเพื่อนใจ-มนุษย์ธรรมดาคนหนึ่ง (https://www.youtube.com/watch?v=CUNnFSvGKyI)
+2026-03-04 02:49:52 | INFO | ------------------------------------------------------------
+2026-03-04 02:49:52 | INFO | 🔗 กำลังดึง Video ID...
+2026-03-04 02:49:52 | INFO |    ➔ 🔗 กำลังดึง Video ID...
+2026-03-04 02:49:52 | INFO | ✅ Video ID: CUNnFSvGKyI
+2026-03-04 02:49:52 | INFO |    ➔ ✅ Video ID: CUNnFSvGKyI
+2026-03-04 02:49:52 | INFO | 📝 กำลังถอด Transcript...: CUNnFSvGKyI
+2026-03-04 02:49:52 | INFO |    ➔ 📝 กำลังถอด Transcript...: CUNnFSvGKyI
+2026-03-04 02:49:53 | INFO | ✅ ดึง Transcript สำเร็จ: video_id=CUNnFSvGKyI (ภาษา: Thai (auto-generated), 63 ประโยค)
+2026-03-04 02:49:53 | INFO | 📊 รวมทั้งหมด: 63 ประโยคจาก 1 วิดีโอ
+2026-03-04 02:49:53 | INFO | ✅ ถอด Transcript สำเร็จ: 63 segments
+2026-03-04 02:49:53 | INFO |    ➔ ✅ ถอด Transcript สำเร็จ: 63 segments
+2026-03-04 02:49:53 | INFO | 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-04 02:49:53 | INFO |    ➔ 🤖 กำลังวิเคราะห์ Highlight ด้วย OpenClaw...
+2026-03-04 02:49:53 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-04 02:49:53 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 1/3)
+2026-03-04 02:49:53 | INFO | 📝 สร้าง transcript text: 2843 ตัวอักษร จาก 63 segments
+2026-03-04 02:49:53 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)
+2026-03-04 02:53:19 | INFO | HTTP Request: POST http://136.110.50.115:18789/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-04 02:53:19 | INFO | ✅ OpenClaw ตอบกลับ: 3625 ตัวอักษร
+2026-03-04 02:53:19 | ERROR | ❌ ไม่สามารถ parse highlights จาก response: ```json
+[
+  {
+    "start_time": 15.0,
+    "end_time": 46.0,
+    "reason": "Hook แนะนำรายการเพื่อนใจที่เป็นพื้นที่ปลอดภัยสำหรับการแบ่งปันปัญหา ตามด้วยแนวคิดสร้างแรงบันดาลใจเรื่องการไขว่คว้าความฝันและคว...
+2026-03-04 02:53:19 | INFO | 🎯 วิเคราะห์ได้ 0 highlights
+2026-03-04 02:53:19 | INFO | ⚠️ ลองใหม่... (1/3)
+2026-03-04 02:53:19 | INFO |    ➔ ⚠️ ลองใหม่... (1/3)
+2026-03-04 02:53:22 | INFO | 🤖 วิเคราะห์ Highlight... (ครั้งที่ 2/3)
+2026-03-04 02:53:22 | INFO |    ➔ 🤖 วิเคราะห์ Highlight... (ครั้งที่ 2/3)
+2026-03-04 02:53:22 | INFO | 📝 สร้าง transcript text: 2843 ตัวอักษร จาก 63 segments
+2026-03-04 02:53:22 | INFO | 🚀 ส่ง request ไป OpenClaw: http://136.110.50.115:18789/v1/chat/completions (agent: unjai)

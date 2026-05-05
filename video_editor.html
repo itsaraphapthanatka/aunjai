@@ -38,6 +38,27 @@
             background: rgba(0, 0, 0, 0.2);
             border-radius: 4px;
         }
+
+        .sched-day-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            background: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .sched-day-label:has(input:checked) {
+            background: #0d9488;
+            color: white;
+            border-color: #0d9488;
+        }
+        .sched-day-label input { display: none; }
     </style>
 </head>
 
@@ -79,9 +100,17 @@
                         class="flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none">
                         <i class="fas fa-star mr-2"></i> Highlight
                     </button>
+                    <button id="tabQuiz"
+                        class="flex-1 text-gray-500 hover:bg-white/50 hover:text-green-500 font-medium py-3 rounded-xl transition-all focus:outline-none">
+                        <i class="fas fa-question-circle mr-2"></i> Quiz
+                    </button>
                     <button id="tabChannel"
                         class="flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none">
                         <i class="fab fa-youtube mr-2"></i> Channel
+                    </button>
+                    <button id="tabScheduler"
+                        class="flex-1 text-gray-500 hover:bg-white/50 hover:text-teal-500 font-medium py-3 rounded-xl transition-all focus:outline-none">
+                        <i class="fas fa-clock mr-2"></i> ตั้งเวลา
                     </button>
                 </div>
 
@@ -160,10 +189,13 @@
                                 <i id="highlightStatusIcon"
                                     class="fas fa-circle-notch fa-spin text-amber-500 text-xl"></i>
                                 <div class="flex-grow">
-                                    <h3 id="highlightStatusTitle" class="font-medium text-amber-800">กำลังวิเคราะห์...
-                                    </h3>
-                                    <p id="highlightStatusMsg" class="text-sm text-amber-600 mt-1">ถอด Transcript
-                                        และส่งให้ AI วิเคราะห์ (อาจใช้เวลา 1-3 นาที)</p>
+                                    <div class="flex justify-between items-center">
+                                        <h3 id="highlightStatusTitle" class="font-medium text-amber-800">กำลังวิเคราะห์...</h3>
+                                        <button onclick="stopTask(activeHighlightTaskId)" class="text-red-500 hover:text-red-700 text-xs font-medium">
+                                            <i class="fas fa-stop-circle"></i> หยุด
+                                        </button>
+                                    </div>
+                                    <p id="highlightStatusMsg" class="text-sm text-amber-600 mt-1">ถอด Transcript และส่งให้ AI วิเคราะห์ (อาจใช้เวลา 1-3 นาที)</p>
                                 </div>
                             </div>
                             <div class="mt-3 w-full bg-amber-200 rounded-full h-1.5 overflow-hidden">
@@ -176,6 +208,47 @@
                     <!-- Highlight Results -->
                     <div id="highlightResults"
                         class="mt-4 hidden space-y-3 custom-scrollbar max-h-[500px] overflow-y-auto pr-1">
+                    </div>
+                </div>
+
+                <!-- Quiz Panel (Hidden by default) -->
+                <div id="panelQuiz" class="glass-panel rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800"><i
+                            class="fas fa-question-circle text-green-500 mr-2"></i>สร้าง Quiz จากคลิปเต็ม</h2>
+                    <p class="text-sm text-gray-500 mb-4">วาง YouTube Link เพื่อสร้างข้อสอบแบบปรนัย 7-10 ข้อจากเนื้อหาทั้งคลิป และจัดเก็บลงใน Pinecone</p>
+                    <form id="quizForm" class="flex gap-3">
+                        <div class="relative flex-grow">
+                            <i class="fab fa-youtube absolute left-4 top-1/2 transform -translate-y-1/2 text-red-400 text-lg"></i>
+                            <input type="text" id="quizInput"
+                                placeholder="วาง YouTube Link ที่นี่... เช่น https://youtu.be/xxx" required
+                                class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-all shadow-sm">
+                        </div>
+                        <button type="submit" id="quizBtn"
+                            class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-md flex items-center gap-2 whitespace-nowrap">
+                            <i class="fas fa-magic"></i> <span>สร้าง Quiz</span>
+                        </button>
+                    </form>
+
+                    <!-- Quiz Status -->
+                    <div id="quizStatus" class="mt-4 hidden">
+                        <div class="p-4 rounded-xl border border-green-100 bg-green-50">
+                            <div class="flex items-center gap-3">
+                                <i id="quizStatusIcon" class="fas fa-circle-notch fa-spin text-green-500 text-xl"></i>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-center">
+                                        <h3 id="quizStatusTitle" class="font-medium text-green-800">กำลังประมวลผล...</h3>
+                                        <button onclick="stopTask(activeQuizTaskId)" class="text-red-500 hover:text-red-700 text-xs font-medium">
+                                            <i class="fas fa-stop-circle"></i> หยุด
+                                        </button>
+                                    </div>
+                                    <p id="quizStatusMsg" class="text-sm text-green-600 mt-1">ถอด Transcript และส่งให้ AI สร้างข้อสอบ (อาจใช้เวลา 1-3 นาที)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Results -->
+                    <div id="quizResults" class="mt-4 hidden space-y-3 custom-scrollbar max-h-[500px] overflow-y-auto pr-1">
                     </div>
                 </div>
 
@@ -212,6 +285,143 @@
                     <!-- Channel Results -->
                     <div id="channelResults"
                         class="mt-4 hidden space-y-2 custom-scrollbar max-h-[550px] overflow-y-auto pr-1">
+                    </div>
+                </div>
+
+                <!-- Scheduler Panel (Hidden by default) -->
+                <div id="panelScheduler" class="glass-panel rounded-2xl p-6 hidden">
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800"><i
+                            class="fas fa-clock text-teal-500 mr-2"></i>ตั้งเวลาดึงวิดีโออัตโนมัติ</h2>
+                    <p class="text-sm text-gray-500 mb-4">กำหนดวัน/เวลาให้ระบบดึงวิดีโอล่าสุดจาก Playlist อัตโนมัติ พร้อมสร้าง Quiz จากคลิปเต็ม</p>
+
+                    <!-- Add Schedule Form -->
+                    <div class="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 p-5 rounded-xl mb-4">
+                        <h3 class="text-sm font-bold text-teal-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-plus-circle"></i> เพิ่ม Schedule ใหม่
+                        </h3>
+
+                        <!-- Step 1: Channel URL → Get Playlists -->
+                        <div class="mb-3">
+                            <label class="text-xs text-gray-600 font-medium mb-1 block">1. ใส่ Channel URL แล้วดึง Playlists</label>
+                            <div class="flex gap-2">
+                                <div class="relative flex-grow">
+                                    <i class="fab fa-youtube absolute left-3 top-1/2 transform -translate-y-1/2 text-red-400"></i>
+                                    <input type="text" id="schedChannelUrl" placeholder="https://www.youtube.com/@ChannelName"
+                                        class="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-sm">
+                                </div>
+                                <button type="button" id="fetchPlaylistsBtn" onclick="fetchPlaylists()"
+                                    class="bg-teal-500 hover:bg-teal-600 text-white text-sm px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-1.5 whitespace-nowrap">
+                                    <i class="fas fa-list"></i> ดึง Playlists
+                                </button>
+                            </div>
+                            <div id="fetchPlaylistsStatus" class="mt-2 hidden text-xs text-teal-600">
+                                <i class="fas fa-circle-notch fa-spin mr-1"></i> กำลังดึงรายการ Playlists...
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Select Playlist -->
+                        <div class="mb-3" id="playlistSelectSection" style="display:none;">
+                            <label class="text-xs text-gray-600 font-medium mb-1 block">2. เลือก Playlist ที่ต้องการติดตาม</label>
+                            <select id="schedPlaylistSelect"
+                                class="w-full py-2.5 px-3 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-sm bg-white">
+                                <option value="">-- เลือก Playlist --</option>
+                            </select>
+                        </div>
+
+                        <!-- Step 3: Schedule Config -->
+                        <div id="schedConfigSection" style="display:none;">
+                            <label class="text-xs text-gray-600 font-medium mb-2 block">3. ตั้งค่า Schedule</label>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                <!-- Schedule Type -->
+                                <div>
+                                    <label class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1 block">ประเภท</label>
+                                    <div class="flex gap-2">
+                                        <label class="flex-1 flex items-center justify-center gap-1.5 cursor-pointer bg-white py-2 px-3 rounded-lg border border-gray-200 text-sm transition-all" id="schedTypeCronLabel">
+                                            <input type="radio" name="schedType" value="cron" checked onchange="toggleScheduleType()">
+                                            <i class="fas fa-calendar-alt text-teal-500"></i> วัน/เวลา
+                                        </label>
+                                        <label class="flex-1 flex items-center justify-center gap-1.5 cursor-pointer bg-white py-2 px-3 rounded-lg border border-gray-200 text-sm transition-all" id="schedTypeIntervalLabel">
+                                            <input type="radio" name="schedType" value="interval" onchange="toggleScheduleType()">
+                                            <i class="fas fa-sync-alt text-blue-500"></i> ทุก X ชม.
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Max Videos -->
+                                <div>
+                                    <label class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1 block">จำนวนวิดีโอล่าสุด</label>
+                                    <input type="number" id="schedMaxVideos" value="5" min="1" max="50"
+                                        class="w-full py-2 px-3 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Cron Config -->
+                            <div id="cronConfigSection">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                    <div>
+                                        <label class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1 block">เลือกวัน</label>
+                                        <div class="flex flex-wrap gap-1">
+                                            <label class="sched-day-label"><input type="checkbox" name="schedDay" value="mon" checked> จ.</label>
+                                            <label class="sched-day-label"><input type="checkbox" name="schedDay" value="tue"> อ.</label>
+                                            <label class="sched-day-label"><input type="checkbox" name="schedDay" value="wed"> พ.</label>
+                                            <label class="sched-day-label"><input type="checkbox" name="schedDay" value="thu"> พฤ.</label>
+                                            <label class="sched-day-label"><input type="checkbox" name="schedDay" value="fri"> ศ.</label>
+                                            <label class="sched-day-label"><input type="checkbox" name="schedDay" value="sat"> ส.</label>
+                                            <label class="sched-day-label"><input type="checkbox" name="schedDay" value="sun"> อา.</label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1 block">เวลา (Asia/Bangkok)</label>
+                                        <input type="time" id="schedCronTime" value="08:00"
+                                            class="w-full py-2 px-3 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-sm">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interval Config -->
+                            <div id="intervalConfigSection" style="display:none;">
+                                <div class="mb-3">
+                                    <label class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1 block">ดึงทุกกี่ชั่วโมง</label>
+                                    <input type="number" id="schedIntervalHours" value="6" min="1" max="168"
+                                        class="w-full py-2 px-3 rounded-lg border border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Auto Processing Info -->
+                            <div class="bg-white/60 border border-teal-100 p-3 rounded-lg mb-4 flex items-center gap-3">
+                                <div class="flex items-center gap-2 text-sm text-teal-700">
+                                    <i class="fas fa-robot text-teal-500"></i>
+                                    <span class="font-medium">เมื่อพบวิดีโอใหม่:</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-xs text-gray-600">
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">
+                                        <i class="fas fa-question-circle"></i> สร้าง Quiz จากคลิปเต็ม
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button type="button" id="saveScheduleBtn" onclick="saveSchedule()"
+                                class="w-full bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white py-3 rounded-xl font-medium transition-all shadow-md flex items-center justify-center gap-2">
+                                <i class="fas fa-save"></i> บันทึก Schedule
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Schedule List -->
+                    <div id="scheduleListSection">
+                        <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                            <i class="fas fa-list-ul text-teal-500"></i> Schedules ที่มีอยู่
+                            <button onclick="loadSchedules()" class="text-xs text-teal-500 hover:text-teal-700 ml-auto">
+                                <i class="fas fa-sync-alt"></i> รีเฟรช
+                            </button>
+                        </h3>
+                        <div id="scheduleList" class="space-y-3 custom-scrollbar max-h-[400px] overflow-y-auto pr-1">
+                            <div class="text-center py-6 bg-gray-50 rounded-xl border border-gray-100">
+                                <i class="fas fa-clock text-gray-300 text-3xl mb-2"></i>
+                                <p class="text-gray-400 text-sm">ยังไม่มี Schedule</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -284,10 +494,13 @@
                                 <span class="text-gray-600 font-medium flex items-center gap-2">
                                     <i class="fas fa-cog fa-spin text-blue-500"></i> กำลังตัดต่อ...
                                 </span>
+                                <button onclick="stopTask(activeTaskId)" class="text-red-500 hover:text-red-700 text-xs font-medium">
+                                    <i class="fas fa-stop-circle"></i> หยุด
+                                </button>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
                                 <!-- Indeterminate progress bar -->
-                                <div class="bg-blue-600 h-2.5 rounded-full w-1/2 animate-[pulse_2s_ease-in-out_infinite]"
+                                <div class="bg-blue-600 h-2.5 rounded-full w-1/2"
                                     style="transform-origin: left; animation: slideProgress 1.5s infinite linear;">
                                 </div>
                             </div>
@@ -345,6 +558,7 @@
         let currentVideoParams = null;
         let activeTaskId = null;
         let pollInterval = null;
+        let stopBatch = false;
 
         // Elements
         const form = document.getElementById('searchForm');
@@ -394,6 +608,18 @@
         const highlightStatusTitle = document.getElementById('highlightStatusTitle');
         const highlightStatusMsg = document.getElementById('highlightStatusMsg');
         const highlightResults = document.getElementById('highlightResults');
+
+        // Quiz Elements
+        const tabQuiz = document.getElementById('tabQuiz');
+        const panelQuiz = document.getElementById('panelQuiz');
+        const quizForm = document.getElementById('quizForm');
+        const quizInput = document.getElementById('quizInput');
+        const quizBtn = document.getElementById('quizBtn');
+        const quizStatus = document.getElementById('quizStatus');
+        const quizStatusIcon = document.getElementById('quizStatusIcon');
+        const quizStatusTitle = document.getElementById('quizStatusTitle');
+        const quizStatusMsg = document.getElementById('quizStatusMsg');
+        const quizResults = document.getElementById('quizResults');
 
         // Channel Elements
         const tabChannel = document.getElementById('tabChannel');
@@ -503,13 +729,17 @@
                     return;
                 }
 
-                // Done or Error
+                // Done, Stopped or Error
                 clearInterval(pollInterval);
                 processingUI.classList.add('hidden');
 
                 if (data.status === "success" && data.file_url) {
                     successUI.classList.remove('hidden');
                     downloadBtn.href = data.file_url;
+                } else if (data.status === "stopped") {
+                    errorUI.classList.remove('hidden');
+                    errorMsg.textContent = "ถูกหยุดโดยผู้ใช้งาน";
+                    trimBtn.classList.remove('hidden');
                 } else if (data.status === "error") {
                     errorUI.classList.remove('hidden');
                     errorMsg.textContent = data.message || "Unknown error occurred";
@@ -523,49 +753,47 @@
         };
 
         // Tabs Logic
-        tabSearch.addEventListener('click', () => {
-            tabSearch.className = "flex-1 bg-white text-blue-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none";
-            tabImport.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            tabHighlight.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            tabChannel.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            panelSearch.classList.remove('hidden');
-            panelImport.classList.add('hidden');
-            panelHighlight.classList.add('hidden');
-            panelChannel.classList.add('hidden');
-        });
+        // Scheduler Elements
+        const tabScheduler = document.getElementById('tabScheduler');
+        const panelScheduler = document.getElementById('panelScheduler');
 
-        tabImport.addEventListener('click', () => {
-            tabImport.className = "flex-1 bg-white text-indigo-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none";
-            tabSearch.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            tabHighlight.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            tabChannel.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            panelImport.classList.remove('hidden');
-            panelSearch.classList.add('hidden');
-            panelHighlight.classList.add('hidden');
-            panelChannel.classList.add('hidden');
-        });
+        const allTabs = [tabSearch, tabImport, tabHighlight, tabQuiz, tabChannel, tabScheduler];
+        const allPanels = [panelSearch, panelImport, panelHighlight, panelQuiz, panelChannel, panelScheduler];
+        const tabInactiveStyles = {
+            tabSearch: 'flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none',
+            tabImport: 'flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none',
+            tabHighlight: 'flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none',
+            tabQuiz: 'flex-1 text-gray-500 hover:bg-white/50 hover:text-green-500 font-medium py-3 rounded-xl transition-all focus:outline-none',
+            tabChannel: 'flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none',
+            tabScheduler: 'flex-1 text-gray-500 hover:bg-white/50 hover:text-teal-500 font-medium py-3 rounded-xl transition-all focus:outline-none',
+        };
+        const tabActiveStyles = {
+            tabSearch: 'flex-1 bg-white text-blue-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none',
+            tabImport: 'flex-1 bg-white text-indigo-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none',
+            tabHighlight: 'flex-1 bg-white text-amber-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none',
+            tabQuiz: 'flex-1 bg-white text-green-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none',
+            tabChannel: 'flex-1 bg-white text-purple-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none',
+            tabScheduler: 'flex-1 bg-white text-teal-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none',
+        };
 
-        tabHighlight.addEventListener('click', () => {
-            tabHighlight.className = "flex-1 bg-white text-amber-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none";
-            tabSearch.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            tabImport.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            tabChannel.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-purple-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            panelHighlight.classList.remove('hidden');
-            panelSearch.classList.add('hidden');
-            panelImport.classList.add('hidden');
-            panelChannel.classList.add('hidden');
-        });
+        function switchEditorTab(activeTabId, activePanelId) {
+            allTabs.forEach(t => { t.className = tabInactiveStyles[t.id]; });
+            allPanels.forEach(p => p.classList.add('hidden'));
+            document.getElementById(activeTabId).className = tabActiveStyles[activeTabId];
+            document.getElementById(activePanelId).classList.remove('hidden');
+            if (activeTabId === 'tabScheduler') loadSchedules();
+        }
 
-        tabChannel.addEventListener('click', () => {
-            tabChannel.className = "flex-1 bg-white text-purple-600 font-medium py-3 rounded-xl shadow-sm transition-all focus:outline-none";
-            tabSearch.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            tabImport.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-blue-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            tabHighlight.className = "flex-1 text-gray-500 hover:bg-white/50 hover:text-amber-500 font-medium py-3 rounded-xl transition-all focus:outline-none";
-            panelChannel.classList.remove('hidden');
-            panelSearch.classList.add('hidden');
-            panelImport.classList.add('hidden');
-            panelHighlight.classList.add('hidden');
-        });
+        tabSearch.addEventListener('click', () => switchEditorTab('tabSearch', 'panelSearch'));
+
+        tabImport.addEventListener('click', () => switchEditorTab('tabImport', 'panelImport'));
+
+        tabHighlight.addEventListener('click', () => switchEditorTab('tabHighlight', 'panelHighlight'));
+
+        tabQuiz.addEventListener('click', () => switchEditorTab('tabQuiz', 'panelQuiz'));
+
+        tabChannel.addEventListener('click', () => switchEditorTab('tabChannel', 'panelChannel'));
+        tabScheduler.addEventListener('click', () => switchEditorTab('tabScheduler', 'panelScheduler'));
 
         // Search Form
         form.addEventListener('submit', async (e) => {
@@ -948,6 +1176,141 @@
         });
 
         // ─────────────────────────────────────────
+        // Full Clip Quiz Feature
+        // ─────────────────────────────────────────
+        let activeQuizTaskId = null;
+        let quizPollInterval = null;
+
+        const renderQuizResults = (data) => {
+            quizResults.innerHTML = '';
+            if (!data.quiz || data.quiz.length === 0) {
+                quizResults.innerHTML = '<div class="p-4 bg-gray-50 text-gray-500 rounded-lg text-center">ไม่พบข้อมูล Quiz</div>';
+                return;
+            }
+
+            const header = document.createElement('div');
+            header.className = 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 p-4 rounded-xl mb-3';
+            header.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-bold text-green-800"><i class="fas fa-check-circle text-green-500 mr-2"></i>สร้าง Quiz สำเร็จ</h3>
+                    <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">${data.quiz.length} ข้อ</span>
+                </div>
+                <p class="text-xs text-green-600">วิเคราะห์จากวิดีโอ: <a href="https://youtu.be/${data.video_id}" target="_blank" class="underline">${data.video_id}</a></p>
+                <div class="mt-2 inline-flex items-center gap-1 text-[10px] text-gray-500 border border-gray-200 bg-white px-2 py-1 rounded">
+                    <i class="fas fa-database text-blue-400"></i> บันทึกลง Pinecone (namespace: full_clip) เรียบร้อยแล้ว
+                </div>
+            `;
+            quizResults.appendChild(header);
+
+            data.quiz.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white border border-gray-100 p-4 rounded-xl shadow-sm mb-3';
+                let optionsHtml = '';
+                if (q.options) {
+                    optionsHtml = '<div class="mt-3 space-y-2 pl-2 border-l-2 border-gray-100">' +
+                        q.options.map((opt, oIdx) => `
+                            <div class="text-sm text-gray-600 flex items-start gap-2">
+                                <span class="font-bold text-gray-400">${String.fromCharCode(65 + oIdx)}.</span>
+                                <span>${opt}</span>
+                            </div>
+                        `).join('') + '</div>';
+                }
+
+                card.innerHTML = `
+                    <p class="text-sm font-medium text-gray-800">
+                        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded mr-2 text-xs">ข้อ ${idx + 1}</span>
+                        ${q.question}
+                    </p>
+                    ${optionsHtml}
+                    <div class="mt-4 pt-3 border-t border-gray-50">
+                        <p class="text-sm font-medium text-green-600 flex items-center gap-2">
+                            <i class="fas fa-check"></i> เฉลย: <span class="text-gray-700 font-normal">${q.answer}</span>
+                        </p>
+                    </div>
+                `;
+                quizResults.appendChild(card);
+            });
+        };
+
+        const checkQuizStatus = async () => {
+            try {
+                const res = await fetch(`/editor/api/status/${activeQuizTaskId}`);
+                const data = await res.json();
+
+                if (data.status === 'processing') {
+                    if (data.progress) {
+                        quizStatusMsg.textContent = data.progress;
+                    }
+                    return;
+                }
+
+                clearInterval(quizPollInterval);
+                quizBtn.disabled = false;
+                quizBtn.innerHTML = '<i class="fas fa-magic"></i> <span>สร้าง Quiz</span>';
+
+                if (data.status === 'success') {
+                    quizStatus.classList.add('hidden');
+                    quizResults.classList.remove('hidden');
+                    renderQuizResults(data);
+                } else if (data.status === 'error') {
+                    quizStatusIcon.className = 'fas fa-exclamation-circle text-red-500 text-xl';
+                    quizStatusTitle.textContent = 'เกิดข้อผิดพลาด';
+                    quizStatusTitle.className = 'font-medium text-red-800';
+                    quizStatusMsg.textContent = data.message || 'Unknown error';
+                    quizStatusMsg.className = 'text-sm text-red-600 mt-1';
+                    quizStatus.querySelector('.p-4').className = 'p-4 rounded-xl border border-red-200 bg-red-50';
+                }
+            } catch (error) {
+                console.error('Quiz polling error:', error);
+            }
+        };
+
+        quizForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = quizInput.value.trim();
+            if (!url) return;
+
+            quizBtn.disabled = true;
+            quizBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+            quizResults.classList.add('hidden');
+            quizStatus.classList.remove('hidden');
+
+            quizStatusIcon.className = 'fas fa-circle-notch fa-spin text-green-500 text-xl';
+            quizStatusTitle.className = 'font-medium text-green-800';
+            quizStatusTitle.textContent = 'กำลังประมวลผล...';
+            quizStatusMsg.className = 'text-sm text-green-600 mt-1';
+            quizStatusMsg.textContent = 'ถอด Transcript และส่งให้ AI สร้างข้อสอบ (อาจใช้เวลา 1-3 นาที)';
+            quizStatus.querySelector('.p-4').className = 'p-4 rounded-xl border border-green-100 bg-green-50';
+
+            activeQuizTaskId = 'quiz_' + Math.random().toString(36).substr(2, 9);
+
+            try {
+                const res = await fetch('/editor/api/quiz', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url, task_id: activeQuizTaskId })
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'accepted') {
+                    quizPollInterval = setInterval(checkQuizStatus, 3000);
+                } else {
+                    throw new Error(data.message || 'Failed to start quiz task');
+                }
+            } catch (error) {
+                quizBtn.disabled = false;
+                quizBtn.innerHTML = '<i class="fas fa-magic"></i> <span>สร้าง Quiz</span>';
+                quizStatusIcon.className = 'fas fa-exclamation-circle text-red-500 text-xl';
+                quizStatusTitle.className = 'font-medium text-red-800';
+                quizStatusTitle.textContent = 'เกิดข้อผิดพลาด';
+                quizStatusMsg.className = 'text-sm text-red-600 mt-1';
+                quizStatusMsg.textContent = error.message;
+                quizStatus.querySelector('.p-4').className = 'p-4 rounded-xl border border-red-200 bg-red-50';
+            }
+        });
+
+        // ─────────────────────────────────────────
         // Channel Scraper Feature
         // ─────────────────────────────────────────
         window.analyzeFromChannel = (videoUrl) => {
@@ -1046,7 +1409,12 @@
                         <div id="batchProgress" class="hidden mt-3">
                             <div class="flex items-center justify-between text-xs text-purple-700 mb-1">
                                 <span id="batchProgressText">กำลังวิเคราะห์...</span>
-                                <span id="batchProgressCount">0/0</span>
+                                <div class="flex items-center gap-3">
+                                    <span id="batchProgressCount">0/0</span>
+                                    <button id="stopBatchBtn" onclick="stopBatchProcess()" class="text-red-500 hover:text-red-700 font-bold flex items-center gap-1">
+                                        <i class="fas fa-stop-circle"></i> หยุดทั้งหมด
+                                    </button>
+                                </div>
                             </div>
                             <div class="w-full bg-purple-200 rounded-full h-1.5">
                                 <div id="batchProgressBar" class="bg-purple-500 h-1.5 rounded-full transition-all" style="width: 0%"></div>
@@ -1180,6 +1548,13 @@
             const allVideos = window._channelVideos;
             if (!allVideos || allVideos.length === 0) return;
 
+            stopBatch = false;
+            const stopBtn = document.getElementById('stopBatchBtn');
+            if (stopBtn) {
+                stopBtn.disabled = false;
+                stopBtn.innerHTML = '<i class="fas fa-stop-circle"></i> หยุดทั้งหมด';
+            }
+
             const skipProcessed = document.getElementById('skipProcessedInput')?.checked || false;
 
             // Get selected videos
@@ -1272,6 +1647,8 @@
                     clearInterval(countdownInterval);
                 }
 
+                if (stopBatch) break;
+
                 const statusEl = document.getElementById(`ch-status-${v.video_id}`);
                 const btnEl = document.getElementById(`ch-btn-${v.video_id}`);
                 const cardEl = document.getElementById(`ch-video-${v.video_id}`);
@@ -1286,6 +1663,9 @@
                 batchProgressText.textContent = `กำลังวิเคราะห์: ${v.title.substring(0, 30)}...`;
                 batchProgressCount.textContent = `${i + 1}/${videosToProcess.length}`;
                 batchProgressBar.style.width = `${((i) / videosToProcess.length) * 100}%`;
+            
+            const stopBtn = document.getElementById('stopBatchBtn');
+            if (stopBtn) stopBtn.classList.remove('hidden');
 
                 // Show spinner on this card
                 if (statusEl) {
@@ -1387,10 +1767,386 @@
 
             // Done
             batchProgressBar.style.width = '100%';
-            batchProgressText.textContent = `เสร็จแล้ว! สำเร็จ ${success}, ล้มเหลว ${errors}`;
-            batchProgressCount.textContent = `${completed}/${videos.length}`;
-            analyzeAllBtn.innerHTML = '<i class="fas fa-check"></i> เสร็จแล้ว';
-            analyzeAllBtn.className = 'bg-green-500 text-white text-sm px-4 py-2 rounded-lg font-medium flex items-center gap-2';
+            if (stopBatch) {
+                batchProgressText.innerHTML = `<span class="text-red-600 font-bold"><i class="fas fa-hand-paper"></i> หยุดการวิเคราะห์แล้ว!</span> สำเร็จ ${success}, ล้มเหลว ${errors}`;
+                analyzeAllBtn.innerHTML = '<i class="fas fa-redo"></i> วิเคราะห์ต่อ';
+            } else {
+                batchProgressText.textContent = `เสร็จแล้ว! สำเร็จ ${success}, ล้มเหลว ${errors}`;
+                analyzeAllBtn.innerHTML = '<i class="fas fa-check"></i> เสร็จแล้ว';
+            }
+            batchProgressCount.textContent = `${completed}/${videosToProcess.length}`;
+            
+            analyzeAllBtn.disabled = false;
+            analyzeAllBtn.className = 'bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-600 text-xs px-4 py-2 rounded-lg font-bold transition-all shadow-md flex items-center gap-2 border border-amber-200';
+            
+            if (batchSizeInput) batchSizeInput.disabled = false;
+            if (delayMinInput) delayMinInput.disabled = false;
+            if (skipProcessedInput) skipProcessedInput.disabled = false;
+        };
+
+        const stopTask = async (taskId) => {
+            if (!taskId) return;
+            try {
+                const res = await fetch(`/editor/api/stop/${taskId}`, { method: 'POST' });
+                const data = await res.json();
+                console.log("Stop request:", data);
+            } catch (err) {
+                console.error("Error stopping task:", err);
+            }
+        };
+
+        const stopBatchProcess = () => {
+            stopBatch = true;
+            const stopBtn = document.getElementById('stopBatchBtn');
+            if (stopBtn) {
+                stopBtn.disabled = true;
+                stopBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> กำลังหยุด...';
+            }
+        };
+
+        // ─────────────────────────────────────────
+        // Scheduler Feature
+        // ─────────────────────────────────────────
+        let _schedChannelName = '';
+        let _schedPlaylists = [];
+
+        window.toggleScheduleType = () => {
+            const type = document.querySelector('input[name="schedType"]:checked').value;
+            document.getElementById('cronConfigSection').style.display = type === 'cron' ? 'block' : 'none';
+            document.getElementById('intervalConfigSection').style.display = type === 'interval' ? 'block' : 'none';
+
+            const cronLabel = document.getElementById('schedTypeCronLabel');
+            const intervalLabel = document.getElementById('schedTypeIntervalLabel');
+            if (type === 'cron') {
+                cronLabel.style.borderColor = '#0d9488';
+                cronLabel.style.background = '#f0fdfa';
+                intervalLabel.style.borderColor = '#e5e7eb';
+                intervalLabel.style.background = 'white';
+            } else {
+                intervalLabel.style.borderColor = '#3b82f6';
+                intervalLabel.style.background = '#eff6ff';
+                cronLabel.style.borderColor = '#e5e7eb';
+                cronLabel.style.background = 'white';
+            }
+        };
+
+        window.fetchPlaylists = async () => {
+            const url = document.getElementById('schedChannelUrl').value.trim();
+            if (!url) { alert('กรุณาใส่ Channel URL'); return; }
+
+            const btn = document.getElementById('fetchPlaylistsBtn');
+            const statusEl = document.getElementById('fetchPlaylistsStatus');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+            statusEl.classList.remove('hidden');
+
+            try {
+                const res = await fetch(`/editor/api/playlists?url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+
+                if (data.status === 'success' && data.playlists?.length > 0) {
+                    _schedChannelName = data.channel_name || '';
+                    _schedPlaylists = data.playlists;
+
+                    const select = document.getElementById('schedPlaylistSelect');
+                    select.innerHTML = '<option value="">-- เลือก Playlist --</option>';
+                    data.playlists.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.url;
+                        opt.textContent = `${p.title} (${p.video_count || '?'} videos)`;
+                        opt.dataset.name = p.title;
+                        select.appendChild(opt);
+                    });
+
+                    document.getElementById('playlistSelectSection').style.display = 'block';
+                    document.getElementById('schedConfigSection').style.display = 'block';
+                    statusEl.innerHTML = `<i class="fas fa-check-circle text-green-500 mr-1"></i> พบ ${data.playlists.length} Playlists จาก ${data.channel_name}`;
+                    statusEl.className = 'mt-2 text-xs text-green-600';
+
+                    // Also add "All Channel Videos" option
+                    const allOpt = document.createElement('option');
+                    allOpt.value = url.replace(/\/(playlists|videos|shorts|featured|about)$/, '') + '/videos';
+                    allOpt.textContent = `📺 วิดีโอทั้ง Channel (${_schedChannelName})`;
+                    allOpt.dataset.name = `วิดีโอทั้ง Channel - ${_schedChannelName}`;
+                    select.insertBefore(allOpt, select.children[1]);
+
+                    toggleScheduleType();
+                } else {
+                    statusEl.innerHTML = `<i class="fas fa-exclamation-circle text-red-500 mr-1"></i> ${data.message || 'ไม่พบ Playlists'}`;
+                    statusEl.className = 'mt-2 text-xs text-red-600';
+                }
+            } catch (err) {
+                statusEl.innerHTML = `<i class="fas fa-exclamation-circle text-red-500 mr-1"></i> ${err.message}`;
+                statusEl.className = 'mt-2 text-xs text-red-600';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-list"></i> ดึง Playlists';
+            }
+        };
+
+        window.saveSchedule = async () => {
+            const playlistSelect = document.getElementById('schedPlaylistSelect');
+            const playlistUrl = playlistSelect.value;
+            if (!playlistUrl) { alert('กรุณาเลือก Playlist'); return; }
+
+            const selectedOpt = playlistSelect.options[playlistSelect.selectedIndex];
+            const playlistName = selectedOpt.dataset.name || selectedOpt.textContent;
+
+            const schedType = document.querySelector('input[name="schedType"]:checked').value;
+            const cronDays = Array.from(document.querySelectorAll('input[name="schedDay"]:checked')).map(cb => cb.value);
+            const cronTime = document.getElementById('schedCronTime').value || '08:00';
+            const intervalHours = parseInt(document.getElementById('schedIntervalHours').value) || 6;
+            const maxVideos = parseInt(document.getElementById('schedMaxVideos').value) || 5;
+
+            if (schedType === 'cron' && cronDays.length === 0) {
+                alert('กรุณาเลือกวันอย่างน้อย 1 วัน');
+                return;
+            }
+
+            const btn = document.getElementById('saveScheduleBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> กำลังบันทึก...';
+
+            try {
+                const res = await fetch('/editor/api/schedules', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        playlist_url: playlistUrl,
+                        playlist_name: playlistName,
+                        channel_name: _schedChannelName,
+                        schedule_type: schedType,
+                        cron_days: cronDays,
+                        cron_time: cronTime,
+                        interval_hours: intervalHours,
+                        max_videos: maxVideos,
+                        auto_quiz: true,
+                    })
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    alert('บันทึก Schedule สำเร็จ!');
+                    loadSchedules();
+                    // Reset form
+                    document.getElementById('playlistSelectSection').style.display = 'none';
+                    document.getElementById('schedConfigSection').style.display = 'none';
+                    document.getElementById('fetchPlaylistsStatus').classList.add('hidden');
+                    document.getElementById('schedChannelUrl').value = '';
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + (data.message || data.detail || 'Unknown'));
+                }
+            } catch (err) {
+                alert('เกิดข้อผิดพลาด: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> บันทึก Schedule';
+            }
+        };
+
+        window.loadSchedules = async () => {
+            const container = document.getElementById('scheduleList');
+            try {
+                const res = await fetch('/editor/api/schedules');
+                const data = await res.json();
+
+                if (data.status === 'success' && data.schedules?.length > 0) {
+                    container.innerHTML = '';
+                    data.schedules.forEach(s => {
+                        container.appendChild(renderScheduleCard(s));
+                    });
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-6 bg-gray-50 rounded-xl border border-gray-100">
+                            <i class="fas fa-clock text-gray-300 text-3xl mb-2"></i>
+                            <p class="text-gray-400 text-sm">ยังไม่มี Schedule</p>
+                        </div>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<div class="text-red-500 text-sm p-3"><i class="fas fa-exclamation-circle"></i> ${err.message}</div>`;
+            }
+        };
+
+        const DAY_LABELS = { mon: 'จ.', tue: 'อ.', wed: 'พ.', thu: 'พฤ.', fri: 'ศ.', sat: 'ส.', sun: 'อา.' };
+
+        function renderScheduleCard(s) {
+            const card = document.createElement('div');
+            const isEnabled = s.enabled;
+            const isRunning = s.is_running;
+
+            card.className = `bg-white border ${isEnabled ? 'border-teal-200' : 'border-gray-200 opacity-60'} p-4 rounded-xl shadow-sm transition-all`;
+
+            let scheduleDesc = '';
+            if (s.schedule_type === 'cron') {
+                const days = (s.cron_days || []).map(d => DAY_LABELS[d] || d).join(', ');
+                scheduleDesc = `ทุก ${days} เวลา ${s.cron_time}`;
+            } else {
+                scheduleDesc = `ทุก ${s.interval_hours} ชั่วโมง`;
+            }
+
+            const lastRunText = s.last_run ? new Date(s.last_run).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : 'ยังไม่เคยรัน';
+            const nextRunText = s.next_run || '-';
+
+            let statusBadge = '';
+            if (isRunning) {
+                statusBadge = '<span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-circle-notch fa-spin"></i> กำลังทำงาน</span>';
+            } else if (s.last_status === 'success') {
+                statusBadge = '<span class="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-check-circle"></i> สำเร็จ</span>';
+            } else if (s.last_status === 'error') {
+                statusBadge = '<span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold"><i class="fas fa-times-circle"></i> ผิดพลาด</span>';
+            }
+
+            card.innerHTML = `
+                <div class="flex items-start justify-between mb-2">
+                    <div class="flex-grow min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-bold ${isEnabled ? 'text-teal-600' : 'text-gray-400'}">
+                                <i class="fas fa-${isEnabled ? 'play-circle' : 'pause-circle'}"></i>
+                            </span>
+                            <h4 class="text-sm font-semibold text-gray-800 truncate" title="${s.playlist_name}">${s.playlist_name}</h4>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-[10px] text-gray-400 truncate">${s.channel_name || ''}</p>
+                    </div>
+                    <span class="text-[10px] text-gray-300 font-mono flex-shrink-0">#${s.id}</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-[11px] text-gray-600 mb-3">
+                    <div class="bg-gray-50 p-2 rounded-lg">
+                        <span class="text-gray-400 block"><i class="fas fa-calendar-alt text-teal-400"></i> ตั้งเวลา</span>
+                        <span class="font-medium">${scheduleDesc}</span>
+                    </div>
+                    <div class="bg-gray-50 p-2 rounded-lg">
+                        <span class="text-gray-400 block"><i class="fas fa-forward text-blue-400"></i> ครั้งถัดไป</span>
+                        <span class="font-medium">${nextRunText}</span>
+                    </div>
+                    <div class="bg-gray-50 p-2 rounded-lg">
+                        <span class="text-gray-400 block"><i class="fas fa-history text-amber-400"></i> รันล่าสุด</span>
+                        <span class="font-medium">${lastRunText}</span>
+                    </div>
+                    <div class="bg-gray-50 p-2 rounded-lg">
+                        <span class="text-gray-400 block"><i class="fas fa-cogs text-purple-400"></i> ตั้งค่า</span>
+                        <span class="font-medium">
+                            ${s.max_videos} วิดีโอ
+                            <i class="fas fa-question-circle text-green-400" title="Auto Quiz (คลิปเต็ม)"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="runScheduleNow('${s.id}')" ${isRunning ? 'disabled' : ''}
+                        class="text-xs ${isRunning ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-teal-50 hover:bg-teal-100 text-teal-600'} px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                        <i class="fas fa-${isRunning ? 'circle-notch fa-spin' : 'play'}"></i> ${isRunning ? 'กำลังรัน...' : 'รันเดี๋ยวนี้'}
+                    </button>
+                    <button onclick="toggleScheduleEnabled('${s.id}')" 
+                        class="text-xs ${isEnabled ? 'bg-amber-50 hover:bg-amber-100 text-amber-600' : 'bg-green-50 hover:bg-green-100 text-green-600'} px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                        <i class="fas fa-${isEnabled ? 'pause' : 'play'}"></i> ${isEnabled ? 'หยุดชั่วคราว' : 'เปิดใช้งาน'}
+                    </button>
+                    <button onclick="viewScheduleHistory('${s.id}')" 
+                        class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                        <i class="fas fa-history"></i> ประวัติ
+                    </button>
+                    <button onclick="deleteSchedule('${s.id}')" 
+                        class="text-xs bg-red-50 hover:bg-red-100 text-red-500 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ml-auto">
+                        <i class="fas fa-trash-alt"></i> ลบ
+                    </button>
+                </div>
+
+                <div id="sched-history-${s.id}" class="hidden mt-3 pt-3 border-t border-gray-100"></div>
+            `;
+            return card;
+        }
+
+        window.runScheduleNow = async (id) => {
+            try {
+                const res = await fetch(`/editor/api/schedules/${id}/run`, { method: 'POST' });
+                const data = await res.json();
+                if (data.status === 'accepted') {
+                    alert('เริ่มดึงวิดีโอแล้ว! ระบบจะทำงานใน background');
+                    setTimeout(() => loadSchedules(), 2000);
+                } else {
+                    alert(data.message || data.detail || 'เกิดข้อผิดพลาด');
+                }
+            } catch (err) {
+                alert('เกิดข้อผิดพลาด: ' + err.message);
+            }
+        };
+
+        window.toggleScheduleEnabled = async (id) => {
+            try {
+                const res = await fetch(`/editor/api/schedules/${id}/toggle`, { method: 'PUT' });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadSchedules();
+                } else {
+                    alert(data.message || data.detail || 'เกิดข้อผิดพลาด');
+                }
+            } catch (err) {
+                alert('เกิดข้อผิดพลาด: ' + err.message);
+            }
+        };
+
+        window.deleteSchedule = async (id) => {
+            if (!confirm('ต้องการลบ Schedule นี้จริงหรือ?')) return;
+            try {
+                const res = await fetch(`/editor/api/schedules/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    loadSchedules();
+                } else {
+                    alert(data.message || data.detail || 'เกิดข้อผิดพลาด');
+                }
+            } catch (err) {
+                alert('เกิดข้อผิดพลาด: ' + err.message);
+            }
+        };
+
+        window.viewScheduleHistory = async (id) => {
+            const container = document.getElementById(`sched-history-${id}`);
+            if (!container) return;
+
+            // Toggle visibility
+            if (!container.classList.contains('hidden')) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = '<div class="text-xs text-gray-400"><i class="fas fa-circle-notch fa-spin"></i> กำลังโหลดประวัติ...</div>';
+
+            try {
+                const res = await fetch(`/editor/api/schedules/${id}/history?limit=10`);
+                const data = await res.json();
+
+                if (data.status === 'success' && data.history?.length > 0) {
+                    let html = '<h4 class="text-xs font-bold text-gray-600 mb-2"><i class="fas fa-history text-blue-400"></i> ประวัติการรัน</h4>';
+                    html += '<div class="space-y-1.5">';
+
+                    data.history.forEach(h => {
+                        const ts = new Date(h.timestamp).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+                        const sIcon = h.status === 'success' ? 'check-circle text-green-500' : 'times-circle text-red-500';
+                        const newCount = h.new_videos || 0;
+                        const processed = h.processed || 0;
+                        const errors = h.errors || 0;
+
+                        html += `
+                            <div class="flex items-center gap-2 text-[11px] bg-gray-50 p-2 rounded-lg">
+                                <i class="fas fa-${sIcon}"></i>
+                                <span class="text-gray-500">${ts}</span>
+                                <span class="text-gray-700 flex-grow">
+                                    พบ ${h.videos_found || 0} วิดีโอ, ใหม่ ${newCount}, ประมวลผล ${processed}${errors > 0 ? `, <span class="text-red-500">ผิดพลาด ${errors}</span>` : ''}
+                                </span>
+                            </div>`;
+                    });
+
+                    html += '</div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="text-xs text-gray-400 text-center py-2">ยังไม่มีประวัติ</div>';
+                }
+            } catch (err) {
+                container.innerHTML = `<div class="text-xs text-red-500"><i class="fas fa-exclamation-circle"></i> ${err.message}</div>`;
+            }
         };
 
     </script>

@@ -91,7 +91,7 @@ def process_video_clip(video_id: str, start_time: float, end_time: float, margin
     # Check if the clip already exists
     if os.path.exists(output_path):
         logger.info(f"Clip already exists: {output_path}")
-        return {"status": "success", "file_url": f"/static/clips/{output_filename}"}
+        return {"status": "success", "file_url": f"/static/clips/{output_filename}", "local_path": output_path}
         
     logger.info(f"Processing clip for {video_id} from {start_time} to {end_time}")
     
@@ -111,7 +111,7 @@ def process_video_clip(video_id: str, start_time: float, end_time: float, margin
             stream = ffmpeg.output(stream, output_path, c='copy')
             ffmpeg.run(stream, cmd=FFMPEG_EXE, capture_stdout=True, capture_stderr=True, overwrite_output=True)
             logger.info(f"✅ Created clip (stream copy): {output_filename}")
-            return {"status": "success", "file_url": f"/static/clips/{output_filename}"}
+            return {"status": "success", "file_url": f"/static/clips/{output_filename}", "local_path": output_path}
         except ffmpeg.Error:
             logger.warning(f"Stream copy failed, falling back to re-encode...")
             if os.path.exists(output_path):
@@ -123,7 +123,7 @@ def process_video_clip(video_id: str, start_time: float, end_time: float, margin
         ffmpeg.run(stream, cmd=FFMPEG_EXE, capture_stdout=True, capture_stderr=True, overwrite_output=True)
         logger.info(f"✅ Created clip (re-encoded): {output_filename}")
         
-        return {"status": "success", "file_url": f"/static/clips/{output_filename}"}
+        return {"status": "success", "file_url": f"/static/clips/{output_filename}", "local_path": output_path}
         
     except ffmpeg.Error as e:
         logger.error(f"FFmpeg error: {e.stderr.decode('utf-8') if e.stderr else str(e)}")

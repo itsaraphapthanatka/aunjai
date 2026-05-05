@@ -4,3 +4,9 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+
+# Google credentials - DO NOT COMMIT
+gdrive_credentials.json
+zzzgdrive_credentials.json
+*credentials*.json
+service_account*.json

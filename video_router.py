@@ -6,6 +6,7 @@ import logging
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
+from typing import Optional, List
 import asyncio
 import os
 import re
@@ -16,6 +17,10 @@ from pipeline import run_pipeline
 from highlight_pipeline import run_highlight_pipeline
 from channel_scraper import scrape_channel_videos
 from highlight_store import get_processed_video_ids
+from quiz_pipeline import run_quiz_pipeline
+from quiz_store import get_quiz_from_pinecone
+from playlist_scraper import scrape_playlist_videos, get_channel_playlists
+from scheduler_service import scheduler_service
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +29,7 @@ router = APIRouter(prefix="/editor", tags=["Video Editor"])
 # Store processing status 
 # In a real app, use Redis or a database. For this demo, a simple dict works.
 processing_status = {}
+stop_signals = set()
 
 class SearchRequest(BaseModel):
     query: str
@@ -44,12 +50,31 @@ class HighlightRequest(BaseModel):
     task_id: str
     auto_clip: bool = True
 
+class QuizRequest(BaseModel):
+    url: str
+    task_id: str
+
 class ChannelRequest(BaseModel):
     url: str
     max_videos: int = 0
 
 class ProcessedCheckRequest(BaseModel):
     video_ids: list[str]
+
+class PlaylistRequest(BaseModel):
+    url: str
+    max_videos: int = 0
+
+class ScheduleRequest(BaseModel):
+    playlist_url: str
+    playlist_name: str = "Unknown Playlist"
+    channel_name: str = ""
+    schedule_type: str = "cron"  # "cron" or "interval"
+    cron_days: List[str] = ["mon"]
+    cron_time: str = "08:00"
+    interval_hours: int = 6
+    max_videos: int = 5
+    auto_quiz: bool = True
 
 @router.get("/", response_class=HTMLResponse)
 @router.get("", response_class=HTMLResponse, include_in_schema=False)
@@ -138,10 +163,16 @@ async def import_video(req: ImportRequest, background_tasks: BackgroundTasks):
     def background_import():
         try:
             logger.info(f"Starting real-time import for video ID: {vid}")
+            
+            def check_stop():
+                return req.task_id in stop_signals
+
             # False means do NOT dry_run, we want to upsert to Pinecone
             summary = run_pipeline([vid], dry_run=False)
             
-            if summary.get("total_vectors_upserted", 0) > 0:
+            if check_stop():
+                processing_status[req.task_id] = {"status": "stopped", "message": "Import stopped by user"}
+            elif summary.get("total_vectors_upserted", 0) > 0:
                 processing_status[req.task_id] = {
                     "status": "success", 
                     "message": f"Successfully imported {summary['total_vectors_upserted']} segments.",
@@ -191,18 +222,70 @@ async def start_highlight(req: HighlightRequest, background_tasks: BackgroundTas
             def on_progress(step, detail):
                 processing_status[req.task_id + "_progress"] = f"{step} {detail}"
 
+            def check_stop():
+                return req.task_id in stop_signals
+
             result = run_highlight_pipeline(
                 youtube_url=req.url,
                 auto_clip=req.auto_clip,
                 on_progress=on_progress,
+                check_stop=check_stop,
             )
             processing_status[req.task_id] = result
         except Exception as e:
-            logger.error(f"Error in highlight pipeline: {e}")
-            processing_status[req.task_id] = {"status": "error", "message": str(e)}
+            if req.task_id in stop_signals:
+                processing_status[req.task_id] = {"status": "stopped", "message": "Processing stopped by user"}
+            else:
+                logger.error(f"Error in highlight pipeline: {e}")
+                processing_status[req.task_id] = {"status": "error", "message": str(e)}
 
     background_tasks.add_task(background_highlight)
     return {"status": "accepted", "message": "Highlight analysis started"}
+
+@router.post("/api/quiz")
+async def start_quiz_generation(req: QuizRequest, background_tasks: BackgroundTasks):
+    """Starts full clip quiz generation: extract transcript → OpenClaw analysis → Pinecone store"""
+    if req.task_id in processing_status and processing_status[req.task_id] == "processing":
+        return {"status": "error", "message": "Task already processing"}
+
+    processing_status[req.task_id] = "processing"
+
+    def background_quiz():
+        try:
+            def on_progress(step, detail):
+                processing_status[req.task_id + "_progress"] = f"{step} {detail}"
+
+            def check_stop():
+                return req.task_id in stop_signals
+
+            result = run_quiz_pipeline(
+                youtube_url=req.url,
+                on_progress=on_progress,
+                check_stop=check_stop,
+            )
+            processing_status[req.task_id] = result
+        except Exception as e:
+            if req.task_id in stop_signals:
+                processing_status[req.task_id] = {"status": "stopped", "message": "Quiz generation stopped by user"}
+            else:
+                logger.error(f"Error in quiz pipeline: {e}")
+                processing_status[req.task_id] = {"status": "error", "message": str(e)}
+
+    background_tasks.add_task(background_quiz)
+    return {"status": "accepted", "message": "Quiz generation started"}
+
+@router.get("/api/quiz/{video_id}")
+async def get_quiz(video_id: str):
+    """Fetch existing full clip quiz from Pinecone"""
+    try:
+        quiz_data = await asyncio.to_thread(get_quiz_from_pinecone, video_id)
+        if quiz_data:
+            return {"status": "success", "quiz": quiz_data}
+        else:
+            return {"status": "not_found", "message": "No quiz found for this video"}
+    except Exception as e:
+        logger.error(f"Error fetching quiz from pinecone: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/api/status/{task_id}")
 async def check_status(task_id: str):
@@ -216,7 +299,24 @@ async def check_status(task_id: str):
          progress = processing_status.get(task_id + "_progress", "")
          return {"status": "processing", "progress": progress}
     else:
+         # Task is done, clear stop signal if any
+         if task_id in stop_signals:
+             stop_signals.remove(task_id)
          return status_data
+
+@router.post("/api/stop/{task_id}")
+async def stop_task(task_id: str):
+    """Signals a background task to stop"""
+    if task_id in processing_status:
+        # If still processing, add to stop signals
+        if processing_status[task_id] == "processing":
+            stop_signals.add(task_id)
+            logger.info(f"Stop signal sent for task: {task_id}")
+            return {"status": "success", "message": "Stop signal sent"}
+        else:
+            return {"status": "error", "message": "Task already finished"}
+    else:
+        return {"status": "error", "message": "Task not found"}
 
 @router.post("/api/channel")
 async def get_channel_videos(req: ChannelRequest):
@@ -241,3 +341,81 @@ async def check_processed_videos(req: ProcessedCheckRequest):
     except Exception as e:
         logger.error(f"Check processed error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# ─────────────────────────────────────────────────────────────────
+# Playlist & Scheduler Endpoints
+# ─────────────────────────────────────────────────────────────────
+
+@router.get("/api/playlists")
+async def get_playlists(url: str):
+    """ดึงรายการ Playlists จาก YouTube Channel"""
+    try:
+        result = await asyncio.to_thread(get_channel_playlists, url)
+        return result
+    except Exception as e:
+        logger.error(f"Get playlists error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/api/playlist/videos")
+async def get_playlist_videos(req: PlaylistRequest):
+    """ดึงวิดีโอจาก Playlist"""
+    try:
+        result = await asyncio.to_thread(
+            scrape_playlist_videos, req.url, req.max_videos
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Get playlist videos error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/api/schedules")
+async def get_schedules():
+    """ดูรายการ schedules ทั้งหมด"""
+    return {"status": "success", "schedules": scheduler_service.get_schedules()}
+
+@router.post("/api/schedules")
+async def add_schedule(req: ScheduleRequest):
+    """เพิ่ม schedule ใหม่"""
+    try:
+        schedule = scheduler_service.add_schedule(req.dict())
+        return {"status": "success", "schedule": schedule}
+    except Exception as e:
+        logger.error(f"Add schedule error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/api/schedules/{schedule_id}")
+async def delete_schedule(schedule_id: str):
+    """ลบ schedule"""
+    if scheduler_service.remove_schedule(schedule_id):
+        return {"status": "success", "message": "ลบ schedule เรียบร้อย"}
+    raise HTTPException(status_code=404, detail="ไม่พบ schedule นี้")
+
+@router.post("/api/schedules/{schedule_id}/run")
+async def run_schedule_now(schedule_id: str):
+    """รัน schedule ทันที"""
+    result = scheduler_service.run_now(schedule_id)
+    if result["status"] == "error":
+        raise HTTPException(status_code=400, detail=result["message"])
+    return result
+
+@router.put("/api/schedules/{schedule_id}/toggle")
+async def toggle_schedule(schedule_id: str):
+    """เปิด/ปิด schedule"""
+    schedule = scheduler_service.toggle_schedule(schedule_id)
+    if schedule is None:
+        raise HTTPException(status_code=404, detail="ไม่พบ schedule นี้")
+    return {"status": "success", "schedule": schedule}
+
+@router.get("/api/schedules/{schedule_id}/history")
+async def get_schedule_history(schedule_id: str, limit: int = 20):
+    """ดูประวัติการรัน"""
+    history = scheduler_service.get_history(schedule_id, limit)
+    return {"status": "success", "history": history}
+
+@router.get("/api/schedules/{schedule_id}/status")
+async def get_schedule_running_status(schedule_id: str):
+    """ดูสถานะ job ที่กำลังรันอยู่"""
+    status = scheduler_service.get_running_status(schedule_id)
+    if status:
+        return {"status": "running", "data": status}
+    return {"status": "idle"}

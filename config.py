@@ -36,7 +36,7 @@ YOUTUBE_URL_TEMPLATE: str = "https://www.youtube.com/watch?v={video_id}"
 # ──────────────────────────────────────────────
 # OpenClaw Configuration
 # ──────────────────────────────────────────────
-OPENCLAW_API_URL: str = os.getenv("OPENCLAW_API_URL", "http://136.110.50.115:18789")
+OPENCLAW_API_URL: str = os.getenv("OPENCLAW_API_URL", "https://openclaw.appreview.cloud")
 OPENCLAW_AGENT_ID: str = os.getenv("OPENCLAW_AGENT_ID", "unjai")
 OPENCLAW_API_KEY: str = os.getenv("OPENCLAW_API_KEY", "")
 
@@ -51,6 +51,13 @@ LINE_CHANNEL_ACCESS_TOKEN: str = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", "")
 # ──────────────────────────────────────────────
 PROXY_HTTP: str = os.getenv("PROXY_HTTP", "")
 PROXY_HTTPS: str = os.getenv("PROXY_HTTPS", "")
+YOUTUBE_COOKIES_FILE: str = os.getenv("YOUTUBE_COOKIES_FILE", "cookies.txt")
+
+# ──────────────────────────────────────────────
+# Google Drive Configuration
+# ──────────────────────────────────────────────
+GOOGLE_DRIVE_CREDENTIALS_FILE: str = os.getenv("GOOGLE_DRIVE_CREDENTIALS_FILE", "gdrive_credentials.json")
+GOOGLE_DRIVE_FOLDER_ID: str = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "16xSVMLqNbo-aVqzGQ0SkiIx4OBaqr-xy")
 
 
 def get_yt_proxy_config():

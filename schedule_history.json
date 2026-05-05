@@ -1,0 +1,728 @@
+[
+  {
+    "schedule_id": "5859c53d",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-04-07T07:47:30.910426",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 1,
+    "processed": 0,
+    "errors": 1,
+    "details": [
+      {
+        "video_id": "Fw-7pOKfVkQ",
+        "title": "รายการเพื่อนใจ - นหาเพื่อนใหม่",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 1 วิดีโอใหม่, สำเร็จ 0, ข้อผิดพลาด 1"
+  },
+  {
+    "schedule_id": "5859c53d",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-04-07T07:53:00.276958",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 1,
+    "processed": 0,
+    "errors": 1,
+    "details": [
+      {
+        "video_id": "Fw-7pOKfVkQ",
+        "title": "รายการเพื่อนใจ - นหาเพื่อนใหม่",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 1 วิดีโอใหม่, สำเร็จ 0, ข้อผิดพลาด 1"
+  },
+  {
+    "schedule_id": "5859c53d",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-04-07T08:22:58.173075",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 1,
+    "processed": 0,
+    "errors": 1,
+    "details": [
+      {
+        "video_id": "Fw-7pOKfVkQ",
+        "title": "รายการเพื่อนใจ - นหาเพื่อนใหม่",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 1 วิดีโอใหม่, สำเร็จ 0, ข้อผิดพลาด 1"
+  },
+  {
+    "schedule_id": "897e985e",
+    "playlist_name": "อัศจรรย์",
+    "timestamp": "2026-04-07T08:41:28.389027",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 0,
+    "processed": 0,
+    "errors": 0,
+    "details": [],
+    "message": "ไม่มีวิดีโอใหม่ (พบ 1 วิดีโอ, ประมวลผลแล้วทั้งหมด)"
+  },
+  {
+    "schedule_id": "897e985e",
+    "playlist_name": "อัศจรรย์",
+    "timestamp": "2026-04-07T08:41:28.389027",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 0,
+    "processed": 0,
+    "errors": 0,
+    "details": [],
+    "message": "ไม่มีวิดีโอใหม่ (พบ 1 วิดีโอ, ประมวลผลแล้วทั้งหมด)"
+  },
+  {
+    "schedule_id": "897e985e",
+    "playlist_name": "อัศจรรย์",
+    "timestamp": "2026-04-07T08:41:30.970822",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 0,
+    "processed": 0,
+    "errors": 0,
+    "details": [],
+    "message": "ไม่มีวิดีโอใหม่ (พบ 1 วิดีโอ, ประมวลผลแล้วทั้งหมด)"
+  },
+  {
+    "schedule_id": "897e985e",
+    "playlist_name": "อัศจรรย์",
+    "timestamp": "2026-04-07T08:41:30.970822",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 0,
+    "processed": 0,
+    "errors": 0,
+    "details": [],
+    "message": "ไม่มีวิดีโอใหม่ (พบ 1 วิดีโอ, ประมวลผลแล้วทั้งหมด)"
+  },
+  {
+    "schedule_id": "3702547d",
+    "playlist_name": "เพลงแห่งความหวังและกำลังใจ",
+    "timestamp": "2026-04-07T08:41:23.453764",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 1,
+    "processed": 0,
+    "errors": 1,
+    "details": [
+      {
+        "video_id": "w2uMWiCestU",
+        "title": "เพลง พระเยซูทรงเป็นขึ้นแล้ว (ที่ไม่มีวันเก่าเลย)เริ่มสว่าง",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 1 วิดีโอใหม่, สำเร็จ 0, ข้อผิดพลาด 1"
+  },
+  {
+    "schedule_id": "6fb70080",
+    "playlist_name": "โลกใบใหญ่ - ดีเจ Arex วีรวัฒน์",
+    "timestamp": "2026-04-07T08:45:56.098053",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 0,
+    "processed": 0,
+    "errors": 0,
+    "details": [],
+    "message": "ไม่มีวิดีโอใหม่ (พบ 1 วิดีโอ, ประมวลผลแล้วทั้งหมด)"
+  },
+  {
+    "schedule_id": "6fb70080",
+    "playlist_name": "โลกใบใหญ่ - ดีเจ Arex วีรวัฒน์",
+    "timestamp": "2026-04-07T08:45:56.098053",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 0,
+    "processed": 0,
+    "errors": 0,
+    "details": [],
+    "message": "ไม่มีวิดีโอใหม่ (พบ 1 วิดีโอ, ประมวลผลแล้วทั้งหมด)"
+  },
+  {
+    "schedule_id": "53b3f6f7",
+    "playlist_name": "คู่คิด",
+    "timestamp": "2026-04-07T08:47:49.425777",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 1,
+    "processed": 0,
+    "errors": 1,
+    "details": [
+      {
+        "video_id": "bh7XFhqd5tM",
+        "title": "“มันก็จะมีปัญหาเข้ามาในทุกช่วงเวลา“ | ฮิม - แอม  | คู่คิด Ep.8 | FEBC Christian Media",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 1 วิดีโอใหม่, สำเร็จ 0, ข้อผิดพลาด 1"
+  },
+  {
+    "schedule_id": "53b3f6f7",
+    "playlist_name": "คู่คิด",
+    "timestamp": "2026-04-07T08:57:41.621794",
+    "status": "success",
+    "videos_found": 1,
+    "new_videos": 1,
+    "processed": 0,
+    "errors": 1,
+    "details": [
+      {
+        "video_id": "bh7XFhqd5tM",
+        "title": "“มันก็จะมีปัญหาเข้ามาในทุกช่วงเวลา“ | ฮิม - แอม  | คู่คิด Ep.8 | FEBC Christian Media",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 1 วิดีโอใหม่, สำเร็จ 0, ข้อผิดพลาด 1"
+  },
+  {
+    "schedule_id": "017e7822",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-04-07T11:01:29.806857",
+    "status": "success",
+    "videos_found": 30,
+    "new_videos": 14,
+    "processed": 11,
+    "errors": 3,
+    "details": [
+      {
+        "video_id": "w2uMWiCestU",
+        "title": "เพลง พระเยซูทรงเป็นขึ้นแล้ว (ที่ไม่มีวันเก่าเลย)เริ่มสว่าง",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "CtOaT3LvmSo",
+        "title": "ชีวิตเกือบพังแต่กลับมาได้เพราะเพลง | บิว วรวรรณ | Holy Drive | Ep.1",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "56BuTIB3p10",
+        "title": "ขอเชิญร่วม Live สด “รู้จักคิด รู้จักคริสต์”",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ 56BuTIB3p10"
+      },
+      {
+        "video_id": "bh7XFhqd5tM",
+        "title": "“มันก็จะมีปัญหาเข้ามาในทุกช่วงเวลา“ | ฮิม - แอม  | คู่คิด Ep.8 | FEBC Christian Media",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "y5jCISGqh0I",
+        "title": "เหนื่อยได้ แต่ไม่ต้องเดินลำพัง | More than this",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "goaMxKmT5Ss",
+        "title": "สุขภาพดีเพื่อทำตามพระประสงค์”",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "R_SP2MI3Tjs",
+        "title": "อธิษฐานเชียร์ให้ชนะ I ขอได้นะ | ยายมะลิ 👵🏼",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "-D6ARSxxz48",
+        "title": "เรื่องราวความหวังและให้กำลังใจ | EP.17 พลังของคำพูด 🗣️",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "ApLarc4yAfk",
+        "title": "ความรู้สึกในวันแรก | คุณเอ็ม (คนตัวลาย)",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "MvBUdkaudmw",
+        "title": "รายการผู้ญิ้งผู้หญิง - เปลี่ยนตัวเองเป็นคนใหม่3",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "pBKLk6mF1ck",
+        "title": "สามีต้องรักภรรยาให้มาก | ชีวิตนี้ยังมีคำตอบ EP.51 | ดีเจ ตึ๋ง สุรมิตร",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ pBKLk6mF1ck"
+      },
+      {
+        "video_id": "Fw-7pOKfVkQ",
+        "title": "รายการเพื่อนใจ - นหาเพื่อนใหม่",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "low6X5FCOEo",
+        "title": "บ่ต้องถอดใจหนี - ประชุมพร กิ่งพันธุ์งาม 【Official MV】",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "AC5iMOf6Sw0",
+        "title": "ป้าหลานคุยกัน สารพันสารเพ EP.1 ช่วยด้วยน้ำกัดเท้า",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ AC5iMOf6Sw0"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 14 วิดีโอใหม่, สำเร็จ 11, ข้อผิดพลาด 3"
+  },
+  {
+    "schedule_id": "017e7822",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-04-11T01:00:00.001814",
+    "status": "success",
+    "videos_found": 30,
+    "new_videos": 14,
+    "processed": 11,
+    "errors": 3,
+    "details": [
+      {
+        "video_id": "w2uMWiCestU",
+        "title": "เพลง พระเยซูทรงเป็นขึ้นแล้ว (ที่ไม่มีวันเก่าเลย)เริ่มสว่าง",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "CtOaT3LvmSo",
+        "title": "ชีวิตเกือบพังแต่กลับมาได้เพราะเพลง | บิว วรวรรณ | Holy Drive | Ep.1",
+        "status": "success",
+        "quiz_status": "success (10 questions)"
+      },
+      {
+        "video_id": "56BuTIB3p10",
+        "title": "ขอเชิญร่วม Live สด “รู้จักคิด รู้จักคริสต์”",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ 56BuTIB3p10"
+      },
+      {
+        "video_id": "OIOFldhKLR8",
+        "title": "“รัก…ต้องมี การเปลี่ยนแปลง“ | บลู - ตี๋ | คู่คิด Ep.8  | FEBC Christian Media",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "y5jCISGqh0I",
+        "title": "เหนื่อยได้ แต่ไม่ต้องเดินลำพัง | More than this",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "goaMxKmT5Ss",
+        "title": "สุขภาพดีเพื่อทำตามพระประสงค์”",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "R_SP2MI3Tjs",
+        "title": "อธิษฐานเชียร์ให้ชนะ I ขอได้นะ | ยายมะลิ 👵🏼",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "-D6ARSxxz48",
+        "title": "เรื่องราวความหวังและให้กำลังใจ | EP.17 พลังของคำพูด 🗣️",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "ApLarc4yAfk",
+        "title": "ความรู้สึกในวันแรก | คุณเอ็ม (คนตัวลาย)",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "MvBUdkaudmw",
+        "title": "รายการผู้ญิ้งผู้หญิง - เปลี่ยนตัวเองเป็นคนใหม่3",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "pBKLk6mF1ck",
+        "title": "สามีต้องรักภรรยาให้มาก | ชีวิตนี้ยังมีคำตอบ EP.51 | ดีเจ ตึ๋ง สุรมิตร",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ pBKLk6mF1ck"
+      },
+      {
+        "video_id": "Fw-7pOKfVkQ",
+        "title": "รายการเพื่อนใจ - นหาเพื่อนใหม่",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "low6X5FCOEo",
+        "title": "บ่ต้องถอดใจหนี - ประชุมพร กิ่งพันธุ์งาม 【Official MV】",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "AC5iMOf6Sw0",
+        "title": "ป้าหลานคุยกัน สารพันสารเพ EP.1 ช่วยด้วยน้ำกัดเท้า",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ AC5iMOf6Sw0"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 14 วิดีโอใหม่, สำเร็จ 11, ข้อผิดพลาด 3"
+  },
+  {
+    "schedule_id": "017e7822",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-04-18T01:00:00.011730",
+    "status": "success",
+    "videos_found": 30,
+    "new_videos": 11,
+    "processed": 0,
+    "errors": 11,
+    "details": [
+      {
+        "video_id": "CtOaT3LvmSo",
+        "title": "ชีวิตเกือบพังแต่กลับมาได้เพราะเพลง | บิว วรวรรณ | Holy Drive | Ep.1",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      },
+      {
+        "video_id": "56BuTIB3p10",
+        "title": "ขอเชิญร่วม Live สด “รู้จักคิด รู้จักคริสต์”",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ 56BuTIB3p10"
+      },
+      {
+        "video_id": "fUpMig84H44",
+        "title": "[Private video]",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ fUpMig84H44"
+      },
+      {
+        "video_id": "y5jCISGqh0I",
+        "title": "เหนื่อยได้ แต่ไม่ต้องเดินลำพัง | More than this",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      },
+      {
+        "video_id": "goaMxKmT5Ss",
+        "title": "สุขภาพดีเพื่อทำตามพระประสงค์”",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      },
+      {
+        "video_id": "R_SP2MI3Tjs",
+        "title": "อธิษฐานเชียร์ให้ชนะ I ขอได้นะ | ยายมะลิ 👵🏼",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      },
+      {
+        "video_id": "-D6ARSxxz48",
+        "title": "เรื่องราวความหวังและให้กำลังใจ | EP.17 พลังของคำพูด 🗣️",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      },
+      {
+        "video_id": "ApLarc4yAfk",
+        "title": "ความรู้สึกในวันแรก | คุณเอ็ม (คนตัวลาย)",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      },
+      {
+        "video_id": "pBKLk6mF1ck",
+        "title": "สามีต้องรักภรรยาให้มาก | ชีวิตนี้ยังมีคำตอบ EP.51 | ดีเจ ตึ๋ง สุรมิตร",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ pBKLk6mF1ck"
+      },
+      {
+        "video_id": "low6X5FCOEo",
+        "title": "บ่ต้องถอดใจหนี - ประชุมพร กิ่งพันธุ์งาม 【Official MV】",
+        "status": "error",
+        "quiz_status": "error: OpenClaw ไม่สามารถสร้าง Quiz ได้ อาจเพราะวิดีโอไม่มีเนื้อหาพอ หรือเซิร์ฟเวอร์ตอบกลับไม่ถูก"
+      },
+      {
+        "video_id": "AC5iMOf6Sw0",
+        "title": "ป้าหลานคุยกัน สารพันสารเพ EP.1 ช่วยด้วยน้ำกัดเท้า",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ AC5iMOf6Sw0"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 11 วิดีโอใหม่, สำเร็จ 0, ข้อผิดพลาด 11"
+  },
+  {
+    "schedule_id": "017e7822",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-04-21T09:31:45.752880",
+    "status": "success",
+    "videos_found": 30,
+    "new_videos": 12,
+    "processed": 9,
+    "errors": 3,
+    "details": [
+      {
+        "video_id": "BgDkrj-RD_o",
+        "title": "ฉันได้วางใจในพระเจ้า",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "CtOaT3LvmSo",
+        "title": "ชีวิตเกือบพังแต่กลับมาได้เพราะเพลง | บิว วรวรรณ | Holy Drive | Ep.1",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "56BuTIB3p10",
+        "title": "ขอเชิญร่วม Live สด “รู้จักคิด รู้จักคริสต์”",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ 56BuTIB3p10"
+      },
+      {
+        "video_id": "fUpMig84H44",
+        "title": "ชีวิตหลังแต่งงาน…บันเทิงมั้ย? | ต๊ะ - เกรซ | คู่คิด Ep.10 | FEBC Christian Media",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "y5jCISGqh0I",
+        "title": "เหนื่อยได้ แต่ไม่ต้องเดินลำพัง | More than this",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "goaMxKmT5Ss",
+        "title": "สุขภาพดีเพื่อทำตามพระประสงค์”",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "R_SP2MI3Tjs",
+        "title": "อธิษฐานเชียร์ให้ชนะ I ขอได้นะ | ยายมะลิ 👵🏼",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "-D6ARSxxz48",
+        "title": "เรื่องราวความหวังและให้กำลังใจ | EP.17 พลังของคำพูด 🗣️",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "ApLarc4yAfk",
+        "title": "ความรู้สึกในวันแรก | คุณเอ็ม (คนตัวลาย)",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "pBKLk6mF1ck",
+        "title": "สามีต้องรักภรรยาให้มาก | ชีวิตนี้ยังมีคำตอบ EP.51 | ดีเจ ตึ๋ง สุรมิตร",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ pBKLk6mF1ck"
+      },
+      {
+        "video_id": "low6X5FCOEo",
+        "title": "บ่ต้องถอดใจหนี - ประชุมพร กิ่งพันธุ์งาม 【Official MV】",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "AC5iMOf6Sw0",
+        "title": "ป้าหลานคุยกัน สารพันสารเพ EP.1 ช่วยด้วยน้ำกัดเท้า",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ AC5iMOf6Sw0"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 12 วิดีโอใหม่, สำเร็จ 9, ข้อผิดพลาด 3"
+  },
+  {
+    "schedule_id": "017e7822",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-04-25T01:00:00.001523",
+    "status": "success",
+    "videos_found": 30,
+    "new_videos": 12,
+    "processed": 9,
+    "errors": 3,
+    "details": [
+      {
+        "video_id": "BgDkrj-RD_o",
+        "title": "ฉันได้วางใจในพระเจ้า",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "CtOaT3LvmSo",
+        "title": "ชีวิตเกือบพังแต่กลับมาได้เพราะเพลง | บิว วรวรรณ | Holy Drive | Ep.1",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "56BuTIB3p10",
+        "title": "ขอเชิญร่วม Live สด “รู้จักคิด รู้จักคริสต์”",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ 56BuTIB3p10"
+      },
+      {
+        "video_id": "fUpMig84H44",
+        "title": "ชีวิตหลังแต่งงาน…บันเทิงมั้ย? | ต๊ะ - เกรซ | คู่คิด Ep.10 | FEBC Christian Media",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "y5jCISGqh0I",
+        "title": "เหนื่อยได้ แต่ไม่ต้องเดินลำพัง | More than this",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "goaMxKmT5Ss",
+        "title": "สุขภาพดีเพื่อทำตามพระประสงค์”",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "R_SP2MI3Tjs",
+        "title": "อธิษฐานเชียร์ให้ชนะ I ขอได้นะ | ยายมะลิ 👵🏼",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "-D6ARSxxz48",
+        "title": "เรื่องราวความหวังและให้กำลังใจ | EP.17 พลังของคำพูด 🗣️",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "ApLarc4yAfk",
+        "title": "ความรู้สึกในวันแรก | คุณเอ็ม (คนตัวลาย)",
+        "status": "success",
+        "quiz_status": "success (7 questions)"
+      },
+      {
+        "video_id": "pBKLk6mF1ck",
+        "title": "สามีต้องรักภรรยาให้มาก | ชีวิตนี้ยังมีคำตอบ EP.51 | ดีเจ ตึ๋ง สุรมิตร",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ pBKLk6mF1ck"
+      },
+      {
+        "video_id": "low6X5FCOEo",
+        "title": "บ่ต้องถอดใจหนี - ประชุมพร กิ่งพันธุ์งาม 【Official MV】",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "AC5iMOf6Sw0",
+        "title": "ป้าหลานคุยกัน สารพันสารเพ EP.1 ช่วยด้วยน้ำกัดเท้า",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ AC5iMOf6Sw0"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 12 วิดีโอใหม่, สำเร็จ 9, ข้อผิดพลาด 3"
+  },
+  {
+    "schedule_id": "017e7822",
+    "playlist_name": "วิดีโอทั้ง Channel - FEBC Christian Media",
+    "timestamp": "2026-05-02T01:00:00.002198",
+    "status": "success",
+    "videos_found": 29,
+    "new_videos": 14,
+    "processed": 10,
+    "errors": 4,
+    "details": [
+      {
+        "video_id": "C3s90pXYpas",
+        "title": "🎶 ขอเชิญฟังเพลง “ฉันคิดถึงคุณ อยากจะบอกถึงความในใจ”",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "IMJ8Xx6yzzA",
+        "title": "HOLY Drive EP.2 ลิซซี่ โอกาฟอร์",
+        "status": "success",
+        "quiz_status": "success (10 questions)"
+      },
+      {
+        "video_id": "56BuTIB3p10",
+        "title": "ขอเชิญร่วม Live สด “รู้จักคิด รู้จักคริสต์”",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ 56BuTIB3p10"
+      },
+      {
+        "video_id": "fbJUKMSR_FI",
+        "title": "ต่างกันสุดขั้ว แต่หาจุดสมดุลได้ | แป้ง - เอเจ  | คู่คิด Ep.11 | FEBC Christian Media",
+        "status": "success",
+        "quiz_status": "success (10 questions)"
+      },
+      {
+        "video_id": "y5jCISGqh0I",
+        "title": "เหนื่อยได้ แต่ไม่ต้องเดินลำพัง | More than this",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "goaMxKmT5Ss",
+        "title": "สุขภาพดีเพื่อทำตามพระประสงค์”",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "R_SP2MI3Tjs",
+        "title": "อธิษฐานเชียร์ให้ชนะ I ขอได้นะ | ยายมะลิ 👵🏼",
+        "status": "success",
+        "quiz_status": "success (10 questions)"
+      },
+      {
+        "video_id": "-D6ARSxxz48",
+        "title": "เรื่องราวความหวังและให้กำลังใจ | EP.17 พลังของคำพูด 🗣️",
+        "status": "success",
+        "quiz_status": "success (8 questions)"
+      },
+      {
+        "video_id": "PQ12sw4PxcQ",
+        "title": "พระเจ้าให้เจอแต่ความทุกข์ ทั้งที่ไม่ได้ขอมาเกิด ? | คิดยังไง 🤔 | FEBC Christian Media",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "ApLarc4yAfk",
+        "title": "ความรู้สึกในวันแรก | คุณเอ็ม (คนตัวลาย)",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "pBKLk6mF1ck",
+        "title": "สามีต้องรักภรรยาให้มาก | ชีวิตนี้ยังมีคำตอบ EP.51 | ดีเจ ตึ๋ง สุรมิตร",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ pBKLk6mF1ck"
+      },
+      {
+        "video_id": "vuJkn0fqBEw",
+        "title": "[Private video]",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ vuJkn0fqBEw"
+      },
+      {
+        "video_id": "low6X5FCOEo",
+        "title": "บ่ต้องถอดใจหนี - ประชุมพร กิ่งพันธุ์งาม 【Official MV】",
+        "status": "success",
+        "quiz_status": "success (9 questions)"
+      },
+      {
+        "video_id": "AC5iMOf6Sw0",
+        "title": "ป้าหลานคุยกัน สารพันสารเพ EP.1 ช่วยด้วยน้ำกัดเท้า",
+        "status": "error",
+        "quiz_status": "error: ไม่พบ transcript สำหรับวิดีโอ AC5iMOf6Sw0"
+      }
+    ],
+    "message": "เสร็จสิ้น: พบ 14 วิดีโอใหม่, สำเร็จ 10, ข้อผิดพลาด 4"
+  }
+]

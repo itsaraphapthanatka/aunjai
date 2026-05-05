@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException, Header, Depends, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from typing import Dict, Any
@@ -27,6 +28,20 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# CORS Configuration
+origins = [
+    "https://openclaw.appreview.cloud",
+    "https://nongaunjai.febradio.org",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Initialize MAAC Middleware
 maac = MAACMiddleware()
 
@@ -38,6 +53,31 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Import and include the video editor router
 from video_router import router as video_router
 app.include_router(video_router)
+
+# Import and include the pinecone router
+from pinecone_router import router as pinecone_router
+app.include_router(pinecone_router)
+
+# Import Scheduler Service
+from scheduler_service import scheduler_service
+
+@app.on_event("startup")
+async def startup_event():
+    """Start the playlist scheduler on app startup"""
+    try:
+        scheduler_service.start()
+        logger.info("✅ Scheduler Service started successfully")
+    except Exception as e:
+        logger.error(f"❌ Failed to start Scheduler Service: {e}")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Graceful shutdown of the scheduler"""
+    try:
+        scheduler_service.shutdown()
+        logger.info("✅ Scheduler Service stopped")
+    except Exception as e:
+        logger.error(f"❌ Error shutting down Scheduler Service: {e}")
 
 # ─────────────────────────────────────────────────────────────────────────
 # Security Dependency: HMAC Verification
