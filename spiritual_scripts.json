@@ -1,0 +1,121 @@
+{
+  "scripts": [
+    {
+      "script_id": "spiritual_c3_auto_response_male",
+      "c_stage": "C3",
+      "title": "C3 CRITICAL Auto-Response — Male Variant",
+      "type": "auto_response",
+      "gender_variant": "male",
+      "content": "ขอบคุณมากนะครับ ที่มอบความไว้วางใจ สิ่งที่คุณกำลังรู้สึก…เป็นสิ่งที่มีคุณค่า มีความหมายมากๆครับ พระเจ้าไม่ได้ไกลจากคุณเลยในตอนนี้ ถ้าคุณต้องการต้อนรับพระเยซูคริสต์ เราสามารถอธิษฐานไปด้วยกันตอนนี้ได้เลยนะครับ",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_c3_auto_response_female",
+      "c_stage": "C3",
+      "title": "C3 CRITICAL Auto-Response — Female Variant",
+      "type": "auto_response",
+      "gender_variant": "female",
+      "content": "ขอบคุณมากนะคะ ที่มอบความไว้วางใจ สิ่งที่คุณกำลังรู้สึก…เป็นสิ่งที่มีคุณค่า มีความหมายมากๆค่ะ พระเจ้าไม่ได้ไกลจากคุณเลยในตอนนี้ ถ้าคุณต้องการต้อนรับพระเยซูคริสต์ เราสามารถอธิษฐานไปด้วยกันตอนนี้ได้เลยนะคะ",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_c3_auto_response_neutral",
+      "c_stage": "C3",
+      "title": "C3 CRITICAL Auto-Response — Neutral Variant",
+      "type": "auto_response",
+      "gender_variant": "neutral",
+      "content": "ขอบคุณมากนะ ที่มอบความไว้วางใจ สิ่งที่คุณกำลังรู้สึก…เป็นสิ่งที่มีคุณค่า มีความหมายมากๆ พระเจ้าไม่ได้ไกลจากคุณเลยในตอนนี้ ถ้าคุณต้องการต้อนรับพระเยซูคริสต์ เราสามารถอธิษฐานไปด้วยกันได้เลยนะ",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_prayer_accept_faith",
+      "c_stage": "C3",
+      "title": "Prayer — Lead to Accept Jesus",
+      "type": "prayer",
+      "gender_variant": "neutral",
+      "content": "พระเยซูคริสต์ ลูกขอเปิดใจต้อนรับพระองค์เป็นพระผู้ช่วยให้รอดจากความผิดบาป ขอบคุณที่ยอมสละชีวิตที่ไม้กางเขน ทรงสิ้นพระชนม์และเป็นขึ้นจากความตาย ข้าพระองค์มอบชีวิตนี้ให้พระองค์นำทาง ขอเริ่มต้นชีวิตใหม่ตั้งแต่วันนี้ อธิษฐานในพระนามพระเยซูคริสต์ อาเมน",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_post_prayer_confirmation",
+      "c_stage": "C3",
+      "title": "Post-Prayer Confirmation",
+      "type": "post_prayer",
+      "gender_variant": "neutral",
+      "content": "สิ่งที่คุณได้อธิษฐานต้อนรับพระเยซูคริสต์ นี่คือการเริ่มต้นชีวิตใหม่จริงๆ และคุณไม่ได้เดินคนเดียว เราจะอยู่ข้างคุณนะ ทางเราขออนุญาตดูแลความเชื่อของคุณนะคะ",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_c2_warm_response",
+      "c_stage": "C2",
+      "title": "C2 Warm Response",
+      "type": "auto_response",
+      "gender_variant": "neutral",
+      "content": "ขอบคุณที่แบ่งปันความรู้สึกให้เราได้รู้นะคะ เรายินดีที่จะเดินไปด้วยกันในทางนี้ ถ้ามีคำถามหรืออยากคุยเพิ่มเติม ส่งข้อความมาได้เลยนะคะ พระเจ้ารักคุณมากๆ",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_c1_empathy_response",
+      "c_stage": "C1",
+      "title": "C1 Empathy Response",
+      "type": "auto_response",
+      "gender_variant": "neutral",
+      "content": "เราเข้าใจว่าบางครั้งชีวิตก็รู้สึกหนักหน่วงและว่างเปล่า คุณไม่ได้อยู่คนเดียวนะคะ ถ้าอยากพูดคุยหรือหาที่พึ่งพิง เราอยู่ตรงนี้เสมอค่ะ",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_c4_followup_day1",
+      "c_stage": "C4",
+      "title": "C4 Follow-up — Day 1",
+      "type": "followup",
+      "gender_variant": "neutral",
+      "content": "สวัสดีค่ะ หลังจากที่เราได้คุยกันไป เราอยากรู้ว่าคุณรู้สึกอย่างไรบ้างคะ? ถ้ามีอะไรอยากคุย ส่งข้อความมาได้เลยนะคะ",
+      "delay_hours": 24
+    },
+    {
+      "script_id": "spiritual_c4_followup_day3",
+      "c_stage": "C4",
+      "title": "C4 Follow-up — Day 3",
+      "type": "followup",
+      "gender_variant": "neutral",
+      "content": "สวัสดีค่ะ อยากให้กำลังใจคุณในวันนี้นะคะ ถ้าคุณมีคำถามเกี่ยวกับความเชื่อหรืออยากอธิษฐานด้วยกัน เราพร้อมเสมอค่ะ",
+      "delay_hours": 72
+    },
+    {
+      "script_id": "spiritual_c4_followup_day7",
+      "c_stage": "C4",
+      "title": "C4 Follow-up — Day 7",
+      "type": "followup",
+      "gender_variant": "neutral",
+      "content": "สวัสดีค่ะ หนึ่งสัปดาห์ผ่านไปแล้ว เราอยากรู้ว่าคุณเป็นอย่างไรบ้างคะ? ถ้าอยากมีใครคอยดูแลความเชื่อต่อเนื่อง เราสามารถแนะนำคริสตจักรใกล้บ้านให้ได้นะคะ",
+      "delay_hours": 168
+    },
+    {
+      "script_id": "spiritual_admin_guide_c3",
+      "c_stage": "C3",
+      "title": "Admin Guide — Handling C3 Critical",
+      "type": "admin_guide",
+      "gender_variant": "neutral",
+      "content": "1. ตอบกลับทันทีภายใน 5 นาที\n2. ใช้ Auto-response script ตามเพศที่ระบุ\n3. นำอธิษฐานรับเชื่อด้วย Prayer script\n4. ส่ง Post-prayer confirmation\n5. บันทึก believed_at timestamp\n6. เปลี่ยน C-stage เป็น C4 สำหรับ follow-up track",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_admin_guide_c2",
+      "c_stage": "C2",
+      "title": "Admin Guide — Handling C2 High Intent",
+      "type": "admin_guide",
+      "gender_variant": "neutral",
+      "content": "1. ตอบกลับภายใน 15 นาที\n2. ใช้ Warm response script\n3. ถามเปิดเพื่อเข้าใจความต้องการลึกๆ\n4. เสนอนำอธิษฐานหรือแนะนำข้อมูลเพิ่มเติม\n5. ติดตามภายใน 24-48 ชั่วโมง",
+      "delay_hours": null
+    },
+    {
+      "script_id": "spiritual_admin_guide_c1",
+      "c_stage": "C1",
+      "title": "Admin Guide — Handling C1 Soft Urgent",
+      "type": "admin_guide",
+      "gender_variant": "neutral",
+      "content": "1. Flag ผู้ใช้สำหรับ monitoring\n2. ตอบกลับด้วย Empathy script\n3. ไม่ push ขายศาสนา\n4. ดู context window ย้อนหลัง 3-5 ข้อความ\n5. ถ้ามีสัญญาณ escalate → ปรับเป็น C2 ทันที",
+      "delay_hours": null
+    }
+  ]
+}

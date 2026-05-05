@@ -59,6 +59,13 @@ YOUTUBE_COOKIES_FILE: str = os.getenv("YOUTUBE_COOKIES_FILE", "cookies.txt")
 GOOGLE_DRIVE_CREDENTIALS_FILE: str = os.getenv("GOOGLE_DRIVE_CREDENTIALS_FILE", "gdrive_credentials.json")
 GOOGLE_DRIVE_FOLDER_ID: str = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "16xSVMLqNbo-aVqzGQ0SkiIx4OBaqr-xy")
 
+# ──────────────────────────────────────────────
+# Spiritual SOS Configuration
+# ──────────────────────────────────────────────
+LINE_ADMIN_GROUP_ID: str = os.getenv("LINE_ADMIN_GROUP_ID", "")
+SPIRITUAL_SOS_ENABLED: str = os.getenv("SPIRITUAL_SOS_ENABLED", "true")
+SPIRITUAL_C3_SLA_MINUTES: str = os.getenv("SPIRITUAL_C3_SLA_MINUTES", "5")
+
 
 def get_yt_proxy_config():
     """

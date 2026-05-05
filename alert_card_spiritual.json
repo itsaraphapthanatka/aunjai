@@ -1,0 +1,235 @@
+{
+  "type": "flex",
+  "altText": "🙏 Spiritual SOS Alert",
+  "contents": {
+    "type": "bubble",
+    "size": "mega",
+    "header": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "🙏",
+              "size": "xl",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": "SPIRITUAL SOS",
+              "weight": "bold",
+              "size": "lg",
+              "color": "#FFFFFF",
+              "margin": "md"
+            },
+            {
+              "type": "text",
+              "text": "{C_STAGE} {LEVEL}",
+              "weight": "bold",
+              "size": "sm",
+              "color": "#FFFFFF",
+              "align": "end",
+              "flex": 1
+            }
+          ],
+          "alignItems": "center"
+        }
+      ],
+      "backgroundColor": "{HEADER_COLOR}",
+      "paddingTop": "lg",
+      "paddingBottom": "lg",
+      "paddingStart": "xl",
+      "paddingEnd": "xl"
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "ชื่อ:",
+              "size": "sm",
+              "color": "#666666",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": " {name}",
+              "size": "sm",
+              "weight": "bold",
+              "flex": 1
+            }
+          ],
+          "margin": "md"
+        },
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "เวลา:",
+              "size": "sm",
+              "color": "#666666",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": " {time}",
+              "size": "sm",
+              "flex": 1
+            }
+          ],
+          "margin": "sm"
+        },
+        {
+          "type": "separator",
+          "margin": "md"
+        },
+        {
+          "type": "text",
+          "text": "\"{trigger_message}\"",
+          "wrap": true,
+          "size": "sm",
+          "color": "#333333",
+          "margin": "md",
+          "style": "italic"
+        },
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "👉 Script:",
+              "size": "sm",
+              "color": "#666666",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": "{spiritual_script_content_or_link}",
+              "size": "sm",
+              "color": "#1DB446",
+              "action": {
+                "type": "uri",
+                "label": "View Script",
+                "uri": "{spiritual_script_link}"
+              },
+              "flex": 1,
+              "wrap": true
+            }
+          ],
+          "margin": "md"
+        },
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "C-Stage:",
+              "size": "xs",
+              "color": "#999999",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": " {C_STAGE_LABEL}",
+              "size": "xs",
+              "color": "#999999",
+              "flex": 1
+            }
+          ],
+          "margin": "sm"
+        }
+      ],
+      "paddingAll": "xl"
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "button",
+          "action": {
+            "type": "postback",
+            "label": "รับเคสนี้",
+            "data": "action=claim_case&case_id={case_id}&type=spiritual"
+          },
+          "style": "primary",
+          "color": "#1DB446",
+          "height": "sm"
+        },
+        {
+          "type": "text",
+          "text": "⏰ ต้องตอบภายใน {RESPONSE_TIME} นาที",
+          "size": "xs",
+          "color": "#999999",
+          "align": "center",
+          "margin": "sm"
+        }
+      ],
+      "paddingAll": "xl"
+    },
+    "styles": {
+      "header": {
+        "backgroundColor": "{HEADER_COLOR}"
+      }
+    }
+  },
+  "variables": {
+    "C_STAGE": {
+      "description": "C-Stage: C1 | C2 | C3 | C4",
+      "required": true
+    },
+    "LEVEL": {
+      "description": "Urgency level mapped from C-Stage: C3=CRITICAL, C2=HIGH, C1=SOFT, C4=Follow-up",
+      "required": true
+    },
+    "HEADER_COLOR": {
+      "description": "Dynamic header color based on level: CRITICAL=#FF4444 (red), HIGH=#FFCC00 (yellow), SOFT=#FF8800 (orange), Follow-up=#00AA00 (green)",
+      "required": true
+    },
+    "name": {
+      "description": "User display name",
+      "required": true
+    },
+    "time": {
+      "description": "Alert timestamp (TH locale)",
+      "required": true
+    },
+    "trigger_message": {
+      "description": "The message that triggered the SOS",
+      "required": true
+    },
+    "spiritual_script_content_or_link": {
+      "description": "Script content preview or deep link to full spiritual script",
+      "required": true
+    },
+    "spiritual_script_link": {
+      "description": "Deep link to spiritual script (for URI action)",
+      "required": true
+    },
+    "C_STAGE_LABEL": {
+      "description": "Human-readable C-Stage label: C1=Engage/Soft, C2=Connect, C3=Transform, C4=Send",
+      "required": true
+    },
+    "case_id": {
+      "description": "Unique case identifier for claim action",
+      "required": true
+    },
+    "RESPONSE_TIME": {
+      "description": "Expected response time in minutes: C3=5, C2=15, C1=30, C4=60",
+      "required": true
+    }
+  }
+}

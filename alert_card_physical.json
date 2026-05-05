@@ -1,0 +1,190 @@
+{
+  "type": "flex",
+  "altText": "🆘 Physical SOS Alert",
+  "contents": {
+    "type": "bubble",
+    "size": "mega",
+    "header": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "🆘",
+              "size": "xl",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": "PHYSICAL SOS",
+              "weight": "bold",
+              "size": "lg",
+              "color": "#FFFFFF",
+              "margin": "md"
+            },
+            {
+              "type": "text",
+              "text": "{LEVEL}",
+              "weight": "bold",
+              "size": "sm",
+              "color": "#FFFFFF",
+              "align": "end",
+              "flex": 1
+            }
+          ],
+          "alignItems": "center"
+        }
+      ],
+      "backgroundColor": "{HEADER_COLOR}",
+      "paddingTop": "lg",
+      "paddingBottom": "lg",
+      "paddingStart": "xl",
+      "paddingEnd": "xl"
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "ชื่อ:",
+              "size": "sm",
+              "color": "#666666",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": " {name}",
+              "size": "sm",
+              "weight": "bold",
+              "flex": 1
+            }
+          ],
+          "margin": "md"
+        },
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "เวลา:",
+              "size": "sm",
+              "color": "#666666",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": " {time}",
+              "size": "sm",
+              "flex": 1
+            }
+          ],
+          "margin": "sm"
+        },
+        {
+          "type": "separator",
+          "margin": "md"
+        },
+        {
+          "type": "text",
+          "text": "\"{trigger_message}\"",
+          "wrap": true,
+          "size": "sm",
+          "color": "#333333",
+          "margin": "md",
+          "style": "italic"
+        },
+        {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": "👉 Script:",
+              "size": "sm",
+              "color": "#666666",
+              "flex": 0
+            },
+            {
+              "type": "text",
+              "text": "{psychology_script_link}",
+              "size": "sm",
+              "color": "#1DB446",
+              "action": {
+                "type": "uri",
+                "label": "View Script",
+                "uri": "{psychology_script_link}"
+              },
+              "flex": 1,
+              "wrap": true
+            }
+          ],
+          "margin": "md"
+        }
+      ],
+      "paddingAll": "xl"
+    },
+    "footer": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "button",
+          "action": {
+            "type": "postback",
+            "label": "รับเคสนี้",
+            "data": "action=claim_case&case_id={case_id}&type=physical"
+          },
+          "style": "primary",
+          "color": "#1DB446",
+          "height": "sm"
+        }
+      ],
+      "paddingAll": "xl"
+    },
+    "styles": {
+      "header": {
+        "backgroundColor": "{HEADER_COLOR}"
+      }
+    }
+  },
+  "variables": {
+    "LEVEL": {
+      "description": "Urgency level: CRITICAL | HIGH | SOFT",
+      "required": true
+    },
+    "HEADER_COLOR": {
+      "description": "Dynamic header color based on level: CRITICAL=#FF4444 (red), HIGH=#FFCC00 (yellow), SOFT=#FF8800 (orange)",
+      "required": true
+    },
+    "name": {
+      "description": "User display name",
+      "required": true
+    },
+    "time": {
+      "description": "Alert timestamp (TH locale)",
+      "required": true
+    },
+    "trigger_message": {
+      "description": "The message that triggered the SOS",
+      "required": true
+    },
+    "psychology_script_link": {
+      "description": "Deep link to psychology crisis script",
+      "required": true
+    },
+    "case_id": {
+      "description": "Unique case identifier for claim action",
+      "required": true
+    }
+  }
+}

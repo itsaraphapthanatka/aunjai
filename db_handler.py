@@ -273,3 +273,71 @@ class DatabaseHandler:
                 # History should be in chronological order
                 results.reverse()
                 return results
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # 6. Spiritual SOS State
+    # ─────────────────────────────────────────────────────────────────────────
+    def get_spiritual_state(self, line_uid: str) -> Dict[str, Any]:
+        """Get spiritual state for a user. Returns None if not found."""
+        sql = """
+        SELECT line_uid, c_stage, believed_at, c4_follow_up_due_at,
+               c4_follow_up_count, context_window, updated_at
+        FROM spiritual_states
+        WHERE line_uid = %s
+        """
+        with self._get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(sql, (line_uid,))
+                row = cur.fetchone()
+                if not row:
+                    return None
+                result = dict(row)
+                import json
+                if result.get('context_window') and isinstance(result['context_window'], str):
+                    try:
+                        result['context_window'] = json.loads(result['context_window'])
+                    except:
+                        result['context_window'] = []
+                return result
+
+    def upsert_spiritual_state(self, line_uid: str, c_stage: str, believed_at=None):
+        """Upsert spiritual state for a user."""
+        import json
+        sql = """
+        INSERT INTO spiritual_states (line_uid, c_stage, believed_at, updated_at)
+        VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+        ON CONFLICT (line_uid) DO UPDATE SET
+            c_stage = EXCLUDED.c_stage,
+            believed_at = COALESCE(EXCLUDED.believed_at, spiritual_states.believed_at),
+            updated_at = CURRENT_TIMESTAMP;
+        """
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (line_uid, c_stage, believed_at))
+
+    def get_context_window(self, line_uid: str, limit: int = 5) -> List[str]:
+        """Get last N messages for context window (for classifier)."""
+        sql = """
+        SELECT content FROM chat_history 
+        WHERE line_uid = %s 
+        ORDER BY created_at DESC LIMIT %s
+        """
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (line_uid, limit))
+                rows = cur.fetchall()
+                # Return in chronological order (oldest first)
+                return [row[0] for row in reversed(rows)]
+
+    def log_sos_case(self, line_uid: str, sos_type: str, level: str, c_stage: str, trigger_message: str, confidence: float):
+        """Log a detected SOS case to sos_cases table."""
+        sql = """
+        INSERT INTO sos_cases (line_uid, type, level, c_stage, trigger_message, confidence, status, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, 'open', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        RETURNING id;
+        """
+        with self._get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(sql, (line_uid, sos_type, level, c_stage, trigger_message, confidence))
+                row = cur.fetchone()
+                return row[0] if row else None
