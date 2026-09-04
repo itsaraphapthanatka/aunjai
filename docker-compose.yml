@@ -1,13 +1,14 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: aunjai-db
+    container_name: aunjai-content-db
+    restart: unless-stopped
     environment:
       POSTGRES_USER: aunjai_user
       POSTGRES_PASSWORD: aunjai_password
       POSTGRES_DB: aunjai_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - aunjai-network
     volumes:
@@ -21,6 +22,9 @@ services:
   app:
     build: .
     container_name: aunjai-app
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8001:8000"
     networks:

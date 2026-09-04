@@ -10,3 +10,8 @@ gdrive_credentials.json
 zzzgdrive_credentials.json
 *credentials*.json
 service_account*.json
+
+# Runtime state — written by the app, must not be tracked (2026-09-04)
+cookies.txt
+schedules.json
+schedule_history.json
