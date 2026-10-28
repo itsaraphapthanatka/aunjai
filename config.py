@@ -40,6 +40,35 @@ OPENCLAW_API_URL: str = os.getenv("OPENCLAW_API_URL", "https://openclaw.apprevie
 OPENCLAW_AGENT_ID: str = os.getenv("OPENCLAW_AGENT_ID", "unjai")
 OPENCLAW_API_KEY: str = os.getenv("OPENCLAW_API_KEY", "")
 
+
+# ──────────────────────────────────────────────
+# Quiz LLM (2026-10-28) — ควิซเต็มคลิปเรียก vLLM ของเราเองตรง ๆ ไม่ผ่าน OpenClaw gateway
+#   เจ้าของตัดสินใจ 28 ต.ค. ให้ย้ายก่อนปิด gateway · ค่าว่างใน .env = ใช้ค่าเริ่มต้น
+#   QUIZ_LLM_BACKEND=openclaw ⇒ กลับไปทางเดิม (สวิตช์ถอยกลับ ใช้ได้ตราบที่ gateway ยังอยู่)
+# ──────────────────────────────────────────────
+def _env(name: str, default: str) -> str:
+    value = os.getenv(name, "")
+    return value.strip() if value and value.strip() else default
+
+
+def _int_env(name: str, default: int, lo: int, hi: int) -> int:
+    try:
+        value = int(_env(name, str(default)))
+    except ValueError:
+        value = default
+    return max(lo, min(hi, value))
+
+
+QUIZ_LLM_BACKEND: str = _env("QUIZ_LLM_BACKEND", "vllm").lower()
+QUIZ_LLM_BASE_URL: str = _env("QUIZ_LLM_BASE_URL", "http://10.10.10.1:8010/v1")
+QUIZ_LLM_MODEL: str = _env("QUIZ_LLM_MODEL", "aunjai-120b")
+QUIZ_LLM_API_KEY: str = os.getenv("QUIZ_LLM_API_KEY", "")
+# "none" = ไม่ส่ง reasoning_effort (ให้ vLLM ใช้ค่าของโมเดลเอง)
+QUIZ_LLM_REASONING_EFFORT: str = _env("QUIZ_LLM_REASONING_EFFORT", "low").lower()
+QUIZ_LLM_MAX_TOKENS: int = _int_env("QUIZ_LLM_MAX_TOKENS", 6000, 1000, 16000)
+# vLLM ตัวเดียวใช้ร่วมกับ prod middleware ⇒ เพดานแข็ง 2 สายพร้อมกัน
+QUIZ_LLM_MAX_CONCURRENCY: int = _int_env("QUIZ_LLM_MAX_CONCURRENCY", 1, 1, 2)
+
 # ──────────────────────────────────────────────
 # LINE Messaging API Configuration
 # ──────────────────────────────────────────────

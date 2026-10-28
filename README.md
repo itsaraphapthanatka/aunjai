@@ -26,7 +26,17 @@ PINECONE_INDEX_NAME=aunjai-knowledge
 OPENCLAW_API_URL=http://your_openclaw_url:port
 OPENCLAW_AGENT_ID=unjai
 OPENCLAW_API_KEY=your_openclaw_key
+
+# === Quiz LLM (ควิซเต็มคลิป) — ไม่ใส่ก็ได้ ค่าเริ่มต้นคือ vLLM ของเรา ===
+# QUIZ_LLM_BACKEND=vllm            # openclaw = กลับไปทางเดิมผ่าน gateway
+# QUIZ_LLM_BASE_URL=http://10.10.10.1:8010/v1
+# QUIZ_LLM_MODEL=aunjai-120b
+# QUIZ_LLM_REASONING_EFFORT=low    # none = ไม่ส่ง reasoning_effort
+# QUIZ_LLM_MAX_TOKENS=6000         # 1000–16000 · งบหมดตอนคิดจะลองใหม่หนึ่งครั้งด้วยงบสองเท่า
+# QUIZ_LLM_MAX_CONCURRENCY=1       # เพดานแข็ง 2 (vLLM ใช้ร่วมกับ prod)
 ```
+
+ทดสอบ (ไม่ต้องลง pytest): `python -m unittest discover -s tests -v`
 
 ### การตั้งค่า FFmpeg
 การตัดวิดีโอต้องพึ่งพาคลิปวิดีโอ (FFmpeg) โปรเจกต์นี้ติดตั้งแพ็กเกจ `imageio-ffmpeg` ไว้แล้ว ซึ่งจะติดตั้ง binary ของ FFmpeg มาให้ในตัว ทำให้ **ไม่จำเป็น** ต้องติดตั้ง FFmpeg ในระดับ OS เอง (แต่ถ้าคุณมีอยู่แล้ว โปรแกรมก็จะใช้ตัวที่มีได้เช่นกัน)
